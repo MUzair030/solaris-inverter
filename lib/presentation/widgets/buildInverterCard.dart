@@ -84,7 +84,7 @@ class _buildInverterCardState extends State<buildInverterCard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Image.asset("assets/inverter1.png",
+                          Image.asset("assets/inverter1.svg",
                               height: 40, width: 40),
                           const SizedBox(width: 12),
                           if (!isExpanded)

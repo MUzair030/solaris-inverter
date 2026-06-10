@@ -123,16 +123,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    Image.asset("assets/app_logo.png", width: 70, height: 70),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Solaris",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                      ),
-                    ),
+                    Image.asset("assets/app_logo.png", width: 80, height: 80),
+                    // const SizedBox(height: 10),
+                    // const Text(
+                    //   "Solaris",
+                    //   style: TextStyle(
+                    //     fontSize: 18,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: AppColors.white,
+                    //   ),
+                    // ),
                     const SizedBox(height: 10),
                     if (authViewModel.loginerrorMessage != null ||
                         authViewModel.loginsuccessMessage != null)

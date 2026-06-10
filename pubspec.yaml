@@ -61,6 +61,7 @@ dev_dependencies:
 
   flutter_lints: ^4.0.0
   flutter_native_splash: ^2.3.2
+  flutter_launcher_icons: ^0.14.4
 
 #flutter:
 #  uses-material-design: true
@@ -73,8 +74,6 @@ flutter_native_splash:
   fullscreen: true
 #  image_scale: 0.7  # Adjust this value (0.5, 0.8, etc.)
 
-  assets:
-    - assets/
   #   - images/a_dot_ham.jpeg
 
   # example:
@@ -104,6 +103,7 @@ flutter:
     - assets/shareapp.png
     - assets/welcomescreen.png
     - assets/notifybig.png
+    - assets/notifybig.svg
     - assets/nextbtn.png
     - assets/address.png
     - assets/imagechange.png
@@ -124,6 +124,7 @@ flutter:
     - assets/profilepic.png
     - assets/profilepic1.png
     - assets/inverter1.png
+    - assets/inverter1.svg
     - assets/devices.png
     - assets/profile.png
     - assets/addbtn.png
@@ -139,4 +140,8 @@ flutter:
     - assets/settings.png
     - assets/splash_bg.png
     - assets/statistics.png
-    - assets/fan.png
+    - assets/fan.png 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/app_logo.png"

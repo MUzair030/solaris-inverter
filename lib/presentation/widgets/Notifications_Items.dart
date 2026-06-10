@@ -30,7 +30,7 @@ class _Notifications_ItemsState extends State<Notifications_Items> {
             Row(
               children: [
                 Image.asset(
-                  "assets/notifybig.png",
+                  "assets/notifybig.svg",
                   height: 55,
                   width: 50,
                 ),
