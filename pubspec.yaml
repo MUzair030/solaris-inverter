@@ -100,42 +100,43 @@ flutter:
   uses-material-design: true
 
   assets:
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\caution.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\shareapp.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\welcomescreen.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\notifybig.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\nextbtn.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\address.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\imagechange.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\country.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\phone.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\city.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\postal.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\help.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\rate.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\terms.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\privacypolicy.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\passwordicon.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\emailicon.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\profileicon.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\logout.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\privacy.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\forwardclick.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\profilepic.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\profilepic1.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\inverter1.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\devices.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\profile.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\addbtn.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\inverter.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\backclick.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\app_logo.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\app_logo1.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\app_logo_large.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\bg.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\home.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\menu.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\notifications.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\settings.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\splash_bg.png
-    - D:\Irshad Android Projects\3pol_Inverter_Flutter\assets\statistics.png
+    - assets/caution.png
+    - assets/shareapp.png
+    - assets/welcomescreen.png
+    - assets/notifybig.png
+    - assets/nextbtn.png
+    - assets/address.png
+    - assets/imagechange.png
+    - assets/country.png
+    - assets/phone.png
+    - assets/city.png
+    - assets/postal.png
+    - assets/help.png
+    - assets/rate.png
+    - assets/terms.png
+    - assets/privacypolicy.png
+    - assets/passwordicon.png
+    - assets/emailicon.png
+    - assets/profileicon.png
+    - assets/logout.png
+    - assets/privacy.png
+    - assets/forwardclick.png
+    - assets/profilepic.png
+    - assets/profilepic1.png
+    - assets/inverter1.png
+    - assets/devices.png
+    - assets/profile.png
+    - assets/addbtn.png
+    - assets/inverter.png
+    - assets/backclick.png
+    - assets/app_logo.png
+    - assets/app_logo1.png
+    - assets/app_logo_large.png
+    - assets/bg.png
+    - assets/home.png
+    - assets/menu.png
+    - assets/notifications.png
+    - assets/settings.png
+    - assets/splash_bg.png
+    - assets/statistics.png
+    - assets/fan.png
