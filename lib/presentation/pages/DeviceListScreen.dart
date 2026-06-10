@@ -80,8 +80,8 @@ class _DevicelistscreenState extends State<Devicelistscreen> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset("assets/bg.png", fit: BoxFit.cover),
-            Container(color: Colors.black.withOpacity(0.1)),
+            // Image.asset("assets/bg.png", fit: BoxFit.cover),
+            // Container(color: Colors.black.withOpacity(0.1)),
             Padding(
               padding: const EdgeInsets.only(
                   left: 15, right: 15, top: 15, bottom: 80),

@@ -392,10 +392,10 @@ class _AddDevicePageState extends State<AddDevicePage> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset("assets/bg.png", fit: BoxFit.cover),
-            Container(
-              color: Colors.black.withOpacity(0.1), // Dark overlay
-            ),
+            // Image.asset("assets/bg.png", fit: BoxFit.cover),
+            // Container(
+            //   color: Colors.black.withOpacity(0.1), // Dark overlay
+            // ),
             Padding(
               padding: const EdgeInsets.only(top: 13.0, right: 15, left: 2),
               child: Column(

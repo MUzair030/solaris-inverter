@@ -151,8 +151,8 @@ class _MainscreenState extends State<Mainscreen> with WidgetsBindingObserver {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset("assets/bg.png", fit: BoxFit.cover),
-          Container(color: Colors.black.withOpacity(0.1)),
+          // Image.asset("assets/bg.png", fit: BoxFit.cover),
+          // Container(color: Colors.black.withOpacity(0.1)),
           Padding(
             padding:
                 const EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 30),

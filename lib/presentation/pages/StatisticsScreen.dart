@@ -136,8 +136,8 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset("assets/bg.png", fit: BoxFit.cover),
-          Container(color: Colors.black.withOpacity(0.1)),
+          // Image.asset("assets/bg.png", fit: BoxFit.cover),
+          // Container(color: Colors.black.withOpacity(0.1)),
           Padding(
             padding:
                 const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 70),
