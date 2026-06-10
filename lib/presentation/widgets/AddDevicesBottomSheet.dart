@@ -38,7 +38,7 @@ class AddDevicesBottomSheet extends StatelessWidget {
                 "1).",
                 style: TextStyle(
                     fontSize: 18,
-                    color: Appconst Color(0xFF2277BB),
+                    color: AppColors.green,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(width: 10),
@@ -59,7 +59,7 @@ class AddDevicesBottomSheet extends StatelessWidget {
                 "2).",
                 style: TextStyle(
                     fontSize: 18,
-                    color: Appconst Color(0xFF2277BB),
+                    color: AppColors.green,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(width: 10),

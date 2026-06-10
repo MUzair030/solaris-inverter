@@ -537,7 +537,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                           height: 20,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            color: Appconst Color(0xFF2277BB),
+                                            color: AppColors.green,
                                           ),
                                         ),
                                       )
@@ -634,7 +634,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                   children: [
                                     Icon(
                                       Icons.qr_code_scanner,
-                                      color: Appconst Color(0xFF2277BB),
+                                      color: AppColors.green,
                                       size: 25,
                                     ),
                                     SizedBox(width: 10),
@@ -686,7 +686,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        color: Appconst Color(0xFF2277BB)),
+                                        color: AppColors.green),
                                     child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,

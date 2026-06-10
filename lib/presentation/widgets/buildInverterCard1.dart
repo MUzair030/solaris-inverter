@@ -104,7 +104,7 @@ class buildInverterCard1 extends StatelessWidget {
                           value: (double.tryParse("${data.genPower}") ?? 0) / 5,
                           backgroundColor: AppColors.white, // Background color
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              Appconst Color(0xFF2277BB)), // Fill color
+                              AppColors.green), // Fill color
                         ),
                       ),
                     ],

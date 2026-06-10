@@ -65,7 +65,7 @@ class _CustomTextField2State extends State<CustomTextField2> {
             borderSide: BorderSide(color: AppColors.white),
           ),
           focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Appconst Color(0xFF2277BB)),
+            borderSide: BorderSide(color: AppColors.green),
           ),
           suffixIcon: widget.suffixIcon,
         ),

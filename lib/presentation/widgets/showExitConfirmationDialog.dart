@@ -136,7 +136,7 @@ class ExitConfirmationDialog {
   //                       alignment: Alignment.topRight,
   //                       child: IconButton(
   //                         icon: const Icon(Icons.close,
-  //                             size: 27, color: Appconst Color(0xFF2277BB)),
+  //                             size: 27, color: AppColors.green),
   //                         onPressed: () => Navigator.of(context).pop(false),
   //                       ),
   //                     ),
@@ -213,7 +213,7 @@ class ExitConfirmationDialog {
   //                           Expanded(
   //                             child: ElevatedButton(
   //                               style: ElevatedButton.styleFrom(
-  //                                 backgroundColor: Appconst Color(0xFF2277BB),
+  //                                 backgroundColor: AppColors.green,
   //                                 shape: RoundedRectangleBorder(
   //                                   borderRadius: BorderRadius.circular(10),
   //                                 ),
@@ -315,7 +315,7 @@ class ExitConfirmationDialog {
                           icon: const Padding(
                             padding: EdgeInsets.all(5),
                             child: Icon(Icons.close,
-                                size: 27, color: Appconst Color(0xFF2277BB)),
+                                size: 27, color: AppColors.green),
                           ),
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
@@ -402,7 +402,7 @@ class ExitConfirmationDialog {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Appconst Color(0xFF2277BB),
+                                  backgroundColor: AppColors.green,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -522,7 +522,7 @@ class ExitConfirmationDialog {
                           icon: const Padding(
                             padding: EdgeInsets.all(5),
                             child: Icon(Icons.close,
-                                size: 27, color: Appconst Color(0xFF2277BB)),
+                                size: 27, color: AppColors.green),
                           ),
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
@@ -609,7 +609,7 @@ class ExitConfirmationDialog {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Appconst Color(0xFF2277BB),
+                                  backgroundColor: AppColors.green,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -707,7 +707,7 @@ class ExitConfirmationDialog {
                               child: Align(
                                 alignment: Alignment.topCenter,
                                 child: Icon(Icons.password,
-                                    size: 50, color: Appconst Color(0xFF2277BB)),
+                                    size: 50, color: AppColors.green),
                               ),
                             ),
                             Align(
@@ -717,7 +717,7 @@ class ExitConfirmationDialog {
                                 children: [
                                   CustomInkWellItem3(
                                     imagePath: Icons.close_sharp,
-                                    color: Appconst Color(0xFF2277BB),
+                                    color: AppColors.green,
                                     onTap: () {
                                       Navigator.of(context).pop(false);
                                     },
@@ -746,8 +746,8 @@ class ExitConfirmationDialog {
                                   borderRadius: BorderRadius.circular(5),
                                   fieldHeight: 35,
                                   fieldWidth: 25,
-                                  activeColor: Appconst Color(0xFF2277BB)2,
-                                  selectedColor: Appconst Color(0xFF2277BB),
+                                  activeColor: AppColors.green2,
+                                  selectedColor: AppColors.green,
                                   inactiveColor: AppColors.black,
                                 ),
                               ),
@@ -757,7 +757,7 @@ class ExitConfirmationDialog {
                                   Expanded(
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Appconst Color(0xFF2277BB),
+                                        backgroundColor: AppColors.green,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),

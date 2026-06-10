@@ -454,7 +454,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
       onPressed: () => _onItemTapped(index),
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            isSelected ? Appconst Color(0xFF2277BB).withOpacity(0.2) : Colors.transparent,
+            isSelected ? AppColors.green.withOpacity(0.2) : Colors.transparent,
         elevation: 0,
         shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -469,13 +469,13 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
             iconPath,
             width: 23,
             height: 23,
-            color: isSelected ? Appconst Color(0xFF2277BB) : Colors.grey,
+            color: isSelected ? AppColors.green : Colors.grey,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Appconst Color(0xFF2277BB) : Colors.grey,
+              color: isSelected ? AppColors.green : Colors.grey,
               fontSize: 12,
             ),
           ),

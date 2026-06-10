@@ -60,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderSide: BorderSide(color: AppColors.white),
           ),
           focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Appconst Color(0xFF2277BB)),
+            borderSide: BorderSide(color: AppColors.green),
           ),
         ),
         onChanged: (_) {

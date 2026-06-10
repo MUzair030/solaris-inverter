@@ -218,7 +218,7 @@ class _buildInverterCardState extends State<buildInverterCard> {
                                     backgroundColor: AppColors.white,
                                     valueColor:
                                         const AlwaysStoppedAnimation<Color>(
-                                            Appconst Color(0xFF2277BB)),
+                                            AppColors.green),
                                   );
                                 },
                               ),
@@ -314,7 +314,7 @@ class _buildInverterCardState extends State<buildInverterCard> {
                                                     'Loading...',
                                                 style: const TextStyle(
                                                   fontSize: 16,
-                                                  color: Appconst Color(0xFF2277BB),
+                                                  color: AppColors.green,
                                                 ),
                                               ),
                                             )

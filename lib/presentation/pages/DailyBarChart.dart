@@ -62,7 +62,7 @@ class DailyBarChart extends StatelessWidget {
         barRods: [
           BarChartRodData(
             toY: dataPoint.value,
-            color: dataPoint.value > 0 ? Appconst Color(0xFF2277BB) : Colors.grey[300],
+            color: dataPoint.value > 0 ? AppColors.green : Colors.grey[300],
             width: 20,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -136,7 +136,7 @@ class DailyBarChart extends StatelessWidget {
           barTouchData: BarTouchData(
             enabled: true,
             touchTooltipData: BarTouchTooltipData(
-              tooltipBgColor: Appconst Color(0xFF2277BB),
+              tooltipBgColor: AppColors.green,
               tooltipPadding: const EdgeInsets.all(4),
               tooltipMargin: 0,
               fitInsideVertically: true,

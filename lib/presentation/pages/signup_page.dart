@@ -266,7 +266,7 @@ class _SignupPageState extends State<SignupPage> {
                           color: authViewModel.errorMessage != null ||
                                   viewModel.error != null
                               ? AppColors.red
-                              : Appconst Color(0xFF2277BB),
+                              : AppColors.green,
                           borderRadius:
                               BorderRadius.circular(3), // Rounded corners
                         ),
@@ -319,7 +319,7 @@ class _SignupPageState extends State<SignupPage> {
                           onChanged: (bool? value) {
                             setState(() => _isChecked = value ?? false);
                           },
-                          activeColor: Appconst Color(0xFF2277BB),
+                          activeColor: AppColors.green,
                         ),
                         Expanded(
                           child: Text(

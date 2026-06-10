@@ -229,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Text(
                                 "Powered by 3pol",
                                 style: TextStyle(
-                                    color: Appconst Color(0xFF2277BB), fontSize: 10),
+                                    color: AppColors.green, fontSize: 10),
                               ),
                             ],
                           ),

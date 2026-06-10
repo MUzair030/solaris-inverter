@@ -627,7 +627,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: viewModel.isLoading
                                   ? const CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          Appconst Color(0xFF2277BB)),
+                                          AppColors.green),
                                     )
                                   : SizedBox(
                                       width:

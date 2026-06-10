@@ -80,7 +80,7 @@ class LineChartWidget extends StatelessWidget {
           isStrokeJoinRound: true,
           isStrokeCapRound: true,
           barWidth: 1.5,
-          // color: Appconst Color(0xFF2277BB),
+          // color: AppColors.green,
           dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(show: false),
         ),
@@ -181,7 +181,7 @@ class LineChartWidget extends StatelessWidget {
         handleBuiltInTouches: true,
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          // tooltipBgColor: Appconst Color(0xFF2277BB),
+          // tooltipBgColor: AppColors.green,
           tooltipRoundedRadius: 8,
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
