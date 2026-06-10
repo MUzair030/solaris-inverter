@@ -806,7 +806,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
       msg: "Connected to ${wifi.ssid}!",
       gravity: ToastGravity.BOTTOM,
       toastLength: Toast.LENGTH_LONG,
-      backgroundColor: Colors.green,
+      backgroundColor: const Color(0xFF2277BB),
       textColor: Colors.white,
     );
 

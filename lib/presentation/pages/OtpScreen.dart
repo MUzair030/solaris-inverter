@@ -109,7 +109,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             decoration: BoxDecoration(
                               color: viewModel.errorMessage != null
                                   ? AppColors.red
-                                  : AppColors.green,
+                                  : Appconst Color(0xFF2277BB),
                               borderRadius:
                                   BorderRadius.circular(3), // Rounded corners
                             ),
@@ -129,7 +129,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.green,
+                            color: Appconst Color(0xFF2277BB),
                           ),
                         ),
                         const Text(
@@ -170,7 +170,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             fieldHeight: 40,
                             fieldWidth: 30,
                             activeColor: AppColors.white,
-                            selectedColor: AppColors.green,
+                            selectedColor: Appconst Color(0xFF2277BB),
                             inactiveColor: AppColors.white,
                           ),
                         ),
@@ -227,7 +227,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        Colors.green, // Green background
+                                        const Color(0xFF2277BB), // Green background
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
                                           10), // Rounded corners

@@ -45,15 +45,15 @@ class BarChartWidget extends StatelessWidget {
           isStrokeJoinRound: true,
           isStrokeCapRound: true,
           barWidth: 1.5,
-          color: AppColors.green,
+          color: Appconst Color(0xFF2277BB),
           dotData: const FlDotData(show: false),
           // Hide dots
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors: [
-                AppColors.green.withOpacity(0.5),
-                AppColors.green.withOpacity(0.2),
+                Appconst Color(0xFF2277BB).withOpacity(0.5),
+                Appconst Color(0xFF2277BB).withOpacity(0.2),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -110,7 +110,7 @@ class BarChartWidget extends StatelessWidget {
       borderData: FlBorderData(show: false),
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: AppColors.green,
+          tooltipBgColor: Appconst Color(0xFF2277BB),
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
               return LineTooltipItem(

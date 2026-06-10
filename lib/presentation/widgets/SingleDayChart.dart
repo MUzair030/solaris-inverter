@@ -66,7 +66,7 @@ import 'LegendItem.dart';
 //           x: blockHour,
 //           barRods: [
 //             BarChartRodData(toY: avgEnergy, color: Colors.orange, width: 6),
-//             BarChartRodData(toY: avgGen, color: Colors.green, width: 6),
+//             BarChartRodData(toY: avgGen, color: const Color(0xFF2277BB), width: 6),
 //             BarChartRodData(toY: avgPV, color: Colors.blue, width: 6),
 //             BarChartRodData(toY: avgOutVolt, color: Colors.purple, width: 6),
 //             BarChartRodData(toY: avgCurrent, color: Colors.red, width: 6),
@@ -150,7 +150,7 @@ import 'LegendItem.dart';
 //       runSpacing: 8,
 //       children: const [
 //         LegendItem(color: Colors.orange, label: 'Energy Consumed'),
-//         LegendItem(color: Colors.green, label: 'Gen Power'),
+//         LegendItem(color: const Color(0xFF2277BB), label: 'Gen Power'),
 //         LegendItem(color: Colors.blue, label: 'PV Voltage'),
 //         LegendItem(color: Colors.purple, label: 'Output Voltage'),
 //         LegendItem(color: Colors.red, label: 'Output Current'),
@@ -228,7 +228,7 @@ class SingleDayChart extends StatelessWidget {
           x: hour,
           barRods: [
             BarChartRodData(toY: avgEnergy, color: Colors.orange, width: 8),
-            BarChartRodData(toY: avgGen, color: Colors.green, width: 8),
+            BarChartRodData(toY: avgGen, color: const Color(0xFF2277BB), width: 8),
             BarChartRodData(toY: avgPV, color: Colors.blue, width: 8),
             BarChartRodData(toY: avgOutVolt, color: Colors.purple, width: 8),
             BarChartRodData(toY: avgCurrent, color: Colors.red, width: 8),

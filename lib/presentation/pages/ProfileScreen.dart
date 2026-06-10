@@ -215,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     "Powered by 3pol",
                                     style: TextStyle(
-                                        color: AppColors.green, fontSize: 10),
+                                        color: Appconst Color(0xFF2277BB), fontSize: 10),
                                   ),
                                 ],
                               ),

@@ -30,7 +30,7 @@ class AppColors {
   static const Color unselectedcolor = Color(0xff8F9098);
   static const Color ownchat = Color(0xFFD9D9D9);
   static const Color lightgreen = Color(0xFF84CA82);
-  static const Color green = Color(0xFF58BA55);
+  static const Color green = Color(0xFF2277BB);
   static const Color green2 = Color(0xFF048000);
   static const Color green1 = Color(0xFF0E3E27);
   static const Color red = Color(0xFFE00000);

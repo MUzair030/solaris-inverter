@@ -64,7 +64,7 @@ class ExitConfirmationDialog {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: const Color(0xFF2277BB),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -136,7 +136,7 @@ class ExitConfirmationDialog {
   //                       alignment: Alignment.topRight,
   //                       child: IconButton(
   //                         icon: const Icon(Icons.close,
-  //                             size: 27, color: AppColors.green),
+  //                             size: 27, color: Appconst Color(0xFF2277BB)),
   //                         onPressed: () => Navigator.of(context).pop(false),
   //                       ),
   //                     ),
@@ -184,7 +184,7 @@ class ExitConfirmationDialog {
   //                                 if (deleteViewModel.response != null) {
   //                                   Fluttertoast.showToast(
   //                                     msg: deleteViewModel.response!.message,
-  //                                     backgroundColor: Colors.green,
+  //                                     backgroundColor: const Color(0xFF2277BB),
   //                                   );
   //
   //                                   await deviceViewModel.fetchDevices();
@@ -213,7 +213,7 @@ class ExitConfirmationDialog {
   //                           Expanded(
   //                             child: ElevatedButton(
   //                               style: ElevatedButton.styleFrom(
-  //                                 backgroundColor: AppColors.green,
+  //                                 backgroundColor: Appconst Color(0xFF2277BB),
   //                                 shape: RoundedRectangleBorder(
   //                                   borderRadius: BorderRadius.circular(10),
   //                                 ),
@@ -315,7 +315,7 @@ class ExitConfirmationDialog {
                           icon: const Padding(
                             padding: EdgeInsets.all(5),
                             child: Icon(Icons.close,
-                                size: 27, color: AppColors.green),
+                                size: 27, color: Appconst Color(0xFF2277BB)),
                           ),
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
@@ -371,7 +371,7 @@ class ExitConfirmationDialog {
                                   if (deleteViewModel.response != null) {
                                     Fluttertoast.showToast(
                                       msg: deleteViewModel.response!.message,
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: const Color(0xFF2277BB),
                                     );
 
                                     await deviceViewModel.fetchDevices();
@@ -402,7 +402,7 @@ class ExitConfirmationDialog {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.green,
+                                  backgroundColor: Appconst Color(0xFF2277BB),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -522,7 +522,7 @@ class ExitConfirmationDialog {
                           icon: const Padding(
                             padding: EdgeInsets.all(5),
                             child: Icon(Icons.close,
-                                size: 27, color: AppColors.green),
+                                size: 27, color: Appconst Color(0xFF2277BB)),
                           ),
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
@@ -578,7 +578,7 @@ class ExitConfirmationDialog {
                                   if (deleteViewModel.response != null) {
                                     Fluttertoast.showToast(
                                       msg: deleteViewModel.response!.message,
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: const Color(0xFF2277BB),
                                     );
 
                                     await deviceViewModel.fetchDevices();
@@ -609,7 +609,7 @@ class ExitConfirmationDialog {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.green,
+                                  backgroundColor: Appconst Color(0xFF2277BB),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -629,7 +629,7 @@ class ExitConfirmationDialog {
                                   // if (deleteViewModel.response != null) {
                                   Fluttertoast.showToast(
                                     msg: "Device Unselected",
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: const Color(0xFF2277BB),
                                   );
                                   // Provider.of<InverterViewModel1>(context,
                                   //         listen: false)
@@ -707,7 +707,7 @@ class ExitConfirmationDialog {
                               child: Align(
                                 alignment: Alignment.topCenter,
                                 child: Icon(Icons.password,
-                                    size: 50, color: AppColors.green),
+                                    size: 50, color: Appconst Color(0xFF2277BB)),
                               ),
                             ),
                             Align(
@@ -717,7 +717,7 @@ class ExitConfirmationDialog {
                                 children: [
                                   CustomInkWellItem3(
                                     imagePath: Icons.close_sharp,
-                                    color: AppColors.green,
+                                    color: Appconst Color(0xFF2277BB),
                                     onTap: () {
                                       Navigator.of(context).pop(false);
                                     },
@@ -746,8 +746,8 @@ class ExitConfirmationDialog {
                                   borderRadius: BorderRadius.circular(5),
                                   fieldHeight: 35,
                                   fieldWidth: 25,
-                                  activeColor: AppColors.green2,
-                                  selectedColor: AppColors.green,
+                                  activeColor: Appconst Color(0xFF2277BB)2,
+                                  selectedColor: Appconst Color(0xFF2277BB),
                                   inactiveColor: AppColors.black,
                                 ),
                               ),
@@ -757,7 +757,7 @@ class ExitConfirmationDialog {
                                   Expanded(
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.green,
+                                        backgroundColor: Appconst Color(0xFF2277BB),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),

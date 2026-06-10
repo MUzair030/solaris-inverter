@@ -11,7 +11,7 @@ class HeaderWidget extends StatelessWidget {
       children: [
         Image.asset("assets/app_logo.png", width: 60, height: 60),
         const Text(
-          "MK Power",
+          "Solaris",
           style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,

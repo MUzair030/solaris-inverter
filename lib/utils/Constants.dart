@@ -97,12 +97,12 @@ class constants {
 
     Share.share(
       "Check out this awesome app: $playStoreUrl",
-      subject: "MK Inverters App",
+      subject: "Solaris Inverters App",
     );
   }
 
   static String htmlData = '''
-    <p>&nbsp;This privacy policy applies to the MK Inverters app (hereby referred to as "Application") for mobile devices that was created by 3POL Apps (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".</p>
+    <p>&nbsp;This privacy policy applies to the Solaris Inverters app (hereby referred to as "Application") for mobile devices that was created by 3POL Apps (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".</p>
     <p><strong>Information Collection and Use</strong></p>
     <p>The Application collects information when you download and use it. This information may include information such as:</p>
     <ul>

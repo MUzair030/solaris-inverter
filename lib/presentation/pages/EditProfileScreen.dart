@@ -627,7 +627,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: viewModel.isLoading
                                   ? const CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          AppColors.green),
+                                          Appconst Color(0xFF2277BB)),
                                     )
                                   : SizedBox(
                                       width:
@@ -638,7 +638,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              Colors.green, // Green background
+                                              const Color(0xFF2277BB), // Green background
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 10), // Rounded corners

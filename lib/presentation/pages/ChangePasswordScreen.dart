@@ -315,7 +315,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                           _validateAndSignin(viewModel);
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green,
+                                          backgroundColor: const Color(0xFF2277BB),
                                           // Green background
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(

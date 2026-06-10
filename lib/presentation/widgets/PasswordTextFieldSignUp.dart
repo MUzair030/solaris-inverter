@@ -66,7 +66,7 @@ class _PasswordTextFieldSignUpState extends State<PasswordTextFieldSignUp> {
           ),
           focusedBorder: const UnderlineInputBorder(
             borderSide:
-                BorderSide(color: AppColors.green), // Blue bottom line on focus
+                BorderSide(color: Appconst Color(0xFF2277BB)), // Blue bottom line on focus
           ),
           suffixIcon: IconButton(
             icon: Icon(

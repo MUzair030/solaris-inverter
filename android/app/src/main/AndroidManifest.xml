@@ -79,7 +79,7 @@
         android:extractNativeLibs="false"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:label="MK Inverters"
+        android:label="Solaris Inverters"
         android:name="${applicationName}"
         android:icon="@drawable/app_logo"
         android:requestLegacyExternalStorage="true">

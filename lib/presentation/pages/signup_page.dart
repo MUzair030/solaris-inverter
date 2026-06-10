@@ -246,7 +246,7 @@ class _SignupPageState extends State<SignupPage> {
                     Image.asset("assets/app_logo.png", width: 70, height: 70),
                     const SizedBox(height: 10),
                     const Text(
-                      "MK Power",
+                      "Solaris",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -266,7 +266,7 @@ class _SignupPageState extends State<SignupPage> {
                           color: authViewModel.errorMessage != null ||
                                   viewModel.error != null
                               ? AppColors.red
-                              : AppColors.green,
+                              : Appconst Color(0xFF2277BB),
                           borderRadius:
                               BorderRadius.circular(3), // Rounded corners
                         ),
@@ -319,7 +319,7 @@ class _SignupPageState extends State<SignupPage> {
                           onChanged: (bool? value) {
                             setState(() => _isChecked = value ?? false);
                           },
-                          activeColor: AppColors.green,
+                          activeColor: Appconst Color(0xFF2277BB),
                         ),
                         Expanded(
                           child: Text(
@@ -341,7 +341,7 @@ class _SignupPageState extends State<SignupPage> {
                                   ? null
                                   : () => _validateAndSignup(authViewModel),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: const Color(0xFF2277BB),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -378,7 +378,7 @@ class _SignupPageState extends State<SignupPage> {
                     //               : () => _validateAndSignup(authViewModel),
                     //           style: ElevatedButton.styleFrom(
                     //             backgroundColor:
-                    //                 Colors.green, // Green background
+                    //                 const Color(0xFF2277BB), // Green background
                     //             shape: RoundedRectangleBorder(
                     //               borderRadius: BorderRadius.circular(
                     //                   10), // Rounded corners
@@ -410,14 +410,14 @@ class _SignupPageState extends State<SignupPage> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green, width: 1),
+                          border: Border.all(color: const Color(0xFF2277BB), width: 1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Center(
                           child: Text(
                             "Already have an account? Login",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: const Color(0xFF2277BB),
                               fontSize: 13,
                             ),
                           ),

@@ -217,7 +217,7 @@ class DeviceMonitoringService {
     // );
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'foreground_service',
-      'MK Inverter Service',
+      'Solaris Inverter Service',
       description: 'Monitoring inverter status',
       importance: Importance.high,
       playSound: false,
@@ -238,7 +238,7 @@ class DeviceMonitoringService {
         isForegroundMode: true,
         autoStart: true,
         notificationChannelId: 'foreground_service',
-        initialNotificationTitle: 'MK Inverter',
+        initialNotificationTitle: 'Solaris Inverter',
         initialNotificationContent: 'Device Monitoring Service',
         foregroundServiceNotificationId: 999,
       ),
@@ -287,7 +287,7 @@ class DeviceMonitoringService {
       if (service is AndroidServiceInstance) {
         service.setAsForegroundService();
         service.setForegroundNotificationInfo(
-          title: 'MK Inverter',
+          title: 'Solaris Inverter',
           content: 'Monitoring Booting... (Please wait)',
         );
       }
@@ -300,12 +300,12 @@ class DeviceMonitoringService {
 
       // Notify health
       await NotificationService.showNotification(
-          "Service Booted", "MK Background monitoring is now active.");
+          "Service Booted", "Solaris Background monitoring is now active.");
 
       if (service is AndroidServiceInstance) {
         service.setAsForegroundService();
         service.setForegroundNotificationInfo(
-          title: 'MK Monitoring Active',
+          title: 'Solaris Monitoring Active',
           content: 'Isolate initialized. Syncing data...',
         );
 
@@ -456,7 +456,7 @@ class DeviceMonitoringService {
           } else {
             if (service is AndroidServiceInstance) {
               service.setForegroundNotificationInfo(
-                title: 'MK Inverter Monitoring',
+                title: 'Solaris Inverter Monitoring',
                 content: "No data records found on server.",
               );
             }
@@ -476,7 +476,7 @@ class DeviceMonitoringService {
       if (service is AndroidServiceInstance) {
         service.setAsForegroundService();
         service.setForegroundNotificationInfo(
-          title: 'MK Init Error',
+          title: 'Solaris Init Error',
           content: e.toString(),
         );
       }

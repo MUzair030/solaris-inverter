@@ -35,7 +35,7 @@ class ErrorScreen extends StatelessWidget {
                       width: 12,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: status == "Online" ? Colors.green : Colors.red,
+                        color: status == "Online" ? const Color(0xFF2277BB) : Colors.red,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -43,7 +43,7 @@ class ErrorScreen extends StatelessWidget {
                     Text(
                       status ?? "Unknown",
                       style: TextStyle(
-                        color: status == "Online" ? Colors.green : Colors.red,
+                        color: status == "Online" ? const Color(0xFF2277BB) : Colors.red,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),

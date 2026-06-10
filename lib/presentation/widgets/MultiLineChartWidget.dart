@@ -158,7 +158,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
       minY: 0,
       // maxY: 5000,
       lineBarsData: [
-        _buildLineChartBarData(energySpots, Colors.green, "Units Consumed"),
+        _buildLineChartBarData(energySpots, const Color(0xFF2277BB), "Units Consumed"),
         _buildLineChartBarData(genPowerSpots, Colors.blue, "Power"),
         _buildLineChartBarData(pvVoltageSpots, Colors.orange, "Solar Voltage"),
         _buildLineChartBarData(
@@ -488,7 +488,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
         children: [
           _legendItem(
               Colors.orange, "Units Consumed", "${latest.energyConsumed} kWh"),
-          _legendItem(Colors.green, "Power", "${latest.genPower} KW"),
+          _legendItem(const Color(0xFF2277BB), "Power", "${latest.genPower} KW"),
           _legendItem(Colors.blue, "Solar Voltage", "${latest.pvVoltage} VDC"),
           _legendItem(
               Colors.purple, "Output Voltage", "${latest.outputVoltage} VAC"),

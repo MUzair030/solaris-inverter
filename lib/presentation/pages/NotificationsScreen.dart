@@ -75,7 +75,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ignoring: isDisabled, // actually disables the tap
                         child: CustomInkWellItem4(
                           title: "Clear All",
-                          color: AppColors.green,
+                          color: Appconst Color(0xFF2277BB),
                           onTap: () async {
                             await provider.clearAll();
                           },

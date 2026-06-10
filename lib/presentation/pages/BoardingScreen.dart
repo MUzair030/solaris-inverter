@@ -54,7 +54,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          "MK Inverters",
+                          "Solaris Inverters",
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -78,7 +78,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                   child: ElevatedButton(
                     onPressed: _goToLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: const Color(0xFF2277BB),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

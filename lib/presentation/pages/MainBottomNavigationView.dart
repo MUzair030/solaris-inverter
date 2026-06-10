@@ -104,7 +104,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
             _debounce?.cancel();
             _debounce = Timer(const Duration(seconds: 2), () async {
               if (!mounted) return;
-              _showSnackBar("🟢 Network connected", Colors.green);
+              _showSnackBar("🟢 Network connected", const Color(0xFF2277BB));
               await _reloadAllDataOnReconnect();
             });
           }
@@ -351,7 +351,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: const Color(0xFF2277BB),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -454,7 +454,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
       onPressed: () => _onItemTapped(index),
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            isSelected ? AppColors.green.withOpacity(0.2) : Colors.transparent,
+            isSelected ? Appconst Color(0xFF2277BB).withOpacity(0.2) : Colors.transparent,
         elevation: 0,
         shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -469,13 +469,13 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
             iconPath,
             width: 23,
             height: 23,
-            color: isSelected ? AppColors.green : Colors.grey,
+            color: isSelected ? Appconst Color(0xFF2277BB) : Colors.grey,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? AppColors.green : Colors.grey,
+              color: isSelected ? Appconst Color(0xFF2277BB) : Colors.grey,
               fontSize: 12,
             ),
           ),

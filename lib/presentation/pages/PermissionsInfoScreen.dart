@@ -43,7 +43,7 @@ class _PermissionsInfoScreenState extends State<PermissionsInfoScreen> {
       child: ListTile(
         leading: Icon(
           status?.isGranted == true ? Icons.check_circle : Icons.cancel,
-          color: status?.isGranted == true ? Colors.green : Colors.red,
+          color: status?.isGranted == true ? const Color(0xFF2277BB) : Colors.red,
         ),
         title: Text(title),
         subtitle: Text(description),

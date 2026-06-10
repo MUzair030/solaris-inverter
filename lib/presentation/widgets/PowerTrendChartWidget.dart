@@ -33,7 +33,7 @@ class PowerTrendChartWidget extends StatelessWidget {
                 lineBarsData: [
                   _buildLine(spotsMap['energy']!, Colors.deepPurple),
                   _buildLine(spotsMap['gen']!, Colors.red),
-                  _buildLine(spotsMap['pv']!, Colors.green),
+                  _buildLine(spotsMap['pv']!, const Color(0xFF2277BB)),
                   _buildLine(spotsMap['outputV']!, Colors.orange),
                   _buildLine(spotsMap['outputC']!, Colors.blue),
                 ],
@@ -86,7 +86,7 @@ class PowerTrendChartWidget extends StatelessWidget {
           children: const [
             _Legend(color: Colors.deepPurple, label: "Energy"),
             _Legend(color: Colors.red, label: "Gen"),
-            _Legend(color: Colors.green, label: "PV"),
+            _Legend(color: const Color(0xFF2277BB), label: "PV"),
             _Legend(color: Colors.orange, label: "Output V"),
             _Legend(color: Colors.blue, label: "Output C"),
           ],
