@@ -1,0 +1,75 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "com.ThreepolApps.homeautomation.smartlife"
+    compileSdk = 35
+    ndkVersion = flutter.ndkVersion
+
+    defaultConfig {
+        applicationId "com.ThreepolApps.homeautomation.smartlife"
+        minSdk = 21
+        targetSdk = 35
+        versionCode 24
+        versionName "1.3.4.0"
+
+        multiDexEnabled true
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+        // Add this for permission compatibility
+//        manifestPlaceholders += [
+//                'appAuthRedirectScheme': 'com.ThreepolApps.homeautomation.smartlife'
+//        ]
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            // If using CMake, pass 16KB page size flag
+//            arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile file("inverterkey.jks") // Keystore file
+            storePassword "inverterkey"
+            keyAlias "inverterkey"
+            keyPassword "inverterkey"
+        }
+    }
+
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
