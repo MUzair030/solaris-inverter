@@ -1,0 +1,32 @@
+workflows:
+  android-release:
+    name: Android Release Build
+    max_build_duration: 60
+    environment:
+      android_signing:
+        - inverterkey          # Name of the keystore you upload in Codemagic dashboard
+      vars:
+        PACKAGE_NAME: "com.ThreepolApps.homeautomation.smartlife"
+      flutter: stable
+
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Build Android release APK
+        script: |
+          flutter build apk \
+            --release \
+            --split-per-abi
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+      - build/app/outputs/bundle/**/*.aab
+
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com   # TODO: replace with your email
+        notify:
+          success: true
+          failure: true

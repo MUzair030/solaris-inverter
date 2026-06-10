@@ -31,10 +31,19 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("inverterkey.jks") // Keystore file
-            storePassword "inverterkey"
-            keyAlias "inverterkey"
-            keyPassword "inverterkey"
+            if (System.getenv("CM_KEYSTORE_PATH")) {
+                // CI environment (Codemagic) — keystore uploaded via dashboard
+                storeFile file(System.getenv("CM_KEYSTORE_PATH"))
+                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("CM_KEY_ALIAS")
+                keyPassword System.getenv("CM_KEY_PASSWORD")
+            } else {
+                // Local development — keystore file in android/app/
+                storeFile file("inverterkey.jks")
+                storePassword "inverterkey"
+                keyAlias "inverterkey"
+                keyPassword "inverterkey"
+            }
         }
     }
 
