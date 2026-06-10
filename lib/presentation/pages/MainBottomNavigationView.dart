@@ -119,7 +119,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
         content: Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: const TextStyle(color: Colors.black, fontSize: 16),
         ),
         backgroundColor: color,
         duration: const Duration(seconds: 3),
@@ -381,7 +381,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
                       },
                       child: const Text(
                         "Continue",
-                        style: TextStyle(color: AppColors.white),
+                        style: TextStyle(color: AppColors.black),
                       ),
                     ),
                   ),

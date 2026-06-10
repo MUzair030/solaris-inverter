@@ -116,7 +116,7 @@ class UpdateChecker {
                       },
                       child: const Text(
                         "Update",
-                        style: TextStyle(color: AppColors.white),
+                        style: TextStyle(color: AppColors.black),
                       ),
                     ),
                   ),

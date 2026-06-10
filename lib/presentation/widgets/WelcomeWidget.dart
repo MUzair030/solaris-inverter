@@ -20,7 +20,7 @@ class WelcomeWidget extends StatelessWidget {
         SizedBox(height: 2),
         Text(
           "Monitor & control your devices seamlessly.",
-          style: TextStyle(fontSize: 11, color: AppColors.white),
+          style: TextStyle(fontSize: 11, color: AppColors.black),
         ),
       ],
     );

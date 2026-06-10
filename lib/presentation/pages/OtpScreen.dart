@@ -84,7 +84,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.white,
+                          color: AppColors.black,
                         ),
                       ),
                       Opacity(
@@ -117,7 +117,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               child: Text(
                                 viewModel.errorMessage ??
                                     viewModel.successMessage!,
-                                style: const TextStyle(color: AppColors.white),
+                                style: const TextStyle(color: AppColors.black),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -156,7 +156,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           textCapitalization: TextCapitalization.characters,
 
                           autoFocus: true,
-                          textStyle: const TextStyle(color: AppColors.white),
+                          textStyle: const TextStyle(color: AppColors.black),
 
                           // ✅ Allow only letters, digits, and hyphen
                           inputFormatters: [
@@ -240,7 +240,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white, // White text color
+                                      color: Colors.black, // White text color
                                     ),
                                   ),
                                 ),

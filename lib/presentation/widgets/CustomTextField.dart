@@ -33,13 +33,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
         keyboardType: widget.keyboardType,
         inputFormatters: widget.inputFormatters,
         maxLength: widget.maxLength,
-        style: const TextStyle(color: AppColors.white),
+        style: const TextStyle(color: AppColors.black),
         decoration: InputDecoration(
           label: RichText(
             text: TextSpan(
               text: widget.label,
               style: const TextStyle(
-                color: AppColors.white,
+                color: AppColors.black,
                 fontSize: 14,
               ),
               children: const [
@@ -53,7 +53,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ],
             ),
           ),
-          labelStyle: const TextStyle(color: AppColors.white),
+          labelStyle: const TextStyle(color: AppColors.black),
           counterText: '${widget.controller.text.length}/${widget.maxLength}',
           counterStyle: const TextStyle(color: AppColors.txtgray, fontSize: 12),
           enabledBorder: const UnderlineInputBorder(

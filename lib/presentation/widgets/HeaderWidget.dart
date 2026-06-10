@@ -15,7 +15,7 @@ class HeaderWidget extends StatelessWidget {
         //   style: TextStyle(
         //       fontSize: 16,
         //       fontWeight: FontWeight.bold,
-        //       color: AppColors.white),
+        //       color: AppColors.black),
         // ),
       ],
     );

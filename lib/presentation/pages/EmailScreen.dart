@@ -116,7 +116,7 @@ class _EmailScreenState extends State<EmailScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+                            color: AppColors.black,
                           ),
                         ),
                         Opacity(
@@ -150,7 +150,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                 child: Text(
                                   viewModel.error ?? viewModel.message!,
                                   style:
-                                      const TextStyle(color: AppColors.white),
+                                      const TextStyle(color: AppColors.black),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -211,7 +211,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white, // White text color
+                                        color: Colors.black, // White text color
                                       ),
                                     ),
                                   ),

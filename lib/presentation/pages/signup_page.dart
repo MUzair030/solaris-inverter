@@ -250,7 +250,7 @@ class _SignupPageState extends State<SignupPage> {
                     //   style: TextStyle(
                     //     fontSize: 18,
                     //     fontWeight: FontWeight.bold,
-                    //     color: AppColors.white,
+                    //     color: AppColors.black,
                     //   ),
                     // ),
                     const SizedBox(height: 10),
@@ -279,7 +279,7 @@ class _SignupPageState extends State<SignupPage> {
                                 "",
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: AppColors.white,
+                              color: AppColors.black,
                               fontSize: 14,
                             ),
                           ),
@@ -324,7 +324,7 @@ class _SignupPageState extends State<SignupPage> {
                         Expanded(
                           child: Text(
                             "By signing up, you agree to our Terms, Privacy Policy, and Cookie Use.",
-                            style: TextStyle(color: Colors.white, fontSize: 11),
+                            style: TextStyle(color: Colors.black, fontSize: 11),
                           ),
                         ),
                       ],
@@ -361,7 +361,7 @@ class _SignupPageState extends State<SignupPage> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                       ),
                                     ),
                             ),
@@ -391,7 +391,7 @@ class _SignupPageState extends State<SignupPage> {
                     //             style: TextStyle(
                     //               fontSize: 16,
                     //               fontWeight: FontWeight.bold,
-                    //               color: Colors.white, // White text color
+                    //               color: Colors.black, // White text color
                     //             ),
                     //           ),
                     //         ),

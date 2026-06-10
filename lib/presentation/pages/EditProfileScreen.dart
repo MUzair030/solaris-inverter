@@ -353,7 +353,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 viewModel.errorMessage ??
                                     viewModel.successMessage!,
                                 // Show error first, else success
-                                style: const TextStyle(color: AppColors.white),
+                                style: const TextStyle(color: AppColors.black),
                               ),
                             ),
                           ),
@@ -511,7 +511,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             //                   "Number should start from 03",
                             //                   textAlign: TextAlign.center,
                             //                   style: TextStyle(
-                            //                       color: Colors.white),
+                            //                       color: Colors.black),
                             //                 ),
                             //               ),
                             //             ),
@@ -693,7 +693,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black),
               ),
             ),
           ),
@@ -725,7 +725,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black),
               ),
             ),
           ),

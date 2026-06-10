@@ -121,7 +121,7 @@ class FirstScreen extends StatelessWidget {
                       },
                       child: const Text(
                         "Continue",
-                        style: TextStyle(color: AppColors.white),
+                        style: TextStyle(color: AppColors.black),
                       ),
                     ),
                   ),
@@ -195,7 +195,7 @@ class FirstScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white, // White text color
+                                color: Colors.black, // White text color
                               ),
                             ),
                             const SizedBox(

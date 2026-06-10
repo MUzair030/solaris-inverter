@@ -115,7 +115,7 @@ class BarChartWidget extends StatelessWidget {
             return touchedSpots.map((spot) {
               return LineTooltipItem(
                 '${spot.y.toStringAsFixed(1)} kWh',
-                const TextStyle(color: AppColors.white, fontSize: 12),
+                const TextStyle(color: AppColors.black, fontSize: 12),
               );
             }).toList();
           },

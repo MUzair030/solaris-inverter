@@ -154,7 +154,7 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+                            color: AppColors.black,
                           ),
                         ),
                         Opacity(
@@ -192,7 +192,7 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
                                       viewModel
                                           .successMessage!, // Show error first, else success
                                   style:
-                                      const TextStyle(color: AppColors.white),
+                                      const TextStyle(color: AppColors.black),
                                 ),
                               ),
                             ),
@@ -251,7 +251,7 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white, // White text color
+                                        color: Colors.black, // White text color
                                       ),
                                     ),
                                   ),

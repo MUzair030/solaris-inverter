@@ -33,13 +33,13 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         obscureText: !_isPasswordVisible,
         inputFormatters: widget.inputFormatters,
         maxLength: _maxLength,
-        style: const TextStyle(color: AppColors.white),
+        style: const TextStyle(color: AppColors.black),
         decoration: InputDecoration(
           label: RichText(
             text: TextSpan(
               text: widget.label,
               style: const TextStyle(
-                color: AppColors.white,
+                color: AppColors.black,
                 fontSize: 14,
               ),
               children: const [
@@ -53,7 +53,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
               ],
             ),
           ),
-          labelStyle: const TextStyle(color: AppColors.white),
+          labelStyle: const TextStyle(color: AppColors.black),
           counterText: '${widget.controller.text.length}/$_maxLength',
           counterStyle: const TextStyle(color: AppColors.txtgray, fontSize: 12),
           enabledBorder: const UnderlineInputBorder(
@@ -66,7 +66,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           suffixIcon: IconButton(
             icon: Icon(
               _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
             onPressed: () {
               setState(() {

@@ -23,7 +23,7 @@ class WelcomeWidget1 extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           "No matter how far you go, home will be your destination to return to. Let's make your home comfortable",
-          style: TextStyle(fontSize: 11, color: AppColors.white),
+          style: TextStyle(fontSize: 11, color: AppColors.black),
         ),
       ],
     );

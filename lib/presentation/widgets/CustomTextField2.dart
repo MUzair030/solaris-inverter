@@ -38,13 +38,13 @@ class _CustomTextField2State extends State<CustomTextField2> {
         readOnly: widget.readOnly,
         maxLength: widget.maxLength,
         inputFormatters: widget.inputFormatters,
-        style: const TextStyle(color: AppColors.white),
+        style: const TextStyle(color: AppColors.black),
         decoration: InputDecoration(
           label: RichText(
             text: TextSpan(
               text: widget.label,
               style: const TextStyle(
-                color: AppColors.white,
+                color: AppColors.black,
                 fontSize: 14,
               ),
               children: const [
@@ -58,9 +58,9 @@ class _CustomTextField2State extends State<CustomTextField2> {
               ],
             ),
           ),
-          labelStyle: const TextStyle(color: AppColors.white, fontSize: 13),
+          labelStyle: const TextStyle(color: AppColors.black, fontSize: 13),
           counterText: '${widget.controller.text.length}/${widget.maxLength}',
-          counterStyle: const TextStyle(color: AppColors.white, fontSize: 12),
+          counterStyle: const TextStyle(color: AppColors.black, fontSize: 12),
           enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.white),
           ),

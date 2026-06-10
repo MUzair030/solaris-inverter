@@ -30,13 +30,13 @@ class _PasswordTextFieldAddDeviceState
         controller: widget.controller,
         obscureText: !_isPasswordVisible,
         maxLength: _maxLength,
-        style: const TextStyle(color: AppColors.white),
+        style: const TextStyle(color: AppColors.black),
         decoration: InputDecoration(
           label: RichText(
             text: TextSpan(
               text: widget.label,
               style: const TextStyle(
-                color: AppColors.white,
+                color: AppColors.black,
                 fontSize: 14,
               ),
               children: const [
@@ -50,9 +50,9 @@ class _PasswordTextFieldAddDeviceState
               ],
             ),
           ),
-          labelStyle: const TextStyle(color: AppColors.white),
+          labelStyle: const TextStyle(color: AppColors.black),
           counterText: '${widget.controller.text.length}/$_maxLength',
-          counterStyle: const TextStyle(color: AppColors.white, fontSize: 12),
+          counterStyle: const TextStyle(color: AppColors.black, fontSize: 12),
           enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.white), // White bottom line
           ),
@@ -63,7 +63,7 @@ class _PasswordTextFieldAddDeviceState
           suffixIcon: IconButton(
             icon: Icon(
               _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
             onPressed: () {
               setState(() {

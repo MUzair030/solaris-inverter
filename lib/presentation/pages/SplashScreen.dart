@@ -197,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       },
                       child: const Text(
                         "Open Settings",
-                        style: TextStyle(color: AppColors.white),
+                        style: TextStyle(color: AppColors.black),
                       ),
                     ),
                   ),

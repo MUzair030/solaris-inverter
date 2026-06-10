@@ -86,7 +86,7 @@ class _DeviceCardState extends State<DeviceCard> {
                         children: [
                           Text(widget.device.invertername!,
                               style: const TextStyle(
-                                  color: AppColors.white, fontSize: 16)),
+                                  color: AppColors.black, fontSize: 16)),
                         ],
                       ),
                     ),
@@ -98,11 +98,11 @@ class _DeviceCardState extends State<DeviceCard> {
                           Text(widget.deviceName,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.white,
+                                  color: AppColors.black,
                                   fontSize: 12)),
                           Text("${widget.device.inverterPower} KVA",
                               style: const TextStyle(
-                                  color: AppColors.white, fontSize: 14)),
+                                  color: AppColors.black, fontSize: 14)),
                         ],
                       ),
                     ),
@@ -110,7 +110,7 @@ class _DeviceCardState extends State<DeviceCard> {
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Text("${widget.device.macAddress}",
                           style: const TextStyle(
-                              color: AppColors.white, fontSize: 11)),
+                              color: AppColors.black, fontSize: 11)),
                     ),
                   ],
                 ),
@@ -125,7 +125,7 @@ class _DeviceCardState extends State<DeviceCard> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check_circle, color: Colors.white, size: 25),
+                    Icon(Icons.check_circle, color: Colors.black, size: 25),
                   ],
                 ),
               ),

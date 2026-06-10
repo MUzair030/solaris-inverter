@@ -212,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 'Logout',
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: AppColors.white,
+                                  color: AppColors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

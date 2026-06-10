@@ -201,7 +201,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
@@ -234,7 +234,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                                             displayDate,
                                             style: const TextStyle(
                                                 fontSize: 14,
-                                                color: AppColors.white),
+                                                color: AppColors.black),
                                           ),
                                         )
                                       : Padding(
@@ -248,7 +248,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                                                   "No Data Available",
                                                   style: TextStyle(
                                                       fontSize: 14,
-                                                      color: AppColors.white),
+                                                      color: AppColors.black),
                                                 ),
                                             ],
                                           ),
@@ -374,7 +374,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
               if (rVal == rMin || rVal == rMid || rVal == rMax) {
                 return Text(
                   '${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 8, color: AppColors.white),
+                  style: const TextStyle(fontSize: 8, color: AppColors.black),
                 );
               } else {
                 return const SizedBox.shrink();
@@ -383,7 +383,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
               //   if (value % 10 == 0) {
               //     return Text(
               //       '${value.toInt()} kWh',
-              //       style: const TextStyle(fontSize: 8, color: AppColors.white),
+              //       style: const TextStyle(fontSize: 8, color: AppColors.black),
               //     );
               //   } else {
               //     return const SizedBox.shrink();
@@ -415,7 +415,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             }
             return BarTooltipItem(
               '${rod.toY.toStringAsFixed(2)} kWh',
-              const TextStyle(color: Colors.white, fontSize: 10),
+              const TextStyle(color: Colors.black, fontSize: 10),
             );
           },
         ),
@@ -467,7 +467,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
           value: selectedFilter,
           icon: const Icon(
             Icons.arrow_drop_down,
-            color: AppColors.white,
+            color: AppColors.black,
           ),
           dropdownColor: AppColors.card,
           onChanged: (String? newValue) {
@@ -483,7 +483,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                 style: TextStyle(
                   fontSize: 14,
                   color:
-                      filter == selectedFilter ? AppColors.green : Colors.white,
+                      filter == selectedFilter ? AppColors.green : Colors.black,
                   fontWeight: filter == selectedFilter
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -626,7 +626,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
         //     reservedSize: 40,
         //     getTitlesWidget: (value, meta) {
         //       return Text('${value.toInt()} kWh',
-        //           style: const TextStyle(fontSize: 8, color: AppColors.white));
+        //           style: const TextStyle(fontSize: 8, color: AppColors.black));
         //     },
         //   ),
         // ),
@@ -636,7 +636,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             reservedSize: 20,
             getTitlesWidget: (value, meta) {
               return Text(_formatYAxisLabels(value + 1),
-                  style: const TextStyle(fontSize: 10, color: AppColors.white));
+                  style: const TextStyle(fontSize: 10, color: AppColors.black));
             },
           ),
         ),
@@ -646,7 +646,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             reservedSize: 0,
             getTitlesWidget: (value, meta) {
               return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 0, color: AppColors.white));
+                  style: const TextStyle(fontSize: 0, color: AppColors.black));
             },
           ),
         ),
@@ -709,7 +709,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
               if (rVal == rMin || rVal == rMid || rVal == rMax) {
                 return Text(
                   '${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 8, color: AppColors.white),
+                  style: const TextStyle(fontSize: 8, color: AppColors.black),
                 );
               } else {
                 return const SizedBox.shrink();
@@ -718,7 +718,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
               //   if (value % 10 == 0) {
               //     return Text(
               //       '${value.toInt()} kWh',
-              //       style: const TextStyle(fontSize: 8, color: AppColors.white),
+              //       style: const TextStyle(fontSize: 8, color: AppColors.black),
               //     );
               //   } else {
               //     return const SizedBox.shrink();
@@ -750,7 +750,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             if (selectedBarIndex == groupIndex) {
               return BarTooltipItem(
                 '${rod.toY.toStringAsFixed(1)} kWh',
-                const TextStyle(color: Colors.white, fontSize: 10),
+                const TextStyle(color: Colors.black, fontSize: 10),
               );
             }
             return null; // Hide tooltip for unselected bars

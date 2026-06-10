@@ -45,7 +45,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 content: Center(
                   child: Text(
                     "🔴 Network Not Connected",
-                    style: TextStyle(color: AppColors.white, fontSize: 16),
+                    style: TextStyle(color: AppColors.black, fontSize: 16),
                   ),
                 ),
                 duration: Duration(seconds: 1),
@@ -64,7 +64,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 content: Center(
                   child: Text(
                     "🔴 Network Disconnected",
-                    style: TextStyle(color: AppColors.white, fontSize: 16),
+                    style: TextStyle(color: AppColors.black, fontSize: 16),
                   ),
                 ),
                 duration: Duration(seconds: 1),
@@ -78,7 +78,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 content: Center(
                   child: Text(
                     "🟢 Network Connected",
-                    style: TextStyle(color: AppColors.white, fontSize: 16),
+                    style: TextStyle(color: AppColors.black, fontSize: 16),
                   ),
                 ),
                 duration: Duration(seconds: 1),
@@ -274,7 +274,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                           viewModel.successMessage!,
                                       // Show error first, else success
                                       style: const TextStyle(
-                                          color: AppColors.white),
+                                          color: AppColors.black),
                                     ),
                                   ),
                                 ),

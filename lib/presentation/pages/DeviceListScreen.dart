@@ -110,7 +110,7 @@ class _DevicelistscreenState extends State<Devicelistscreen> {
                               child: Text(
                                 "No devices found.",
                                 style: TextStyle(
-                                    color: AppColors.white, fontSize: 16),
+                                    color: AppColors.black, fontSize: 16),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -122,7 +122,7 @@ class _DevicelistscreenState extends State<Devicelistscreen> {
                               child: Text(
                                 "No devices found.",
                                 style: TextStyle(
-                                    color: AppColors.white, fontSize: 16),
+                                    color: AppColors.black, fontSize: 16),
                                 textAlign: TextAlign.center,
                               ),
                             ),

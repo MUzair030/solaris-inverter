@@ -215,7 +215,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
                       const SizedBox(height: 16),
                       const Text(
                         "Connecting to IoT network...",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                       const SizedBox(height: 8),
                       if (_connectedSSID != null)
@@ -247,7 +247,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
                         },
                         child: const Text(
                           "Cancel",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ],
@@ -327,7 +327,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.white,
+                        color: AppColors.black,
                       ),
                     ),
                     Row(
@@ -336,7 +336,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
                         IconButton(
                           icon: const Icon(
                             Icons.flash_on,
-                            color: AppColors.white,
+                            color: AppColors.black,
                             size: 22,
                           ),
                           onPressed: () => _controller.toggleTorch(),
@@ -344,7 +344,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
                         IconButton(
                           icon: const Icon(
                             Icons.cameraswitch,
-                            color: AppColors.white,
+                            color: AppColors.black,
                             size: 22,
                           ),
                           onPressed: () => _controller.switchCamera(),
@@ -807,7 +807,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
       gravity: ToastGravity.BOTTOM,
       toastLength: Toast.LENGTH_LONG,
       backgroundColor: const Color(0xFF2277BB),
-      textColor: Colors.white,
+      textColor: Colors.black,
     );
 
     // Wait for network stabilization and UI update

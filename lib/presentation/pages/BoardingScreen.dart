@@ -58,7 +58,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -89,7 +89,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                   ),

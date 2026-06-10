@@ -92,7 +92,7 @@ class LineChartWidget extends StatelessWidget {
             reservedSize: 20,
             getTitlesWidget: (value, meta) {
               return Text(_formatYAxisLabels(value),
-                  style: const TextStyle(fontSize: 9, color: AppColors.white));
+                  style: const TextStyle(fontSize: 9, color: AppColors.black));
             },
           ),
         ),
@@ -102,7 +102,7 @@ class LineChartWidget extends StatelessWidget {
             reservedSize: 25,
             getTitlesWidget: (value, meta) {
               return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 8, color: AppColors.white));
+                  style: const TextStyle(fontSize: 8, color: AppColors.black));
             },
           ),
         ),
@@ -112,7 +112,7 @@ class LineChartWidget extends StatelessWidget {
             reservedSize: 0,
             getTitlesWidget: (value, meta) {
               return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 0, color: AppColors.white));
+                  style: const TextStyle(fontSize: 0, color: AppColors.black));
             },
           ),
         ),
@@ -125,7 +125,7 @@ class LineChartWidget extends StatelessWidget {
               // final hour = value.toInt();
               // final formatted = '${hour.toString().padLeft(1, '0')}';
               // // return Text(formatted,
-              // //     style: const TextStyle(fontSize: 9, color: AppColors.white));
+              // //     style: const TextStyle(fontSize: 9, color: AppColors.black));
               //
               // return Transform.rotate(
               //   angle: 35 * 3.1415926535 / 180,
@@ -133,7 +133,7 @@ class LineChartWidget extends StatelessWidget {
               //     padding: const EdgeInsets.all(8.0),
               //     child: Text(formatted,
               //         style:
-              //             const TextStyle(fontSize: 9, color: AppColors.white)),
+              //             const TextStyle(fontSize: 9, color: AppColors.black)),
               //   ),
               // );
 
@@ -150,7 +150,7 @@ class LineChartWidget extends StatelessWidget {
                     child: Text(
                       hour.toString(),
                       style:
-                          const TextStyle(fontSize: 9, color: AppColors.white),
+                          const TextStyle(fontSize: 9, color: AppColors.black),
                     ),
                   ),
                 );
@@ -165,7 +165,7 @@ class LineChartWidget extends StatelessWidget {
               //   padding: const EdgeInsets.only(top: 6.0),
               //   child: Text(
               //     value.toInt().toString(),
-              //     style: const TextStyle(fontSize: 9, color: AppColors.white),
+              //     style: const TextStyle(fontSize: 9, color: AppColors.black),
               //   ),
               // );
             },
@@ -187,7 +187,7 @@ class LineChartWidget extends StatelessWidget {
             return touchedSpots.map((spot) {
               return LineTooltipItem(
                 '${spot.y.toStringAsFixed(1)} kWh',
-                const TextStyle(color: AppColors.white, fontSize: 12),
+                const TextStyle(color: AppColors.black, fontSize: 12),
               );
             }).toList();
           },

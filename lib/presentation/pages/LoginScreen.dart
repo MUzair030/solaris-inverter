@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     //   style: TextStyle(
                     //     fontSize: 18,
                     //     fontWeight: FontWeight.bold,
-                    //     color: AppColors.white,
+                    //     color: AppColors.black,
                     //   ),
                     // ),
                     const SizedBox(height: 10),
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 authViewModel.loginsuccessMessage ??
                                 "",
                             textAlign: TextAlign.center,
-                            style: const TextStyle(color: AppColors.white),
+                            style: const TextStyle(color: AppColors.black),
                           ),
                         ),
                       ),
@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               padding: EdgeInsets.only(top: 12, bottom: 12),
                               child: Text(
                                 "Forgot password?",
-                                style: TextStyle(color: AppColors.white),
+                                style: TextStyle(color: AppColors.black),
                               ),
                             ),
                           ),
@@ -228,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                            color: Colors.black,
                                           ),
                                         ),
                                 ),
@@ -254,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         //             style: TextStyle(
                         //               fontSize: 16,
                         //               fontWeight: FontWeight.bold,
-                        //               color: Colors.white, // White text color
+                        //               color: Colors.black, // White text color
                         //             ),
                         //           ),
                         //         ),

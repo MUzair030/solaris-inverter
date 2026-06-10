@@ -52,7 +52,7 @@ class constants {
   //         content: Center(
   //           child: Text(
   //             "No browser available to open the link.",
-  //             style: TextStyle(fontSize: 16, color: AppColors.white),
+  //             style: TextStyle(fontSize: 16, color: AppColors.black),
   //           ),
   //         ),
   //         duration: Duration(seconds: 1),

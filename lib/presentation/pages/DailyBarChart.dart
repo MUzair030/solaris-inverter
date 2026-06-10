@@ -104,7 +104,7 @@ class DailyBarChart extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: index == todayIndex
                                 ? Colors.orange
-                                : Colors.white,
+                                : Colors.black,
                           ),
                         ),
                       ),
@@ -121,7 +121,7 @@ class DailyBarChart extends StatelessWidget {
                 getTitlesWidget: (value, meta) {
                   return Text(
                     '${value.toInt()} kWh',
-                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                    style: const TextStyle(fontSize: 10, color: Colors.black),
                   );
                 },
               ),
@@ -148,7 +148,7 @@ class DailyBarChart extends StatelessWidget {
                 }
                 return BarTooltipItem(
                   '${rod.toY.toStringAsFixed(2)} kWh',
-                  const TextStyle(color: Colors.white, fontSize: 10),
+                  const TextStyle(color: Colors.black, fontSize: 10),
                 );
               },
             ),
@@ -265,7 +265,7 @@ class DailyBarChart extends StatelessWidget {
 //                           style: TextStyle(
 //                             fontSize: 12,
 //                             fontWeight: FontWeight.bold,
-//                             color: isToday ? Colors.orange : Colors.white,
+//                             color: isToday ? Colors.orange : Colors.black,
 //                           ),
 //                         ),
 //                       ),
@@ -282,7 +282,7 @@ class DailyBarChart extends StatelessWidget {
 //                 getTitlesWidget: (value, meta) {
 //                   return Text(
 //                     '${value.toInt()} kWh',
-//                     style: const TextStyle(fontSize: 10, color: Colors.white),
+//                     style: const TextStyle(fontSize: 10, color: Colors.black),
 //                   );
 //                 },
 //               ),
@@ -303,7 +303,7 @@ class DailyBarChart extends StatelessWidget {
 //               getTooltipItem: (group, groupIndex, rod, rodIndex) {
 //                 return BarTooltipItem(
 //                   '${rod.toY.toStringAsFixed(2)} kWh',
-//                   const TextStyle(color: Colors.white),
+//                   const TextStyle(color: Colors.black),
 //                 );
 //               },
 //             ),

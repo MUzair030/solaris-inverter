@@ -74,7 +74,7 @@ class ExitConfirmationDialog {
                       },
                       child: const Text(
                         "Exit",
-                        style: TextStyle(color: AppColors.white),
+                        style: TextStyle(color: AppColors.black),
                       ),
                     ),
                   ),
@@ -249,7 +249,7 @@ class ExitConfirmationDialog {
   //                               },
   //                               child: const Text(
   //                                 "Select",
-  //                                 style: TextStyle(color: AppColors.white),
+  //                                 style: TextStyle(color: AppColors.black),
   //                               ),
   //                             ),
   //                           ),
@@ -456,7 +456,7 @@ class ExitConfirmationDialog {
                                 },
                                 child: const Text(
                                   "Select",
-                                  style: TextStyle(color: AppColors.white),
+                                  style: TextStyle(color: AppColors.black),
                                 ),
                               ),
                             ),
@@ -663,7 +663,7 @@ class ExitConfirmationDialog {
                                 },
                                 child: const Text(
                                   "Deselect",
-                                  style: TextStyle(color: AppColors.white),
+                                  style: TextStyle(color: AppColors.black),
                                 ),
                               ),
                             ),
@@ -769,7 +769,7 @@ class ExitConfirmationDialog {
                                       child: const Text(
                                         "Verify otp",
                                         style:
-                                            TextStyle(color: AppColors.white),
+                                            TextStyle(color: AppColors.black),
                                       ),
                                     ),
                                   ),

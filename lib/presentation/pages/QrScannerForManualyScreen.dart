@@ -151,7 +151,7 @@ class _QrScannerForManualyScreenState extends State<QrScannerForManualyScreen> {
                     SizedBox(height: 16),
                     Text(
                       "Waiting for pairing devices...",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
                   ],
                 ),
@@ -175,7 +175,7 @@ class _QrScannerForManualyScreenState extends State<QrScannerForManualyScreen> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.white,
+                    color: AppColors.black,
                   ),
                 ),
                 Row(
@@ -184,7 +184,7 @@ class _QrScannerForManualyScreenState extends State<QrScannerForManualyScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.flash_on,
-                        color: AppColors.white,
+                        color: AppColors.black,
                         size: 22,
                       ),
                       onPressed: () => _controller.toggleTorch(),
@@ -192,7 +192,7 @@ class _QrScannerForManualyScreenState extends State<QrScannerForManualyScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.cameraswitch,
-                        color: AppColors.white,
+                        color: AppColors.black,
                         size: 22,
                       ),
                       onPressed: () => _controller.switchCamera(),

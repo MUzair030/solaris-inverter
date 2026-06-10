@@ -433,7 +433,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         },
                         child: const Icon(
                           Icons.info,
-                          color: AppColors.white,
+                          color: AppColors.black,
                           size: 25,
                         ),
                       ),
@@ -456,12 +456,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                 const Text(
                                   'SSID: ',
                                   style: TextStyle(
-                                      fontSize: 15.0, color: AppColors.white),
+                                      fontSize: 15.0, color: AppColors.black),
                                 ),
                                 Text(
                                   _conssidController.text,
                                   style: const TextStyle(
-                                      fontSize: 14.0, color: AppColors.white),
+                                      fontSize: 14.0, color: AppColors.black),
                                 ),
                               ],
                             ),
@@ -471,12 +471,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                 const Text(
                                   'BSSID: ',
                                   style: TextStyle(
-                                      fontSize: 15.0, color: AppColors.white),
+                                      fontSize: 15.0, color: AppColors.black),
                                 ),
                                 Text(
                                   _conbssidController.text,
                                   style: const TextStyle(
-                                      fontSize: 14.0, color: AppColors.white),
+                                      fontSize: 14.0, color: AppColors.black),
                                 ),
                               ],
                             ),
@@ -484,7 +484,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                             const Text(
                               '* Type your WI-FI name and password of your home network to connect.',
                               style: TextStyle(
-                                  fontSize: 14.0, color: AppColors.white),
+                                  fontSize: 14.0, color: AppColors.black),
                             ),
                             const SizedBox(height: 20),
                             Padding(
@@ -544,14 +544,14 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                     else if (!_isManualSsid)
                                       IconButton(
                                         icon: const Icon(Icons.refresh,
-                                            color: AppColors.white, size: 20),
+                                            color: AppColors.black, size: 20),
                                         onPressed: _scanWifiNetworks,
                                         tooltip: "Refresh WiFi list",
                                       ),
                                     if (!_isManualSsid)
                                       PopupMenuButton<String>(
                                         icon: const Icon(Icons.arrow_drop_down,
-                                            color: AppColors.white),
+                                            color: AppColors.black),
                                         onSelected: (String ssid) {
                                           if (ssid == "manual") {
                                             setState(() {
@@ -692,13 +692,13 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.connect_without_contact,
-                                            color: Colors.white),
+                                            color: Colors.black),
                                         SizedBox(width: 5),
                                         Text(
                                           'Connect Inverter',
                                           style: TextStyle(
                                             fontSize: 15,
-                                            color: AppColors.white,
+                                            color: AppColors.black,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -711,13 +711,13 @@ class _AddDevicePageState extends State<AddDevicePage> {
                             Text(
                               _status,
                               style: const TextStyle(
-                                  fontSize: 15, color: AppColors.white),
+                                  fontSize: 15, color: AppColors.black),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               "Response: $_message",
                               style: const TextStyle(
-                                  fontSize: 15, color: AppColors.white),
+                                  fontSize: 15, color: AppColors.black),
                             ),
                           ],
                         ),
@@ -892,7 +892,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, // White text color
+                          color: Colors.black, // White text color
                         ),
                       ),
                     ),
@@ -1042,7 +1042,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, // White text color
+                          color: Colors.black, // White text color
                         ),
                       ),
                     ),

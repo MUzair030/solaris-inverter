@@ -175,7 +175,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
             getTitlesWidget: (value, meta) {
               return Text(
                 (value.toInt()).toStringAsFixed(0),
-                style: const TextStyle(fontSize: 9, color: Colors.white),
+                style: const TextStyle(fontSize: 9, color: Colors.black),
               );
             },
           ),
@@ -186,7 +186,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
             reservedSize: 20,
             getTitlesWidget: (value, meta) {
               return Text(_formatYAxisLabels(value),
-                  style: const TextStyle(fontSize: 9, color: AppColors.white));
+                  style: const TextStyle(fontSize: 9, color: AppColors.black));
             },
           ),
         ),
@@ -211,7 +211,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
               //     style: const TextStyle(
               //         fontSize: 9,
               //         fontWeight: FontWeight.bold,
-              //         color: AppColors.white),
+              //         color: AppColors.black),
               //   ),
               // );
 
@@ -221,7 +221,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
               final hour = value.toInt();
               final formatted = '${hour.toString().padLeft(1, '0')}';
               return Text(formatted,
-                  style: const TextStyle(fontSize: 9, color: AppColors.white));
+                  style: const TextStyle(fontSize: 9, color: AppColors.black));
             },
           ),
         ),
@@ -263,7 +263,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
       //         return LineTooltipItem(
       //           '$title: ${spot.y.toStringAsFixed(1)}$units\n$dateTime',
       //           const TextStyle(
-      //             color: Colors.white,
+      //             color: Colors.black,
       //             fontSize: 12,
       //             fontFeatures: [FontFeature.tabularFigures()],
       //           ),
@@ -271,7 +271,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
       //         // return LineTooltipItem(
       //         //   '$title: ${spot.y.toStringAsFixed(1)}$units\n',
       //         //   const TextStyle(
-      //         //     color: Colors.white,
+      //         //     color: Colors.black,
       //         //     fontSize: 12,
       //         //     fontFeatures: [FontFeature.tabularFigures()],
       //         //   ),
@@ -329,7 +329,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
           //     return LineTooltipItem(
           //       '$title: ${spot.y.toStringAsFixed(1)}$units\n$dateTime',
           //       const TextStyle(
-          //         color: Colors.white,
+          //         color: Colors.black,
           //         fontSize: 11,
           //         fontFeatures: [FontFeature.tabularFigures()],
           //       ),
@@ -392,7 +392,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
                 return LineTooltipItem(
                   buffer.toString(),
                   const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 11,
                     height: 1.2,
                     fontFeatures: [FontFeature.tabularFigures()],
@@ -411,7 +411,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
             //     return LineTooltipItem(
             //       buffer.toString(),
             //       const TextStyle(
-            //         color: Colors.white,
+            //         color: Colors.black,
             //         fontSize: 11,
             //         fontFeatures: [FontFeature.tabularFigures()],
             //       ),
@@ -517,12 +517,12 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
               ),
               const SizedBox(width: 4),
               Text(text,
-                  style: const TextStyle(fontSize: 12, color: AppColors.white)),
+                  style: const TextStyle(fontSize: 12, color: AppColors.black)),
             ],
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 12, color: AppColors.white),
+            style: const TextStyle(fontSize: 12, color: AppColors.black),
           ),
         ],
       ),

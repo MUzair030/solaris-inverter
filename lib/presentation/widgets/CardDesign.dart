@@ -21,7 +21,7 @@ class CardDesign extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Center(
-            child: Text(message, style: TextStyle(color: AppColors.white)),
+            child: Text(message, style: TextStyle(color: AppColors.black)),
           ),
         ),
       ),

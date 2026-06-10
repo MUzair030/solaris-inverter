@@ -68,7 +68,7 @@ class ErrorScreen extends StatelessWidget {
         // const Text(
         //   "Oops! Something went wrong.",
         //   style: TextStyle(
-        //     color: Colors.white,
+        //     color: Colors.black,
         //     fontSize: 20,
         //     fontWeight: FontWeight.w600,
         //   ),
@@ -96,7 +96,7 @@ class ErrorScreen extends StatelessWidget {
                 content: Center(
                   child: Text(
                     "Kindly Check your System and Retry...",
-                    style: TextStyle(color: AppColors.white, fontSize: 16),
+                    style: TextStyle(color: AppColors.black, fontSize: 16),
                   ),
                 ),
                 duration: Duration(seconds: 3),
@@ -125,14 +125,14 @@ class ErrorScreen extends StatelessWidget {
             children: [
               Icon(
                 Icons.refresh,
-                color: AppColors.white,
+                color: AppColors.black,
               ),
               SizedBox(width: 6),
               Text(
                 "Retry",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ],
