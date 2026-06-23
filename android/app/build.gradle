@@ -40,10 +40,18 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("inverterkey.jks") // Keystore file
-            storePassword "inverterkey"
-            keyAlias "inverterkey"
-            keyPassword "inverterkey"
+            def keystoreFile = System.getenv("CM_KEYSTORE_PATH")
+            if (keystoreFile != null) {
+                storeFile file(keystoreFile)
+                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("CM_KEY_ALIAS")
+                keyPassword System.getenv("CM_KEY_PASSWORD")
+            } else {
+                storeFile file("inverterkey.jks") // fallback for local builds if it exists
+                storePassword "inverterkey"
+                keyAlias "inverterkey"
+                keyPassword "inverterkey"
+            }
         }
     }
 
