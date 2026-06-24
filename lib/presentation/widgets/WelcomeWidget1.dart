@@ -16,7 +16,7 @@ class WelcomeWidget1 extends StatelessWidget {
             Text("Welcome to Smart Home!",
                 style: TextStyle(
                     fontSize: 22,
-                    color: AppColors.green,
+                    color: AppColors.blue,
                     fontWeight: FontWeight.bold)),
           ],
         ),

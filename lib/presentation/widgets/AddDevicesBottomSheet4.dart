@@ -59,7 +59,7 @@ class AddDevicesBottomSheet4 extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Green background
+                backgroundColor: const Color(0xFFFF6B00), // Green background
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), // Rounded corners
                 ),

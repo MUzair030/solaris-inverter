@@ -104,7 +104,7 @@ class buildInverterCard1 extends StatelessWidget {
                           value: (double.tryParse("${data.genPower}") ?? 0) / 5,
                           backgroundColor: AppColors.white, // Background color
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.green), // Fill color
+                              AppColors.blue), // Fill color
                         ),
                       ),
                     ],
@@ -144,7 +144,7 @@ class buildInverterCard1 extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                  color: Colors.green, shape: BoxShape.circle)),
+                                  color: const Color(0xFFFF6B00), shape: BoxShape.circle)),
                           const SizedBox(width: 6),
                           Text("Live",
                               style: TextStyle(

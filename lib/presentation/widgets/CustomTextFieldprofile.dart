@@ -70,7 +70,7 @@ class _CustomTextFieldprofileState extends State<CustomTextFieldprofile> {
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Image.asset(
                     widget.assetIcon!,
-                    color: AppColors.green,
+                    color: AppColors.blue,
                     width: 20,
                     height: 20,
                     fit: BoxFit.contain,
@@ -85,7 +85,7 @@ class _CustomTextFieldprofileState extends State<CustomTextFieldprofile> {
             borderSide: BorderSide(color: AppColors.black),
           ),
           focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: AppColors.green),
+            borderSide: BorderSide(color: AppColors.blue),
           ),
         ),
         onChanged: (_) {
@@ -133,7 +133,7 @@ class _CustomTextFieldprofileState extends State<CustomTextFieldprofile> {
 //                 borderSide: BorderSide(color: AppColors.black),
 //               ),
 //               focusedBorder: const UnderlineInputBorder(
-//                 borderSide: BorderSide(color: AppColors.green),
+//                 borderSide: BorderSide(color: AppColors.blue),
 //               ),
 //             ),
 //             onChanged: (value) {

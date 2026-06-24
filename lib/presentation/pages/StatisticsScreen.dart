@@ -342,7 +342,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                             color: labels[value.toInt()] == currentLabel
-                                ? AppColors.green
+                                ? AppColors.blue
                                 : Colors.white,
                           ),
                         ),
@@ -403,7 +403,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       barTouchData: BarTouchData(
         enabled: true,
         touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: AppColors.green,
+          tooltipBgColor: AppColors.blue,
           tooltipPadding: const EdgeInsets.all(4),
           tooltipMargin: 0,
           fitInsideVertically: true,
@@ -433,7 +433,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             BarChartRodData(
               toY: value,
               width: 25,
-              color: Colors.green,
+              color: const Color(0xFFFF6B00),
               borderRadius: BorderRadius.circular(4),
               backDrawRodData: BackgroundBarChartRodData(
                 show: true,
@@ -483,7 +483,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                 style: TextStyle(
                   fontSize: 14,
                   color:
-                      filter == selectedFilter ? AppColors.green : Colors.white,
+                      filter == selectedFilter ? AppColors.blue : Colors.white,
                   fontWeight: filter == selectedFilter
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -581,8 +581,8 @@ class _StatisticsscreenState extends State<Statisticsscreen>
             width: 15,
             color: totalEnergy > 0
                 ? (selectedBarIndex == index
-                    ? AppColors.green
-                    : AppColors.green)
+                    ? AppColors.blue
+                    : AppColors.blue)
                 : AppColors.gray1.withOpacity(0.2),
             borderRadius: BorderRadius.circular(4),
             backDrawRodData: BackgroundBarChartRodData(
@@ -602,7 +602,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       //       color: totalEnergy > 0
       //           ? (selectedBarIndex == index
       //               ? AppColors.orange
-      //               : AppColors.green)
+      //               : AppColors.blue)
       //           : AppColors.gray1.withOpacity(0.2),
       //       width: 25,
       //       borderRadius: BorderRadius.circular(3),
@@ -677,7 +677,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                             color: labels[value.toInt()] == currentLabel
-                                ? AppColors.green
+                                ? AppColors.blue
                                 : Colors.white,
                           ),
                         ),

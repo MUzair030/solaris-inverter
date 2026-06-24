@@ -77,7 +77,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFFF6B00), Color(0xFFFFA500)],
+                      colors: [const Color(0xFFFF6B00), Color(0xFFFFA500)],
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),

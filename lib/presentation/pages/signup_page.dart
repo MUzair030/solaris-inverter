@@ -266,7 +266,7 @@ class _SignupPageState extends State<SignupPage> {
                           color: authViewModel.errorMessage != null ||
                                   viewModel.error != null
                               ? AppColors.red
-                              : AppColors.green,
+                              : AppColors.blue,
                           borderRadius:
                               BorderRadius.circular(3), // Rounded corners
                         ),
@@ -319,7 +319,7 @@ class _SignupPageState extends State<SignupPage> {
                           onChanged: (bool? value) {
                             setState(() => _isChecked = value ?? false);
                           },
-                          activeColor: AppColors.green,
+                          activeColor: AppColors.blue,
                         ),
                         Expanded(
                           child: Text(
@@ -338,7 +338,7 @@ class _SignupPageState extends State<SignupPage> {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFFFF6B00), Color(0xFFFFA500)],
+                                colors: [const Color(0xFFFF6B00), Color(0xFFFFA500)],
                               ),
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -385,7 +385,7 @@ class _SignupPageState extends State<SignupPage> {
                     //               : () => _validateAndSignup(authViewModel),
                     //           style: ElevatedButton.styleFrom(
                     //             backgroundColor:
-                    //                 Colors.green, // Green background
+                    //                 const Color(0xFFFF6B00), // Green background
                     //             shape: RoundedRectangleBorder(
                     //               borderRadius: BorderRadius.circular(
                     //                   10), // Rounded corners
@@ -417,14 +417,14 @@ class _SignupPageState extends State<SignupPage> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green, width: 1),
+                          border: Border.all(color: const Color(0xFFFF6B00), width: 1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Center(
                           child: Text(
                             "Already have an account? Login",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: const Color(0xFFFF6B00),
                               fontSize: 13,
                             ),
                           ),

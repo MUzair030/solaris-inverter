@@ -30,7 +30,7 @@ class _DeviceCardState extends State<DeviceCard> {
     return Card(
       color: widget.isSelected
           ? AppColors.lightgreen.withOpacity(0.6)
-          : AppColors.green1,
+          : AppColors.blue,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Stack(
@@ -52,7 +52,7 @@ class _DeviceCardState extends State<DeviceCard> {
                       //   scale: 0.7,
                       //   child: CupertinoSwitch(
                       //     value: isSwitched,
-                      //     activeColor: AppColors.green,
+                      //     activeColor: AppColors.blue,
                       //     trackColor: AppColors.switchgray,
                       //     onChanged: (value) {
                       //       setState(

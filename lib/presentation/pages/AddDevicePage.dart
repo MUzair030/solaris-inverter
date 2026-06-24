@@ -537,7 +537,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                           height: 20,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            color: AppColors.green,
+                                            color: AppColors.blue,
                                           ),
                                         ),
                                       )
@@ -626,7 +626,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   border:
-                                      Border.all(color: Colors.green, width: 1),
+                                      Border.all(color: const Color(0xFFFF6B00), width: 1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Row(
@@ -634,14 +634,14 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                   children: [
                                     Icon(
                                       Icons.qr_code_scanner,
-                                      color: AppColors.green,
+                                      color: AppColors.blue,
                                       size: 25,
                                     ),
                                     SizedBox(width: 10),
                                     Text(
                                       "Scan QR Code",
                                       style: TextStyle(
-                                        color: Colors.green,
+                                        color: const Color(0xFFFF6B00),
                                         fontSize: 13,
                                       ),
                                     ),
@@ -686,7 +686,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        color: AppColors.green),
+                                        color: AppColors.blue),
                                     child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -1030,7 +1030,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Green background
+                        backgroundColor: const Color(0xFFFF6B00), // Green background
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(7), // Rounded corners

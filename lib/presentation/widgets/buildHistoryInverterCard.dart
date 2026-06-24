@@ -213,7 +213,7 @@ class _buildInverterCardState extends State<buildHistoryInverterCard> {
                                     backgroundColor: AppColors.white,
                                     valueColor:
                                         const AlwaysStoppedAnimation<Color>(
-                                            AppColors.green),
+                                            AppColors.blue),
                                   );
                                 },
                               ),
@@ -277,7 +277,7 @@ class _buildInverterCardState extends State<buildHistoryInverterCard> {
                                             height: 12,
                                             decoration: BoxDecoration(
                                               color: status == "Online"
-                                                  ? Colors.green
+                                                  ? const Color(0xFFFF6B00)
                                                   : Colors.red,
                                               shape: BoxShape.circle,
                                             ),
@@ -287,7 +287,7 @@ class _buildInverterCardState extends State<buildHistoryInverterCard> {
                                             status,
                                             style: TextStyle(
                                               color: status == "Online"
-                                                  ? Colors.green
+                                                  ? const Color(0xFFFF6B00)
                                                   : Colors.red,
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
@@ -302,7 +302,7 @@ class _buildInverterCardState extends State<buildHistoryInverterCard> {
                                               'Loading...',
                                           style: const TextStyle(
                                             fontSize: 16,
-                                            color: AppColors.green,
+                                            color: AppColors.blue,
                                           ),
                                         ),
                                       )

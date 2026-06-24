@@ -202,7 +202,7 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.green,
+                              color: AppColors.blue,
                             ),
                           ),
                           const Text(
@@ -239,7 +239,7 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
-                                          Colors.green, // Green background
+                                          const Color(0xFFFF6B00), // Green background
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),

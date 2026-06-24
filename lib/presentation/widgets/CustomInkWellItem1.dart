@@ -19,9 +19,9 @@ class CustomInkWellItem1 extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(7), // Rounded corners
-      splashColor: Colors.green.withOpacity(0.3), // Ripple effect color
+      splashColor: const Color(0xFFFF6B00).withOpacity(0.3), // Ripple effect color
       highlightColor:
-          Colors.green.withOpacity(0.5), // Background color when pressed
+          const Color(0xFFFF6B00).withOpacity(0.5), // Background color when pressed
       child: Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 10, left: 5),
         child: Row(

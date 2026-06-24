@@ -31,7 +31,7 @@ Widget buildLegend() {
     // spacing: 10,
     children: [
       LegendItem(color: Colors.orange, label: 'Energy Consumed'),
-      LegendItem(color: Colors.green, label: 'Gen Power'),
+      LegendItem(color: const Color(0xFFFF6B00), label: 'Gen Power'),
       LegendItem(color: Colors.blue, label: 'PV Voltage'),
       LegendItem(color: Colors.purple, label: 'Output Voltage'),
       LegendItem(color: Colors.red, label: 'Output Current'),

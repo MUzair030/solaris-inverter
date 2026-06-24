@@ -84,7 +84,7 @@ class WeeklyBarChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: value,
-                      color: Colors.green,
+                      color: const Color(0xFFFF6B00),
                       width: 16,
                     ),
                   ],

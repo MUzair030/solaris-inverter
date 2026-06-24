@@ -38,7 +38,7 @@ class AddDevicesBottomSheet extends StatelessWidget {
                 "1).",
                 style: TextStyle(
                     fontSize: 18,
-                    color: AppColors.green,
+                    color: AppColors.blue,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(width: 10),
@@ -59,7 +59,7 @@ class AddDevicesBottomSheet extends StatelessWidget {
                 "2).",
                 style: TextStyle(
                     fontSize: 18,
-                    color: AppColors.green,
+                    color: AppColors.blue,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(width: 10),
@@ -84,7 +84,7 @@ class AddDevicesBottomSheet extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: const Color(0xFFFF6B00),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

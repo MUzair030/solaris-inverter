@@ -90,7 +90,7 @@ class FirstScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: const Color(0xFFFF6B00),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -178,7 +178,7 @@ class FirstScreen extends StatelessWidget {
                           //         builder: (context) => AddDevicePage()));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Green background
+                          backgroundColor: const Color(0xFFFF6B00), // Green background
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(10), // Rounded corners
@@ -222,14 +222,14 @@ class FirstScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green, width: 1),
+                          border: Border.all(color: const Color(0xFFFF6B00), width: 1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Center(
                           child: Text(
                             "Voltis",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: const Color(0xFFFF6B00),
                               fontSize: 13,
                             ),
                           ),
