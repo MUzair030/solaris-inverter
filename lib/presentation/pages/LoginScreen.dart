@@ -20,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usermailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isSubmitting = false;
 
   late AuthViewModel viewModel;
 
@@ -51,8 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _validateAndSignin(AuthViewModel authViewModel) {
-    // if (authViewModel.isLoading) return;
+  void _validateAndSignin(AuthViewModel authViewModel) async {
+    if (_isSubmitting) return;
     authViewModel.clearMessages();
     setState(() {
       authViewModel.loginerrorMessage = null;
@@ -94,7 +95,18 @@ class _LoginScreenState extends State<LoginScreen> {
       email: usermailController.text,
       password: passwordController.text,
     );
-    authViewModel.login(context, request);
+    setState(() {
+      _isSubmitting = true;
+    });
+    try {
+      await authViewModel.login(context, request);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -206,12 +218,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
-                                    colors: [const Color(0xFFFF6B00), Color(0xFFFFA500)],
+                                    colors: [Color(0xFFFF6B00), Color(0xFFFFA500)],
                                   ),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: ElevatedButton(
-                                  onPressed: authViewModel.isLoading
+                                  onPressed: authViewModel.isLoading || _isSubmitting
                                       ? null
                                       : () => _validateAndSignin(authViewModel),
                                   style: ElevatedButton.styleFrom(
@@ -223,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 6),
                                   ),
-                                  child: authViewModel.isLoading
+                                  child: authViewModel.isLoading || _isSubmitting
                                       ? const SizedBox(
                                           child: CircularProgressIndicator(
                                             valueColor:
@@ -241,32 +253,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                 ),
                               ),
-                        // authViewModel.isLoading
-                        //     ? CircularProgressIndicator()
-                        //     : SizedBox(
-                        //         width: double.infinity, // Full width button
-                        //         child: ElevatedButton(
-                        //           onPressed: authViewModel.isLoading
-                        //               ? null
-                        //               : () => _validateAndSignin(authViewModel),
-                        //           style: ElevatedButton.styleFrom(
-                        //             backgroundColor:
-                        //                 const Color(0xFFFF6B00), // Green background
-                        //             shape: RoundedRectangleBorder(
-                        //               borderRadius: BorderRadius.circular(10),
-                        //             ),
-                        //             padding: EdgeInsets.symmetric(vertical: 5),
-                        //           ),
-                        //           child: Text(
-                        //             "Login",
-                        //             style: TextStyle(
-                        //               fontSize: 16,
-                        //               fontWeight: FontWeight.bold,
-                        //               color: Colors.white, // White text color
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
                         const SizedBox(height: 15),
                         GestureDetector(
                           onTap: () {

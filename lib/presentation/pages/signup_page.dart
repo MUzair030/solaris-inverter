@@ -26,6 +26,7 @@ class _SignupPageState extends State<SignupPage> {
   // final TextEditingController usernameController = TextEditingController();
   // final TextEditingController lastnameController = TextEditingController();
   bool _isChecked = false;
+  bool _isSubmitting = false;
 
   late final Color colortext;
 
@@ -109,7 +110,8 @@ class _SignupPageState extends State<SignupPage> {
 
   String? passwordErrorText;
   String? confirmPasswordErrorText;
-  void _validateAndSignup(AuthViewModel authViewModel) {
+  void _validateAndSignup(AuthViewModel authViewModel) async {
+    if (_isSubmitting) return;
     // if (authViewModel.isLoading) return;
     authViewModel.clearMessages();
     setState(() {
@@ -211,7 +213,18 @@ class _SignupPageState extends State<SignupPage> {
       lastname: "",
     );
 
-    authViewModel.signup(context, request);
+    setState(() {
+      _isSubmitting = true;
+    });
+    try {
+      await authViewModel.signup(context, request);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -344,7 +357,7 @@ class _SignupPageState extends State<SignupPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: ElevatedButton(
-                              onPressed: authViewModel.isLoading
+                              onPressed: authViewModel.isLoading || _isSubmitting
                                   ? null
                                   : () => _validateAndSignup(authViewModel),
                               style: ElevatedButton.styleFrom(
@@ -356,7 +369,7 @@ class _SignupPageState extends State<SignupPage> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 6),
                               ),
-                              child: authViewModel.isLoading
+                              child: authViewModel.isLoading || _isSubmitting
                                   ? const SizedBox(
                                       child: CircularProgressIndicator(
                                         valueColor:
