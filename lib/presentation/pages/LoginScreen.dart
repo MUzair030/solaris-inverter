@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _isSubmitting = true;
     });
     try {
-      await authViewModel.login(context, request);
+      await authViewModel.login(request);
     } finally {
       if (mounted) {
         setState(() {

@@ -45,9 +45,9 @@ import 'presentation/pages/SplashScreen.dart';
 import 'presentation/viewmodels/DeviceViewModel.dart';
 import 'presentation/viewmodels/MacViewModel.dart';
 import 'presentation/viewmodels/auth_viewmodel.dart';
-// import 'core/navigation/app_navigator.dart';
-//
-// final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+/// Global navigator key used by AuthViewModel to navigate
+/// without needing a BuildContext (safe across async gaps on Android 14+).
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -181,11 +181,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Voltis Inverter',
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // navigatorKey: navigatorKey,
       home: SplashScreen(),
     );
   }

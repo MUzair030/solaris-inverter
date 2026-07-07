@@ -1,8 +1,9 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/core/network/dio_client.dart';
+import 'package:threepol_inverter_flutter/main.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/EmailScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/FirstScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/MainBottomNavigationView.dart';
@@ -42,15 +43,14 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> signup(BuildContext context, SignupRequestModel request) async {
+  // Signup - no BuildContext; navigation uses navigatorKey (safe on Android 15)
+  Future<void> signup(SignupRequestModel request) async {
     try {
       bool isConnected = await _checkInternet();
       if (!isConnected) {
         loginerrorMessage = "Network is not connected";
         notifyListeners();
-        Future.delayed(const Duration(seconds: 2), () {
-          clearMessages();
-        });
+        Future.delayed(const Duration(seconds: 2), clearMessages);
         return;
       }
       isLoading = true;
@@ -59,48 +59,36 @@ class AuthViewModel extends ChangeNotifier {
       final response = await _signupUseCase.execute(request);
 
       if (response.message.contains("Error:")) {
-        // errorMessage = response.message
-        //     .replaceFirst("Error: ", "")
-        //     .trim(); // Extract error message
-        // successMessage = null;
         errorMessage = response.message.replaceFirst("Error: ", "").trim();
         successMessage = null;
-        print("Signup Error: $errorMessage");
       } else {
         successMessage = response.message;
-        errorMessage = response.message;
-        print("Signup Success: $successMessage");
-
-        // Delay navigation by 1 second
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          _navigateToLogin(context);
-          clearMessages();
-        });
         errorMessage = null;
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          clearMessages();
+          navigatorKey.currentState?.pushReplacement(
+            MaterialPageRoute(builder: (_) => LoginScreen()),
+          );
+        });
       }
     } catch (e) {
       errorMessage =
           e.toString().replaceAll(RegExp(r'Exception: |Error: '), '').trim();
       successMessage = null;
-      // print("Signup Exception: $errorMessage");
-      Future.delayed(const Duration(seconds: 2), () {
-        clearMessages();
-      });
+      Future.delayed(const Duration(seconds: 2), clearMessages);
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> login(BuildContext context, LoginRequestModel request) async {
+  // Login - no BuildContext; navigation uses navigatorKey (safe on Android 15)
+  Future<void> login(LoginRequestModel request) async {
     try {
       bool isConnected = await _checkInternet();
       if (!isConnected) {
         loginerrorMessage = "Network is not connected";
         notifyListeners();
-        // Future.delayed(const Duration(seconds: 2), () {
-        //   clearMessages();
-        // });
         return;
       }
       isLoading = true;
@@ -111,41 +99,35 @@ class AuthViewModel extends ChangeNotifier {
       loginerrorMessage = loginsuccessMessage;
       isLoggedIn = true;
 
-      // Save the token first
       await SharedPreferencesHelper.saveLoginData(response.id,
           response.username, response.email, request.password, response.token);
 
-      // 🔥 Refresh Dio with the new token immediately
       await dioClient.refreshToken();
 
-      // print("🔵 Token updated in DioClient!");
-
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        viewModel ??= Provider.of<DeviceViewModel>(context, listen: false);
+      final ctx = navigatorKey.currentContext;
+      if (ctx != null) {
+        viewModel ??= Provider.of<DeviceViewModel>(ctx, listen: false);
         await viewModel?.fetchDevices();
-        // Provider.of<InverterViewModel>(context, listen: false)
-        //     .fetchInverterData(context);
-        // Delay navigation by 1 second
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          if (viewModel?.hasDevices == true) {
-            _navigateToHome(context);
-          } else {
-            _navigateToFirstScreen(context);
-          }
-          // Clear messages after navigation
-          clearMessages();
-        });
+      }
+
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        clearMessages();
+        if (viewModel?.hasDevices == true) {
+          navigatorKey.currentState?.pushReplacement(
+            MaterialPageRoute(builder: (_) => Mainbottomnavigationview()),
+          );
+        } else {
+          navigatorKey.currentState?.pushReplacement(
+            MaterialPageRoute(builder: (_) => FirstScreen()),
+          );
+        }
       });
 
       loginerrorMessage = null;
     } catch (e) {
       loginerrorMessage = e.toString().replaceAll("Exception:", "").trim();
-      // loginerrorMessage = "Wrong credentials";
       loginsuccessMessage = null;
       isLoggedIn = false;
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   clearMessages();
-      // });
     } finally {
       isLoading = false;
       notifyListeners();
@@ -169,35 +151,11 @@ class AuthViewModel extends ChangeNotifier {
     isLoading = false;
   }
 
-  void _navigateToLogin(BuildContext context) {
-    clearMessages();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
-
-  void _navigateToHome(BuildContext context) {
-    clearMessages();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Mainbottomnavigationview()),
-    );
-  }
-
-  void _navigateToFirstScreen(BuildContext context) {
-    clearMessages();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => FirstScreen()),
-    );
-  }
-
   void navigateToEmail(BuildContext context) {
     clearMessages();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => EmailScreen()),
+      MaterialPageRoute(builder: (_) => EmailScreen()),
     );
   }
 }

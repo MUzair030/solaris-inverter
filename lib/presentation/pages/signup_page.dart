@@ -217,7 +217,7 @@ class _SignupPageState extends State<SignupPage> {
       _isSubmitting = true;
     });
     try {
-      await authViewModel.signup(context, request);
+      await authViewModel.signup(request);
     } finally {
       if (mounted) {
         setState(() {
