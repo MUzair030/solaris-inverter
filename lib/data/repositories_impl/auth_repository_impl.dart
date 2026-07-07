@@ -135,22 +135,36 @@ class AuthRepositoryImpl implements AuthRepository {
   // }
 
   String _extractErrorMessage(dynamic data) {
-    final message = data?['message'];
-
-    if (message is List && message.isNotEmpty) {
-      return message.first.toString();
-    } else if (message is Map) {
-      // if 'message' is a map like {email: ["Email already exists"]}
-      final firstKey = message.keys.first;
-      final value = message[firstKey];
-      if (value is List && value.isNotEmpty) {
-        return value.first.toString();
+    if (data == null) return 'An unexpected error occurred';
+    if (data is String) return data;
+    
+    if (data is Map) {
+      if (data.containsKey('message')) {
+        final message = data['message'];
+        if (message is List && message.isNotEmpty) {
+          return message.first.toString();
+        } else if (message is Map && message.isNotEmpty) {
+          final firstKey = message.keys.first;
+          final value = message[firstKey];
+          if (value is List && value.isNotEmpty) {
+            return value.first.toString();
+          }
+          return value.toString();
+        } else if (message is String) {
+          return message;
+        }
+      } else if (data.isNotEmpty) {
+        // Fallback for cases like {"password": ["Too short"]}
+        final firstKey = data.keys.first;
+        final value = data[firstKey];
+        if (value is List && value.isNotEmpty) {
+          return value.first.toString();
+        } else if (value is String) {
+          return value;
+        }
       }
-      return value.toString();
-    } else if (message is String) {
-      return message;
-    } else {
-      return 'An unexpected error occurred';
     }
+    
+    return 'An unexpected error occurred';
   }
 }

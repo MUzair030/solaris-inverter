@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,10 +32,20 @@ class AuthViewModel extends ChangeNotifier {
 
   DeviceViewModel? viewModel;
 
+  Future<bool> _checkInternet() async {
+    try {
+      final result = await InternetAddress.lookup("google.com")
+          .timeout(const Duration(seconds: 3));
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> signup(BuildContext context, SignupRequestModel request) async {
     try {
-      final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      bool isConnected = await _checkInternet();
+      if (!isConnected) {
         loginerrorMessage = "Network is not connected";
         notifyListeners();
         Future.delayed(const Duration(seconds: 2), () {
@@ -83,8 +94,8 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> login(BuildContext context, LoginRequestModel request) async {
     try {
-      final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      bool isConnected = await _checkInternet();
+      if (!isConnected) {
         loginerrorMessage = "Network is not connected";
         notifyListeners();
         // Future.delayed(const Duration(seconds: 2), () {
