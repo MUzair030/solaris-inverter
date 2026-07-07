@@ -469,7 +469,7 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
 
       print("🔗 [WiFi] Checking current connection...");
 
-      // Request location permission (required for WiFi access on Android)
+      // Request location permission and check Wi-Fi (Android only)
       if (Platform.isAndroid) {
         final status = await Permission.location.request();
         if (!status.isGranted) {
@@ -482,15 +482,14 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
           );
           return;
         }
-      }
 
-      // First, check if we're already connected to this network
-      final isAlreadyConnected = await _checkCurrentConnection(wifi);
-      if (isAlreadyConnected) {
-        print("✅ [WiFi] Already connected to ${wifi.ssid}");
-        await _onConnectedToIoT(wifi);
-        return;
-      }
+        // First, check if we're already connected to this network
+        final isAlreadyConnected = await _checkCurrentConnection(wifi);
+        if (isAlreadyConnected) {
+          print("✅ [WiFi] Already connected to ${wifi.ssid}");
+          await _onConnectedToIoT(wifi);
+          return;
+        }
 
         // Check if WiFi is enabled
         print("📡 [WiFi] Checking if WiFi is enabled...");
