@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/mainscreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/signup_page.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usermailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isSubmitting = false;
+  String _appVersion = '';
 
   late AuthViewModel viewModel;
 
@@ -32,18 +34,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // usermailController.text = "irshad@gmail.com";
-    // passwordController.text = "123456789";
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
     ));
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   viewModel = Provider.of<AuthViewModel>(context, listen: false);
-    //   await viewModel.init();
-    // });
     super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = 'v${info.version} (${info.buildNumber})';
+      });
+    }
   }
 
   @override
@@ -126,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Image.asset("assets/splash_bg.png", fit: BoxFit.cover),
             Container(
-              color: Colors.black.withOpacity(0.3), // Dark overlay
+              color: Colors.black.withOpacity(0.3),
             ),
             SingleChildScrollView(
               child: Padding(
@@ -151,18 +157,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         authViewModel.loginsuccessMessage != null)
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(
-                            3), // Add padding for better appearance
+                        padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           color: authViewModel.loginerrorMessage != null
-                              ? AppColors.red // Show red if there's an error
+                              ? AppColors.red
                               : (authViewModel.loginsuccessMessage != null
-                                  ? AppColors
-                                      .green // Show green if login is successful
-                                  : Colors
-                                      .transparent), // Default to transparent
-                          borderRadius:
-                              BorderRadius.circular(3), // Rounded corners
+                                  ? AppColors.green
+                                  : Colors.transparent),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                         child: Center(
                           child: Text(
@@ -196,7 +198,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
-                              // Fluttertoast.showToast(msg: "coming soon...");
                               Provider.of<AuthViewModel>(context, listen: false)
                                   .navigateToEmail(context);
                             },
@@ -259,8 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      SignupPage()), // Replace with your LoginScreen
+                                  builder: (context) => SignupPage()),
                             );
                           },
                           child: Container(
@@ -274,13 +274,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Text(
                                 "Don't have an account? Signup",
                                 style: TextStyle(
-                                  color: const Color(0xFFFF6B00),
+                                  color: Color(0xFFFF6B00),
                                   fontSize: 13,
                                 ),
                               ),
                             ),
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        // Version tag
+                        if (_appVersion.isNotEmpty)
+                          Text(
+                            _appVersion,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.45),
+                              fontSize: 11,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ],
