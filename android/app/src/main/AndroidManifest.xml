@@ -129,8 +129,8 @@
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:enabled="true"
             android:exported="false"
-             android:stopWithTask="false"
-            android:foregroundServiceType="dataSync|connectedDevice"
+            android:stopWithTask="false"
+            android:foregroundServiceType="dataSync"
             tools:replace="android:exported" />
 <!--        <service-->
 <!--            android:name="id.flutter.flutter_background_service.BackgroundService"-->
