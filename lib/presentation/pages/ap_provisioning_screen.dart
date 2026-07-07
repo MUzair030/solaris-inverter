@@ -108,8 +108,10 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         // Navigator.pop(context);
         Navigator.pushReplacement(
           context,
@@ -117,7 +119,6 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
             builder: (context) => const Mainbottomnavigationview(),
           ), // Navigate back
         );
-        return false;
       },
       child: Scaffold(
         body: Stack(
@@ -468,14 +469,6 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
 
       print("🔗 [WiFi] Checking current connection...");
 
-      // First, check if we're already connected to this network
-      final isAlreadyConnected = await _checkCurrentConnection(wifi);
-      if (isAlreadyConnected) {
-        print("✅ [WiFi] Already connected to ${wifi.ssid}");
-        await _onConnectedToIoT(wifi);
-        return;
-      }
-
       // Request location permission (required for WiFi access on Android)
       if (Platform.isAndroid) {
         final status = await Permission.location.request();
@@ -489,6 +482,15 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
           );
           return;
         }
+      }
+
+      // First, check if we're already connected to this network
+      final isAlreadyConnected = await _checkCurrentConnection(wifi);
+      if (isAlreadyConnected) {
+        print("✅ [WiFi] Already connected to ${wifi.ssid}");
+        await _onConnectedToIoT(wifi);
+        return;
+      }
 
         // Check if WiFi is enabled
         print("📡 [WiFi] Checking if WiFi is enabled...");

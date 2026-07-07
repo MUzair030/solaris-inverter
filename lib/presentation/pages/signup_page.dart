@@ -218,14 +218,15 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
     final viewModel = Provider.of<SendOtpViewModel>(context);
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => LoginScreen()), // Navigate back
         );
-        return false;
       },
       child: Scaffold(
         body: Stack(

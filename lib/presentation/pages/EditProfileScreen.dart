@@ -262,12 +262,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<EditUserViewModel>(context);
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         viewModel.clearMessages1();
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (contex) => SettingsScreen()));
-        return false;
       },
       child: Scaffold(
         body: Padding(

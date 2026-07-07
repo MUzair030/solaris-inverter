@@ -167,15 +167,18 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         if (_selectedIndexNotifier.value != 0) {
           _selectedIndexNotifier.value = 0;
-          return false;
         } else {
           bool exitApp =
               await ExitConfirmationDialog.showExitConfirmationDialog(context);
-          return exitApp;
+          if (exitApp) {
+            SystemNavigator.pop();
+          }
         }
       },
       child: Scaffold(

@@ -112,13 +112,14 @@ class _ForgotPassworScreenState extends State<ForgotPassworScreen> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ForgotPasswordViewModel>(context);
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
-        return false;
       },
       child: Scaffold(
         body: Stack(

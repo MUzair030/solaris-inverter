@@ -74,13 +74,14 @@ class _EmailScreenState extends State<EmailScreen> {
   Widget build(BuildContext context) {
     // final viewModel = Provider.of<SendOtpViewModel>(context);
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
-        return false;
       },
       child: Scaffold(
         body: Stack(

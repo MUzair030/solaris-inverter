@@ -226,16 +226,25 @@ class _AddDevicePageState extends State<AddDevicePage> {
   }
 
   Future<void> _getWifiInfo() async {
-    final info = NetworkInfo();
-    String? ssid = await info.getWifiName();
-    String? bssid = await info.getWifiBSSID();
+    try {
+      if (await Permission.locationWhenInUse.request().isGranted) {
+        final info = NetworkInfo();
+        String? ssid = await info.getWifiName();
+        String? bssid = await info.getWifiBSSID();
 
-    setState(() {
-      // _ssid = ssid ?? "Unknown SSID";
-      // _bssid = bssid ?? "Unknown BSSID";
-      _conssidController.text = ssid ?? "Unknown SSID";
-      _conbssidController.text = bssid ?? "Unknown BSSID";
-    });
+        setState(() {
+          _conssidController.text = ssid ?? "Unknown SSID";
+          _conbssidController.text = bssid ?? "Unknown BSSID";
+        });
+      } else {
+        setState(() {
+          _conssidController.text = "Permission required";
+          _conbssidController.text = "Permission required";
+        });
+      }
+    } catch (e) {
+      print("Error getting WiFi info: $e");
+    }
   }
 
   Future<void> _connectToServer() async {
@@ -376,8 +385,10 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         // Navigator.pop(context);
         Navigator.pushReplacement(
           context,
@@ -385,7 +396,6 @@ class _AddDevicePageState extends State<AddDevicePage> {
             builder: (context) => const Mainbottomnavigationview(),
           ), // Navigate back
         );
-        return false;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,

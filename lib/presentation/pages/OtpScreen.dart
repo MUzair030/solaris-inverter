@@ -42,14 +42,15 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<VerifyOtpViewModel>(context);
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         // Navigator.pushReplacement(
         //   context,
         //   MaterialPageRoute(builder: (context) => EmailScreen()),
         // );
         Navigator.pop(context);
-        return false;
       },
       child: Scaffold(
         body: Stack(

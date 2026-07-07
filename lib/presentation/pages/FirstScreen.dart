@@ -136,13 +136,14 @@ class FirstScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Mainbottomnavigationview()),
         );
-        return false; // Prevent default back behavior
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,

@@ -183,11 +183,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ChangePasswordViewModel>(context);
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         viewModel.clearMessages1();
         Navigator.pop(context);
-        return false;
       },
       child: Scaffold(
         backgroundColor: AppColors.white,
