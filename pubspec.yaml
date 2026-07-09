@@ -2,7 +2,7 @@ name: threepol_inverter_flutter
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.5+16
+version: 1.1.6+17
 
 environment:
   sdk: ^3.5.3
