@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/AddDevicesBottomSheet3.dart';
+import 'package:threepol_inverter_flutter/presentation/widgets/DataCollectionConsentDialog.dart';
 
 import '../../app/App_Colors.dart';
 import '../widgets/HeaderWidget.dart';
@@ -32,7 +33,6 @@ class FirstScreen extends StatelessWidget {
     bool notificationGranted = await Permission.notification.isGranted;
 
     if (cameraGranted && locationGranted && notificationGranted) {
-      // _showDeviceDetailBottomSheet(context);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -40,98 +40,30 @@ class FirstScreen extends StatelessWidget {
         ),
       );
     } else {
-      showPermissionsDisclosureDialog(context);
+      final consented = await showDataCollectionConsentDialog(
+        context,
+        [Permission.camera, Permission.location, Permission.notification],
+      );
+      if (consented) {
+        bool success = await requestCameraAndLocationPermissions();
+        if (success) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Ap_Provisioning_Screen(),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Camera, location, and notification permissions are required.",
+              ),
+            ),
+          );
+        }
+      }
     }
-  }
-
-  void showPermissionsDisclosureDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Permissions Required",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "This app requires access to your camera, location, and notifications to function properly.",
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Cancel"),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF6B00),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () async {
-                        Navigator.of(context).pop(); // Close the bottom sheet
-                        bool success =
-                            await requestCameraAndLocationPermissions();
-                        if (success) {
-                          // _showDeviceDetailBottomSheet(
-                          //     context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const Ap_Provisioning_Screen(),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Camera, location, and notification permissions are required.",
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Continue",
-                        style: TextStyle(color: AppColors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   @override

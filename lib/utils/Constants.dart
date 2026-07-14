@@ -4,8 +4,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../app/app_colors.dart';
-
 class constants {
   static final constants _instance = constants._internal();
 
@@ -102,44 +100,60 @@ class constants {
   }
 
   static String htmlData = '''
-    <p>&nbsp;This privacy policy applies to the Voltis Inverter app (hereby referred to as "Application") for mobile devices that was created by 3POL Apps (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".</p>
+    <p>This privacy policy applies to the Voltis Inverter app (hereby referred to as "Application") for mobile devices that was created by 3POL Apps (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".</p>
     <p><strong>Information Collection and Use</strong></p>
-    <p>The Application collects information when you download and use it. This information may include information such as:</p>
+    <p>The Application collects the following types of data when you download, register, and use it:</p>
     <ul>
-    <li>Your device's Internet Protocol address (e.g. IP address)</li>
-    <li>The pages of the Application that you visit, the time and date of your visit, the time spent on those pages</li>
-    <li>The time spent on the Application</li>
-    <li>The operating system you use on your mobile device</li>
+    <li><strong>Account Information:</strong> Email address and password (for user registration and authentication).</li>
+    <li><strong>Device Identifiers:</strong> MAC addresses of your inverter devices and your mobile device's unique identifiers.</li>
+    <li><strong>Location Data:</strong> Approximate and precise location (used to discover and connect to nearby WiFi networks for device provisioning).</li>
+    <li><strong>Camera:</strong> Used to scan QR codes displayed on inverter devices for WiFi configuration.</li>
+    <li><strong>WiFi Information:</strong> SSID and BSSID of nearby WiFi networks (used solely for connecting your inverter device to your home WiFi).</li>
+    <li><strong>Device Information:</strong> Operating system version, device model, IP address, and app usage statistics.</li>
+    <li><strong>Inverter Data:</strong> Solar power generation data, battery status, energy consumption, and device settings (to display in-app analytics and monitoring).</li>
+    <li><strong>Notification Permissions:</strong> Used to send you alerts about inverter status, system updates, and important service notifications.</li>
     </ul>
-    <p>The Application does not gather precise information about the location of your mobile device.</p>
-    <p>The Service Provider may use the information you provided to contact you from time to time to provide you with important information, required notices and marketing promotions.</p>
-    <p>For a better experience, while using the Application, the Service Provider may require you to provide us with certain personally identifiable information. The information that the Service Provider request will be retained by them and used as described in this privacy policy.</p>
-    <p><strong>Third Party Access</strong></p>
-    <p>Only aggregated, anonymized data is periodically transmitted to external services to aid the Service Provider in improving the Application and their service.</p>
-    <p>Please note that the Application utilizes third-party services that have their own Privacy Policy about handling data:</p>
+    <p><strong>How We Use Your Data</strong></p>
     <ul>
-      <li><a href="https://firebase.google.com/support/privacy">Google Analytics for Firebase</a></li>
-      <li><a href="https://firebase.google.com/support/privacy">Firebase Crashlytics</a></li>
+    <li>To provide, maintain, and improve the Application's functionality (WiFi provisioning, real-time monitoring, statistics).</li>
+    <li>To authenticate your account and associate inverter devices with your profile.</li>
+    <li>To send push notifications for inverter alerts and important service updates.</li>
+    <li>To analyze usage patterns and improve app performance.</li>
+    <li>To communicate with you regarding your account, support requests, or service changes.</li>
     </ul>
-    <p>The Service Provider may disclose User Provided and Automatically Collected Information:</p>
+    <p><strong>Data Sharing and Disclosure</strong></p>
+    <p>We do not sell your personal data. We may share data only in the following circumstances:</p>
     <ul>
-      <li>As required by law, such as to comply with a subpoena, or similar legal process</li>
-      <li>To protect your safety or the safety of others, investigate fraud, or respond to a government request</li>
-      <li>With trusted service providers who work on our behalf</li>
+    <li>With trusted third-party service providers who help operate our infrastructure (hosting, analytics, push notifications).</li>
+    <li>As required by law, such as to comply with a subpoena or legal process.</li>
+    <li>To protect your safety or the safety of others, investigate fraud, or respond to a government request.</li>
+    <li>In connection with a business transfer (merger, acquisition, or sale of assets).</li>
     </ul>
-    <p><strong>Opt-Out Rights</strong></p>
-    <p>You can stop all collection of information by the Application easily by uninstalling it.</p>
-    <p><strong>Data Retention Policy</strong></p>
-    <p>We retain user data as long as you use the Application. To request deletion, email <a href="mailto:3pol.dev@gmail.com">3pol.dev@gmail.com</a></p>
-    <p><strong>Children</strong></p>
-    <p>We do not knowingly collect data from children under 13. If you become aware of such data, contact us.</p>
-    <p><strong>Security</strong></p>
-    <p>We safeguard your data with physical, electronic, and procedural measures.</p>
-    <p><strong>Changes</strong></p>
-    <p>This Privacy Policy may be updated. Check this page regularly.</p>
+    <p><strong>Third-Party Services</strong></p>
+    <p>The Application uses third-party services that have their own privacy policies:</p>
+    <ul>
+    <li><a href="https://firebase.google.com/support/privacy">Firebase Analytics and Crashlytics</a> - for app analytics and crash reporting</li>
+    <li><a href="https://firebase.google.com/support/privacy">Firebase Cloud Messaging</a> - for push notifications</li>
+    </ul>
+    <p><strong>Data Storage and Retention</strong></p>
+    <p>Your data is stored securely on our servers and retained as long as you maintain an active account. You may request deletion of your data at any time by contacting us. Upon account deletion, your personal data will be removed within 30 days unless required to be retained for legal compliance.</p>
+    <p><strong>Data Security</strong></p>
+    <p>We implement industry-standard security measures including encryption in transit (TLS) and at rest to protect your data from unauthorized access, alteration, or destruction.</p>
+    <p><strong>Your Rights and Choices</strong></p>
+    <ul>
+    <li><strong>Opt-Out:</strong> You can stop all data collection by uninstalling the Application.</li>
+    <li><strong>Access and Deletion:</strong> You can request access to or deletion of your personal data by emailing <a href="mailto:3pol.dev@gmail.com">3pol.dev@gmail.com</a>.</li>
+    <li><strong>Notification Controls:</strong> You can manage notification preferences in your device settings.</li>
+    <li><strong>Location and Camera:</strong> You can revoke these permissions at any time through your device settings, though some features may not function.</li>
+    </ul>
+    <p><strong>Children's Privacy</strong></p>
+    <p>We do not knowingly collect data from children under 13. If you become aware of a child providing personal data, contact us immediately so we can delete it.</p>
+    <p><strong>Changes to This Policy</strong></p>
+    <p>We may update this Privacy Policy from time to time. We will notify you of material changes through the Application or by email. Continued use after changes constitutes acceptance.</p>
     <p><strong>Your Consent</strong></p>
-    <p>By using this app, you consent to this Privacy Policy.</p>
+    <p>By using the Application, you consent to the collection and use of your data as described in this policy.</p>
     <p><strong>Contact Us</strong></p>
-    <p>If you have questions, contact <a href="mailto:3pol.dev@gmail.com">3pol.dev@gmail.com</a></p>
+    <p>If you have questions or concerns about this Privacy Policy or your data, contact us at <a href="mailto:3pol.dev@gmail.com">3pol.dev@gmail.com</a>.</p>
+    <p><strong>Effective Date:</strong> July 2025</p>
     ''';
 }

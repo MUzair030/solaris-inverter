@@ -34,8 +34,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            // If using CMake, pass 16KB page size flag
-//            arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
         }
     }
     signingConfigs {

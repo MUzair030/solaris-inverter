@@ -4,12 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/LoginScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/NotificationsScreen.dart';
-import 'package:threepol_inverter_flutter/presentation/pages/PrivacyPolicyLink.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/PrivacyPolicyScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/SettingsScreen.dart';
-import 'package:threepol_inverter_flutter/presentation/pages/signup_page.dart';
-import 'package:threepol_inverter_flutter/utils/Constants.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/App_Colors.dart';
 import '../../core/network/dio_client.dart';
@@ -163,12 +159,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 title: "Privacy",
                                 onTap: () {
                                   Navigator.of(context).pop();
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) =>
-                                  //             Privacypolicyscreen()));
-                                  constants().launchPrivacyPolicy();
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              Privacypolicyscreen()));
                                 }),
                           ],
                         ),

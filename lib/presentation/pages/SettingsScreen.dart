@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/app/App_Colors.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/ChangePasswordScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/PermissionsInfoScreen.dart';
+import 'package:threepol_inverter_flutter/presentation/pages/PrivacyPolicyScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/signup_page.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/CustomInkWellItem.dart';
 
@@ -162,7 +163,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             imagePath: "assets/privacypolicy.png",
                             title: "Privacy",
                             onTap: () {
-                              constants().launchPrivacyPolicy();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Privacypolicyscreen(),
+                                ),
+                              );
                             }),
                         const SizedBox(height: 20),
                         const Text("General",

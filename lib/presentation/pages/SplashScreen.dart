@@ -11,6 +11,7 @@ import 'package:threepol_inverter_flutter/presentation/pages/LoginScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/MainBottomNavigationView.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/signup_page.dart';
 import 'package:threepol_inverter_flutter/presentation/viewmodels/DeviceViewModel.dart';
+import 'package:threepol_inverter_flutter/presentation/widgets/DataCollectionConsentDialog.dart';
 
 import '../../../utils/SharedPreferencesHelper.dart';
 import '../../app/App_Colors.dart';
@@ -38,10 +39,14 @@ class _SplashScreenState extends State<SplashScreen> {
     // checkBatteryOptimization();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // await disableBatteryOptimization();
-      await requestNotificationPermission();
+      final consented = await showDataCollectionConsentDialog(
+        context,
+        [Permission.notification],
+      );
+      if (consented) {
+        await requestNotificationPermission();
+      }
       await DeviceMonitoringService.initialize();
-      // await DeviceMonitoringService.startMonitoring();
     });
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import '../../app/App_Colors.dart';
 import '../../utils/Constants.dart';
@@ -49,30 +50,37 @@ class _PrivacypolicyscreenState extends State<Privacypolicyscreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color:
-                          Colors.black, // Change to AppColors.black if needed
+                      color: Colors.black,
                     ),
                   ),
                 ),
               ],
             ),
             Expanded(
-                child: SingleChildScrollView(
               child: SingleChildScrollView(
-                child: SelectableText(
-                  stripHtmlTags(constants.htmlData),
-                  style: const TextStyle(fontSize: 14, color: Colors.black),
+                padding: const EdgeInsets.all(16),
+                child: Html(
+                  data: constants.htmlData,
+                  style: {
+                    "body": Style(
+                      fontSize: FontSize(14),
+                      color: Colors.black,
+                      lineHeight: const LineHeight(1.6),
+                    ),
+                    "strong": Style(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    "a": Style(
+                      color: Colors.blue,
+                      textDecoration: TextDecoration.underline,
+                    ),
+                  },
                 ),
               ),
-            ))
+            ),
           ],
         ),
       ),
     );
-  }
-
-  String stripHtmlTags(String htmlString) {
-    final document = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
-    return htmlString.replaceAll(document, '').replaceAll('&nbsp;', ' ').trim();
   }
 }

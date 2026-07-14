@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/presentation/pages/LoginScreen.dart';
+import 'package:threepol_inverter_flutter/presentation/pages/PrivacyPolicyScreen.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/CustomTextField.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/PasswordTextField.dart';
 import '../../../app/App_Colors.dart';
@@ -336,9 +337,34 @@ class _SignupPageState extends State<SignupPage> {
                           activeColor: AppColors.blue,
                         ),
                         Expanded(
-                          child: Text(
-                            "By signing up, you agree to our Terms, Privacy Policy, and Cookie Use.",
-                            style: TextStyle(color: Colors.white, fontSize: 11),
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(color: Colors.white, fontSize: 11),
+                              children: [
+                                const TextSpan(text: "By signing up, you agree to our "),
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Privacypolicyscreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text(
+                                      "Terms, Privacy Policy",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 11,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const TextSpan(text: ", and Cookie Use."),
+                              ],
+                            ),
                           ),
                         ),
                       ],
