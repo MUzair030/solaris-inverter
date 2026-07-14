@@ -32,11 +32,7 @@ android {
             useLegacyPackaging true
         }
     }
-    externalNativeBuild {
-        cmake {
-            arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-        }
-    }
+    // No CMake/native code — 16 KB page size compatibility is handled by AGP 8.6.0+ and recent NDK
     signingConfigs {
         release {
             def keystoreFile = System.getenv("CM_KEYSTORE_PATH")
