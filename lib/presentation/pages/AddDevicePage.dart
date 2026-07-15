@@ -8,6 +8,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/AddDevicesBottomSheet1.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/CustomTextField2.dart';
+import 'package:threepol_inverter_flutter/presentation/widgets/DataCollectionConsentDialog.dart';
 
 import '../../../../../../app/App_Colors.dart';
 import 'dart:io';
@@ -171,52 +172,65 @@ class _AddDevicePageState extends State<AddDevicePage> {
   Future<void> _scanWifiNetworks() async {
     setState(() => _isScanning = true);
     try {
-      // Check permissions explicitly if needed, but wifi_scan handles some.
-      // Better to check with permission_handler as well.
-      if (await Permission.location.request().isGranted) {
-        final canScan = await WiFiScan.instance.canStartScan();
-        if (canScan == CanStartScan.yes) {
-          await WiFiScan.instance.startScan();
-          // Wait a bit for scan to complete or listen to stream.
-          // For simplicity, we can just get results after a short delay or if they are already available.
-          await Future.delayed(const Duration(seconds: 2));
-          final canGet = await WiFiScan.instance.canGetScannedResults();
-          if (canGet == CanGetScannedResults.yes) {
-            final results = await WiFiScan.instance.getScannedResults();
-            setState(() {
-              _accessPoints = results;
-              if (results.isNotEmpty &&
-                  !_isManualSsid &&
-                  _ssidController.text.isEmpty) {
-                // Find first non-empty SSID
-                String? firstSsid;
-                for (var ap in results) {
-                  if (ap.ssid.isNotEmpty) {
-                    firstSsid = ap.ssid;
-                    break;
-                  }
-                }
-                if (firstSsid != null) {
-                  _ssidController.text = firstSsid;
+      if (await Permission.location.isGranted) {
+        await _doScan();
+      } else {
+        final consented = await showDataCollectionConsentDialog(
+          context,
+          [Permission.location],
+        );
+        if (consented && await Permission.location.request().isGranted) {
+          await _doScan();
+        } else {
+          Fluttertoast.showToast(
+            msg: "Location permission required for WiFi scanning",
+          );
+        }
+      }
+    } catch (e) {
+      print("Error scanning WiFi: $e");
+    } finally {
+      setState(() => _isScanning = false);
+    }
+  }
+
+  Future<void> _doScan() async {
+    try {
+      final canScan = await WiFiScan.instance.canStartScan();
+      if (canScan == CanStartScan.yes) {
+        await WiFiScan.instance.startScan();
+        await Future.delayed(const Duration(seconds: 2));
+        final canGet = await WiFiScan.instance.canGetScannedResults();
+        if (canGet == CanGetScannedResults.yes) {
+          final results = await WiFiScan.instance.getScannedResults();
+          setState(() {
+            _accessPoints = results;
+            if (results.isNotEmpty &&
+                !_isManualSsid &&
+                _ssidController.text.isEmpty) {
+              String? firstSsid;
+              for (var ap in results) {
+                if (ap.ssid.isNotEmpty) {
+                  firstSsid = ap.ssid;
+                  break;
                 }
               }
-            });
-            if (results.isEmpty) {
-              Fluttertoast.showToast(
-                  msg:
-                      "No WiFi networks found. You may need to enter manually.");
+              if (firstSsid != null) {
+                _ssidController.text = firstSsid;
+              }
             }
-          } else {
-            Fluttertoast.showToast(msg: "Cannot get scan results: $canGet");
+          });
+          if (results.isEmpty) {
+            Fluttertoast.showToast(
+                msg: "No WiFi networks found. You may need to enter manually.");
           }
-        } else if (canScan == CanStartScan.noLocationServiceDisabled) {
-          _showLocationServiceDialog();
         } else {
-          Fluttertoast.showToast(msg: "Cannot start scan: $canScan");
+          Fluttertoast.showToast(msg: "Cannot get scan results: $canGet");
         }
+      } else if (canScan == CanStartScan.noLocationServiceDisabled) {
+        _showLocationServiceDialog();
       } else {
-        Fluttertoast.showToast(
-            msg: "Location permission required for WiFi scanning");
+        Fluttertoast.showToast(msg: "Cannot start scan: $canScan");
       }
     } catch (e) {
       print("Error scanning WiFi: $e");
@@ -227,21 +241,36 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   Future<void> _getWifiInfo() async {
     try {
-      if (await Permission.locationWhenInUse.request().isGranted) {
-        final info = NetworkInfo();
-        String? ssid = await info.getWifiName();
-        String? bssid = await info.getWifiBSSID();
-
-        setState(() {
-          _conssidController.text = ssid ?? "Unknown SSID";
-          _conbssidController.text = bssid ?? "Unknown BSSID";
-        });
+      if (await Permission.locationWhenInUse.isGranted) {
+        await _doGetWifiInfo();
       } else {
-        setState(() {
-          _conssidController.text = "Permission required";
-          _conbssidController.text = "Permission required";
-        });
+        final consented = await showDataCollectionConsentDialog(
+          context,
+          [Permission.location],
+        );
+        if (consented && await Permission.locationWhenInUse.request().isGranted) {
+          await _doGetWifiInfo();
+        } else {
+          setState(() {
+            _conssidController.text = "Permission required";
+            _conbssidController.text = "Permission required";
+          });
+        }
       }
+    } catch (e) {
+      print("Error getting WiFi info: $e");
+    }
+  }
+
+  Future<void> _doGetWifiInfo() async {
+    try {
+      final info = NetworkInfo();
+      String? ssid = await info.getWifiName();
+      String? bssid = await info.getWifiBSSID();
+      setState(() {
+        _conssidController.text = ssid ?? "Unknown SSID";
+        _conbssidController.text = bssid ?? "Unknown BSSID";
+      });
     } catch (e) {
       print("Error getting WiFi info: $e");
     }

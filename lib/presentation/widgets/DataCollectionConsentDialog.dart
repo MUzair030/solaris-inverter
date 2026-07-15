@@ -53,7 +53,7 @@ Future<bool> showDataCollectionConsentDialog(
               _buildDataItem(
                 Icons.location_on,
                 "Location",
-                "Used to discover nearby WiFi networks and configure your inverter device.",
+                "Required to scan for nearby WiFi networks so the app can discover and connect your inverter to your home WiFi. Location data is only used for WiFi scanning and is not stored or shared.",
               ),
             if (permissions.contains(Permission.notification))
               _buildDataItem(

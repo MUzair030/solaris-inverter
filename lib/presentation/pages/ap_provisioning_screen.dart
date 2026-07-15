@@ -15,6 +15,7 @@ import '../../app/App_Colors.dart';
 import '../../data/models/WifiData.dart';
 import '../../services/wifi_connection_service.dart';
 import '../widgets/CustomInkWellItem2.dart';
+import '../widgets/DataCollectionConsentDialog.dart';
 import 'AddDevicePage.dart';
 import 'MainBottomNavigationView.dart';
 
@@ -471,8 +472,21 @@ class _Ap_Provisioning_ScreenState extends State<Ap_Provisioning_Screen> {
 
       // Request location permission and check Wi-Fi (Android only)
       if (Platform.isAndroid) {
-        final status = await Permission.location.request();
-        if (!status.isGranted) {
+        bool locationGranted = await Permission.location.isGranted;
+        if (!locationGranted) {
+          final consented = await showDataCollectionConsentDialog(
+            context,
+            [Permission.location],
+          );
+          if (!consented) {
+            _safeSetState(() {
+              _showManualOption = true;
+            });
+            return;
+          }
+          locationGranted = await Permission.location.request().isGranted;
+        }
+        if (!locationGranted) {
           _safeSetState(() {
             _showManualOption = true;
           });
