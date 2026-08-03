@@ -19,8 +19,8 @@ class InverterRepositoryImpl implements InverterRepository {
         queryParameters: {
           "macAddress": macAddress,
           "perday": false,
-          "perweekl": false,
-          "permonthy": false,
+          "perweek": false,
+          "permonth": false,
           "peryear": false,
           "completereport": false,
         },
@@ -43,8 +43,8 @@ class InverterRepositoryImpl implements InverterRepository {
     try {
       Map<String, bool> queryParams = {
         "perday": false,
-        "perweekl": false,
-        "permonthy": false,
+        "perweek": false,
+        "permonth": false,
         "peryear": false,
         "completereport": false,
       };
@@ -54,10 +54,10 @@ class InverterRepositoryImpl implements InverterRepository {
           queryParams["perday"] = true;
           break;
         case "weekly":
-          queryParams["perweekl"] = true;
+          queryParams["perweek"] = true;
           break;
         case "monthly":
-          queryParams["permonthy"] = true;
+          queryParams["permonth"] = true;
           break;
         case "yearly":
           queryParams["peryear"] = true;
