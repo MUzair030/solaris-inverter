@@ -110,7 +110,7 @@ class BarChartWidget extends StatelessWidget {
       borderData: FlBorderData(show: false),
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: AppColors.blue,
+          getTooltipColor: (_) => AppColors.blue,
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
               return LineTooltipItem(

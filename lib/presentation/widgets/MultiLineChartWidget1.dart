@@ -272,7 +272,7 @@ class MultiLineChartWidget1 extends StatelessWidget {
         handleBuiltInTouches: true,
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          tooltipRoundedRadius: 8,
+          tooltipBorderRadius: BorderRadius.circular(8),
           fitInsideHorizontally: true,
           // fitInsideVertically: true,
           tooltipMargin: 8,

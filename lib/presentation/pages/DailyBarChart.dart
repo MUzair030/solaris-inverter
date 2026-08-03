@@ -136,7 +136,7 @@ class DailyBarChart extends StatelessWidget {
           barTouchData: BarTouchData(
             enabled: true,
             touchTooltipData: BarTouchTooltipData(
-              tooltipBgColor: AppColors.blue,
+              getTooltipColor: (_) => AppColors.blue,
               tooltipPadding: const EdgeInsets.all(4),
               tooltipMargin: 0,
               fitInsideVertically: true,
