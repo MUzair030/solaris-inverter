@@ -5,6 +5,7 @@ class ApiEndpoints {
   static const String signin = 'auth/signin';
   static const String getAllInverterData =
       '$baseUrl/inverter/getAllInverterData'; // both apis works
+  static const String inverterStats = '$baseUrl/inverter/stats';
   // static const String getAllInverterData = 'inverter/getAllInverterData';
   // MAC Address API (GET request with query parameters)
   // static const String addMacAddress = "$baseUrl/auth/macaddress";

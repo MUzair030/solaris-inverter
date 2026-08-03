@@ -1,7 +1,6 @@
-import 'package:dio/dio.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:threepol_inverter_flutter/core/network/dio_client.dart';
 import 'package:threepol_inverter_flutter/data/models/inverter_data_model.dart';
+import 'package:threepol_inverter_flutter/data/models/inverter_stats_model.dart';
 import 'package:threepol_inverter_flutter/domain/repositories/inverter_repository.dart';
 
 import '../../../core/network/api_endpoints.dart';
@@ -80,6 +79,37 @@ class InverterRepositoryImpl implements InverterRepository {
       return data.map((json) => InverterDataModel.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to fetch inverter data: $e');
+    }
+  }
+
+  @override
+  Future<List<InverterStatsModel>> fetchInverterStats(
+    String macAddress, {
+    required String groupBy,
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final response = await _dioClient.dio.get(
+        ApiEndpoints.inverterStats,
+        queryParameters: {
+          "macAddress": macAddress,
+          "groupBy": groupBy,
+          if (startDate != null) "startDate": startDate,
+          if (endDate != null) "endDate": endDate,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data is List) {
+        List<dynamic> data = response.data;
+        return data
+            .map((json) => InverterStatsModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception("Invalid API response");
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch inverter stats: $e');
     }
   }
 }
