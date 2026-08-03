@@ -1,198 +1,203 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:threepol_inverter_flutter/app/chart_theme.dart';
 
-import '../../app/App_Colors.dart';
 import '../../data/models/inverter_data_model.dart';
+import 'ChartEmptyState.dart';
 
+/// Modern hourly energy-consumption line chart used in the Statistics daily view.
 class LineChartWidget extends StatelessWidget {
-  final List inverterData;
+  final List<InverterDataModel> inverterData;
 
-  const LineChartWidget({Key? key, required this.inverterData})
-      : super(key: key);
+  const LineChartWidget({super.key, required this.inverterData});
 
   @override
   Widget build(BuildContext context) {
+    if (inverterData.isEmpty) {
+      return const ChartEmptyState(compact: true);
+    }
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: LineChart(_buildLineChart(inverterData)),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: LineChart(_buildLineChart()),
     );
   }
 
-  LineChartData _buildLineChart(List inverterData) {
-    List<FlSpot> spots = [];
-    Map<int, double> hourData = {};
+  LineChartData _buildLineChart() {
+    final hourly = _hourlyAverages();
+    final hours = <int>[
+      for (int h = 0; h < 24; h++)
+        if (hourly[h] != null) h,
+    ];
+    final firstHour = hours.first;
+    final lastHour = hours.last;
 
-    // Group data by hour
-    final Map<int, List<InverterDataModel>> hourlyData = {};
-    for (var item in inverterData) {
-      final hour = item.createdAt.hour;
-      hourlyData.putIfAbsent(hour, () => []).add(item);
+    final spots = <FlSpot>[];
+    for (int h = firstHour; h <= lastHour; h++) {
+      final v = hourly[h];
+      spots.add(v == null ? FlSpot.nullSpot : FlSpot(h.toDouble(), v));
     }
 
-    // Sort hours
-    final hours = hourlyData.keys.toList()..sort();
-    final latestHour = hours.isNotEmpty ? hours.last : 0;
+    final maxY = (hourly.whereType<double>().fold<double>(0, (a, b) => a > b ? a : b) * 1.2).clamp(10.0, double.infinity);
+    final span = lastHour - firstHour;
+    final interval = _intervalFor(span);
+    final dateForHour = _dateForHour();
 
-    double interval;
-    if (latestHour <= 6) {
-      interval = 1;
-    } else if (latestHour <= 12) {
-      interval = 2;
-    } else if (latestHour <= 18) {
-      interval = 3;
-    } else {
-      interval = 4; // max spacing
-    }
-
-    // Fill hourData with existing values or 0 if no data
-    for (int i = 1; i <= 24; i++) {
-      hourData[i] = 0;
-    }
-
-    for (var item in inverterData) {
-      int hour = item.createdAt.hour;
-      hourData[hour] = item.energyConsumed;
-      // hourData[hour] = (hourData[hour] ?? 0) + item.energyConsumed;
-    }
-
-    // Convert hourData into FlSpot list
-    hourData.forEach((hour, energy) {
-      spots.add(FlSpot(hour.toDouble(), energy));
-    });
-
-    // Common formatting function for Y-axis labels
-    String _formatYAxisLabels(double value) {
-      if (value >= 1e9) return '${(value / 1e9).toStringAsFixed(1)}B';
-      if (value >= 1e6) return '${(value / 1e6).toStringAsFixed(1)}M';
-      if (value >= 1e3) return '${(value / 1e3).toStringAsFixed(1)}k';
-      return value.toStringAsFixed(0);
-    }
-
-    // Mon to Sun
     return LineChartData(
+      minX: firstHour.toDouble(),
+      maxX: lastHour.toDouble(),
+      minY: 0,
+      maxY: maxY,
       lineBarsData: [
         LineChartBarData(
           spots: spots,
-          isCurved: false,
-          isStepLineChart: false,
+          isCurved: true,
+          barWidth: 2.2,
+          color: ChartTheme.brand,
           isStrokeJoinRound: true,
           isStrokeCapRound: true,
-          barWidth: 1.5,
-          // color: AppColors.blue,
           dotData: const FlDotData(show: false),
-          belowBarData: BarAreaData(show: false),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: ChartTheme.verticalGradient(ChartTheme.brand),
+          ),
         ),
       ],
       titlesData: FlTitlesData(
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 20,
-            getTitlesWidget: (value, meta) {
-              return Text(_formatYAxisLabels(value),
-                  style: const TextStyle(fontSize: 9, color: AppColors.white));
-            },
-          ),
-        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 25,
+            reservedSize: 34,
+            interval: maxY / 4,
             getTitlesWidget: (value, meta) {
-              return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 8, color: AppColors.white));
-            },
-          ),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 0,
-            getTitlesWidget: (value, meta) {
-              return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 0, color: AppColors.white));
+              return Text(
+                ChartTheme.formatCompact(value),
+                style: ChartTheme.axisLabelStyle,
+              );
             },
           ),
         ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30,
-            interval: interval,
+            reservedSize: 26,
+            interval: interval.toDouble(),
             getTitlesWidget: (value, meta) {
-              // final hour = value.toInt();
-              // final formatted = '${hour.toString().padLeft(1, '0')}';
-              // // return Text(formatted,
-              // //     style: const TextStyle(fontSize: 9, color: AppColors.white));
-              //
-              // return Transform.rotate(
-              //   angle: 35 * 3.1415926535 / 180,
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: Text(formatted,
-              //         style:
-              //             const TextStyle(fontSize: 9, color: AppColors.white)),
-              //   ),
-              // );
-
-              int hour = value.toInt();
-
-              // Only show labels for hours divisible by 3 or the last hour (24)
-              // For pattern like 1, 4, 7, 10, 13, 16, 19, 22
-              // Or you can use: (hour - 1) % 3 == 0
-              if ((hour - 1) % 3 == 0 || hour == 24) {
-                return Transform.rotate(
-                  angle: 35 * 3.1415926535 / 180,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      hour.toString(),
-                      style:
-                          const TextStyle(fontSize: 9, color: AppColors.white),
-                    ),
-                  ),
-                );
+              final hour = value.round();
+              if (hour != firstHour &&
+                  hour != lastHour &&
+                  hour % interval != 0) {
+                return const SizedBox.shrink();
               }
-              return const SizedBox.shrink();
-              // int intValue = value.toInt();
-              // if (intValue < 1 || intValue > 24) return const SizedBox.shrink();
-              // if ((intValue - 1) % 3 != 0 && intValue != 24) {
-              //   return const SizedBox.shrink();
-              // }
-              // return Padding(
-              //   padding: const EdgeInsets.only(top: 6.0),
-              //   child: Text(
-              //     value.toInt().toString(),
-              //     style: const TextStyle(fontSize: 9, color: AppColors.white),
-              //   ),
-              // );
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  _hourLabel(hour),
+                  style: ChartTheme.axisBottomLabelStyle,
+                ),
+              );
             },
           ),
         ),
       ),
-      minX: 1,
-      maxX: 24,
-      minY: 0,
-      gridData: const FlGridData(show: true),
-      borderData: FlBorderData(show: false),
+      gridData: FlGridData(
+        show: true,
+        drawVerticalLine: false,
+        horizontalInterval: maxY / 4,
+        getDrawingHorizontalLine: (_) => const FlLine(
+          color: ChartTheme.grid,
+          strokeWidth: 1,
+          dashArray: [4, 4],
+        ),
+      ),
+      borderData: FlBorderData(
+        show: true,
+        border: const Border(
+          left: BorderSide(color: ChartTheme.gridStrong),
+          bottom: BorderSide(color: ChartTheme.gridStrong),
+        ),
+      ),
       lineTouchData: LineTouchData(
         handleBuiltInTouches: true,
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          // tooltipBgColor: AppColors.blue,
-          tooltipRoundedRadius: 8,
+          tooltipBorderRadius: BorderRadius.circular(10),
+          getTooltipColor: (_) => const Color(0xF21A1A26),
+          tooltipPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          tooltipMargin: 10,
           getTooltipItems: (touchedSpots) {
-            return touchedSpots.map((spot) {
-              return LineTooltipItem(
-                '${spot.y.toStringAsFixed(1)} kWh',
-                const TextStyle(color: AppColors.white, fontSize: 12),
+            if (touchedSpots.isEmpty) return [];
+            final hour = touchedSpots.first.x.round();
+            final date = dateForHour[hour];
+            final items = <LineTooltipItem>[];
+            if (date != null) {
+              items.add(
+                LineTooltipItem(
+                  DateFormat('EEE, MMM d, yyyy').format(date),
+                  const TextStyle(
+                    fontSize: 10,
+                    color: ChartTheme.label,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               );
-            }).toList();
+            }
+            items.add(
+              LineTooltipItem(
+                'Energy    ${touchedSpots.first.y.toStringAsFixed(1)} kWh',
+                const TextStyle(
+                  color: ChartTheme.brand,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
+            return items;
           },
         ),
       ),
     );
+  }
+
+  List<double?> _hourlyAverages() {
+    final sums = List<double>.filled(24, 0);
+    final counts = List<int>.filled(24, 0);
+    for (final item in inverterData) {
+      final h = item.createdAt.hour;
+      sums[h] += item.energyConsumed;
+      counts[h]++;
+    }
+    return [
+      for (int h = 0; h < 24; h++)
+        counts[h] == 0 ? null : sums[h] / counts[h],
+    ];
+  }
+
+  Map<int, DateTime> _dateForHour() {
+    final map = <int, DateTime>{};
+    for (final item in inverterData) {
+      map.putIfAbsent(item.createdAt.hour, () => item.createdAt);
+    }
+    return map;
+  }
+
+  int _intervalFor(int span) {
+    if (span <= 6) return 1;
+    if (span <= 12) return 2;
+    if (span <= 20) return 3;
+    return 4;
+  }
+
+  String _hourLabel(int hour) {
+    if (hour == 0) return '12AM';
+    if (hour == 12) return '12PM';
+    if (hour < 12) return '${hour}AM';
+    return '${hour - 12}PM';
   }
 }
