@@ -12,13 +12,14 @@ import '../viewmodels/inverter_stats_viewmodel.dart';
 import 'ChartEmptyState.dart';
 import 'ZoomableLineChart.dart';
 
-enum AnalyticsTab { day, month, year, total }
+enum AnalyticsTab { hour, day, week, month, year }
 
-/// Energy analytics with Day / Month / Year / Total tabs.
+/// Energy analytics with Hour / Day / Week / Month / Year tabs.
 ///
-/// Tabs switch the aggregation granularity of the backend `/stats` endpoint.
-/// Arrow buttons and a calendar move the selected date, and every switch
-/// reloads and re-animates the interactive (zoomable) chart.
+/// Each tab requests a bucketed series from the backend `/stats` endpoint and
+/// renders it as an interactive (zoomable) line chart. Arrow buttons and a
+/// calendar move the selected period, and every switch reloads and re-animates
+/// the chart.
 class EnergyAnalyticsSection extends StatefulWidget {
   final String? macAddress;
 
@@ -31,7 +32,7 @@ class EnergyAnalyticsSection extends StatefulWidget {
 class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
   late final InverterStatsViewModel _viewModel;
 
-  AnalyticsTab _tab = AnalyticsTab.day;
+  AnalyticsTab _tab = AnalyticsTab.hour;
   DateTime _selectedDay = DateTime.now();
   DateTime _selectedMonth = DateTime.now();
   DateTime _selectedYear = DateTime.now();
@@ -67,19 +68,25 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
 
   (String, String?, String?) _queryParams() {
     switch (_tab) {
-      case AnalyticsTab.day:
+      case AnalyticsTab.hour:
         final s = _dateOnly(_selectedDay);
         return ('hour', s, s);
-      case AnalyticsTab.month:
+      case AnalyticsTab.day:
         final y = _selectedMonth.year;
         final m = _selectedMonth.month;
         final start = DateTime(y, m, 1);
         final end = DateTime(y, m, _daysInMonth(y, m));
         return ('day', _dateOnly(start), _dateOnly(end));
-      case AnalyticsTab.year:
+      case AnalyticsTab.week:
+        final y = _selectedMonth.year;
+        final m = _selectedMonth.month;
+        final start = DateTime(y, m, 1);
+        final end = DateTime(y, m, _daysInMonth(y, m));
+        return ('week', _dateOnly(start), _dateOnly(end));
+      case AnalyticsTab.month:
         final y = _selectedYear.year;
         return ('month', '$y-01-01', '$y-12-31');
-      case AnalyticsTab.total:
+      case AnalyticsTab.year:
         return ('year', null, null);
     }
   }
@@ -92,17 +99,18 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
   void _shift(int delta) {
     setState(() {
       switch (_tab) {
-        case AnalyticsTab.day:
+        case AnalyticsTab.hour:
           _selectedDay = _selectedDay.add(Duration(days: delta));
-        case AnalyticsTab.month:
+        case AnalyticsTab.day:
+        case AnalyticsTab.week:
           _selectedMonth = DateTime(
             _selectedMonth.year,
             _selectedMonth.month + delta,
             1,
           );
-        case AnalyticsTab.year:
+        case AnalyticsTab.month:
           _selectedYear = DateTime(_selectedYear.year + delta);
-        case AnalyticsTab.total:
+        case AnalyticsTab.year:
           return;
       }
     });
@@ -116,7 +124,7 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
       firstDate: DateTime(2015),
       lastDate: DateTime.now(),
       initialDatePickerMode:
-          _tab == AnalyticsTab.day ? DatePickerMode.day : DatePickerMode.year,
+          _tab == AnalyticsTab.hour ? DatePickerMode.day : DatePickerMode.year,
       helpText: 'Select date',
       cancelText: 'Cancel',
       confirmText: 'OK',
@@ -124,13 +132,14 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
     if (picked == null) return;
     setState(() {
       switch (_tab) {
-        case AnalyticsTab.day:
+        case AnalyticsTab.hour:
           _selectedDay = picked;
-        case AnalyticsTab.month:
+        case AnalyticsTab.day:
+        case AnalyticsTab.week:
           _selectedMonth = DateTime(picked.year, picked.month, 1);
-        case AnalyticsTab.year:
+        case AnalyticsTab.month:
           _selectedYear = DateTime(picked.year);
-        case AnalyticsTab.total:
+        case AnalyticsTab.year:
           break;
       }
     });
@@ -139,27 +148,30 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
 
   DateTime _initialCalendarDate() {
     switch (_tab) {
-      case AnalyticsTab.day:
+      case AnalyticsTab.hour:
         return _selectedDay;
-      case AnalyticsTab.month:
+      case AnalyticsTab.day:
+      case AnalyticsTab.week:
         return _selectedMonth;
-      case AnalyticsTab.year:
+      case AnalyticsTab.month:
         return _selectedYear;
-      case AnalyticsTab.total:
+      case AnalyticsTab.year:
         return DateTime.now();
     }
   }
 
   String get _rangeLabel {
     switch (_tab) {
-      case AnalyticsTab.day:
+      case AnalyticsTab.hour:
         return DateFormat('EEE, MMM d, yyyy').format(_selectedDay);
-      case AnalyticsTab.month:
+      case AnalyticsTab.day:
         return DateFormat('MMMM yyyy').format(_selectedMonth);
-      case AnalyticsTab.year:
+      case AnalyticsTab.week:
+        return 'Weeks · ${DateFormat('MMM yyyy').format(_selectedMonth)}';
+      case AnalyticsTab.month:
         return _selectedYear.year.toString();
-      case AnalyticsTab.total:
-        return 'All Time';
+      case AnalyticsTab.year:
+        return 'All Years';
     }
   }
 
@@ -186,9 +198,11 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
-              for (final tab in AnalyticsTab.values) ...[
+              for (final tab in AnalyticsTab.values)
                 _TabChip(
                   label: tab.name[0].toUpperCase() + tab.name.substring(1),
                   active: _tab == tab,
@@ -197,14 +211,12 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
                     _load();
                   },
                 ),
-                if (tab != AnalyticsTab.total) const SizedBox(width: 8),
-              ],
             ],
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              if (_tab != AnalyticsTab.total) ...[
+              if (_tab != AnalyticsTab.year) ...[
                 _IconButton(icon: Icons.chevron_left, onTap: () => _shift(-1)),
                 const SizedBox(width: 8),
               ],
@@ -219,12 +231,15 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
                   ),
                 ),
               ),
-              if (_tab != AnalyticsTab.total) ...[
+              if (_tab != AnalyticsTab.year) ...[
                 const SizedBox(width: 8),
                 _IconButton(icon: Icons.chevron_right, onTap: () => _shift(1)),
+                const SizedBox(width: 8),
+                _IconButton(
+                  icon: Icons.calendar_month_outlined,
+                  onTap: _openCalendar,
+                ),
               ],
-              const SizedBox(width: 8),
-              _IconButton(icon: Icons.calendar_month_outlined, onTap: _openCalendar),
             ],
           ),
           const SizedBox(height: 16),
@@ -284,7 +299,7 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
 
   List<FlSpot> _buildSpots(List<InverterStatsModel> stats) {
     switch (_tab) {
-      case AnalyticsTab.day:
+      case AnalyticsTab.hour:
         final hours = <int, double>{};
         for (final item in stats) {
           final hour = int.tryParse(
@@ -295,7 +310,7 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
           for (var h = 0; h < 24; h++)
             FlSpot(h.toDouble(), hours[h] ?? 0),
         ];
-      case AnalyticsTab.month:
+      case AnalyticsTab.day:
         final days = <int, double>{};
         for (final item in stats) {
           final day = int.tryParse(
@@ -307,7 +322,12 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
           for (var d = 1; d <= total; d++)
             FlSpot((d - 1).toDouble(), days[d] ?? 0),
         ];
-      case AnalyticsTab.year:
+      case AnalyticsTab.week:
+        return [
+          for (var i = 0; i < stats.length; i++)
+            FlSpot(i.toDouble(), stats[i].energyConsumed),
+        ];
+      case AnalyticsTab.month:
         final months = <int, double>{};
         for (final item in stats) {
           final month = int.tryParse(
@@ -318,7 +338,7 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
           for (var m = 1; m <= 12; m++)
             FlSpot((m - 1).toDouble(), months[m] ?? 0),
         ];
-      case AnalyticsTab.total:
+      case AnalyticsTab.year:
         return [
           for (var i = 0; i < stats.length; i++)
             FlSpot(i.toDouble(), stats[i].energyConsumed),
@@ -328,16 +348,23 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
 
   List<String> _buildLabels(List<InverterStatsModel> stats) {
     switch (_tab) {
-      case AnalyticsTab.day:
+      case AnalyticsTab.hour:
         return _hourLabels;
-      case AnalyticsTab.month:
+      case AnalyticsTab.day:
         final total = _daysInMonth(_selectedMonth.year, _selectedMonth.month);
         return [for (var d = 1; d <= total; d++) '$d'];
-      case AnalyticsTab.year:
+      case AnalyticsTab.week:
+        return [
+          for (final item in stats)
+            item.bucket.length >= 10
+                ? item.bucket.substring(5, 10).replaceAll('-', '/')
+                : item.bucket,
+        ];
+      case AnalyticsTab.month:
         return const [
           'Jan', '', '', 'Apr', '', '', 'Jul', '', '', 'Oct', '', '',
         ];
-      case AnalyticsTab.total:
+      case AnalyticsTab.year:
         return [
           for (final item in stats)
             item.bucket.length >= 4 ? item.bucket.substring(0, 4) : item.bucket,
@@ -394,12 +421,11 @@ class _IconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 34,
-        height: 34,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
-          color: ChartTheme.gridStrong,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: ChartTheme.gridStrong),
+          color: const Color(0xFF2A2E3F),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, size: 18, color: ChartTheme.label),
       ),
