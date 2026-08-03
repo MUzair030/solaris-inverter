@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/app/App_Colors.dart';
@@ -9,22 +8,13 @@ import 'package:threepol_inverter_flutter/app/chart_theme.dart';
 import '../../core/network/dio_client.dart';
 import '../../data/models/inverter_data_model.dart';
 import '../../data/repositories_impl/inverter_repository_impl.dart';
-import '../../domain/usecases/fetch_inverter_data_usecase.dart';
 import '../../domain/usecases/get_inverter_data_usecase.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/inverter_viewmodel1.dart';
-import '../widgets/EnergyDonutChart.dart';
+import '../widgets/EnergyVisualizationsSection.dart';
 import '../widgets/HeaderWidget.dart';
-import '../widgets/InverterChart.dart';
 import '../widgets/LineChartWidget.dart';
-import '../widgets/MetricBarChart.dart';
-import '../widgets/MetricRadarChart.dart';
-import '../widgets/PowerGaugeWidget.dart';
-import '../widgets/ScatterCorrelationChart.dart';
-import '../widgets/WeeklyEnergyBarChart.dart';
 import '../widgets/WelcomeWidget.dart';
-import 'DailyBarChart.dart';
-import 'WeeklyBarChart.dart';
 
 class Statisticsscreen extends StatefulWidget {
   const Statisticsscreen({super.key});
@@ -37,7 +27,6 @@ class _StatisticsscreenState extends State<Statisticsscreen>
     with WidgetsBindingObserver {
   int? selectedBarIndex;
   String selectedFilter = "daily";
-  String selectedViz = "gauge";
   bool isDataLoaded = false;
   String? lastLoadedMac;
   String? lastLoadedMonth;
@@ -269,7 +258,9 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _visualizationsSection(filteredData),
+                  EnergyVisualizationsSection(
+                    macAddress: Provider.of<SelectedDeviceProvider>(context).mac,
+                  ),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -453,250 +444,6 @@ class _StatisticsscreenState extends State<Statisticsscreen>
           ],
         );
       }),
-    );
-  }
-
-  Widget _visualizationsSection(List<InverterDataModel> data) {
-    const vizOptions = [
-      ('gauge', Icons.speed_outlined, 'Gauge'),
-      ('donut', Icons.donut_large_outlined, 'Donut'),
-      ('radar', Icons.radar, 'Radar'),
-      ('scatter', Icons.scatter_plot_outlined, 'Scatter'),
-      ('bars', Icons.bar_chart_outlined, 'Bars'),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 3, spreadRadius: 2),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Visualizations",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: vizOptions.map((option) {
-                final key = option.$1;
-                final icon = option.$2;
-                final label = option.$3;
-                final isActive = selectedViz == key;
-                return GestureDetector(
-                  onTap: () => setState(() => selectedViz = key),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isActive ? ChartTheme.brand : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isActive
-                            ? ChartTheme.brand
-                            : ChartTheme.gridStrong,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          icon,
-                          size: 14,
-                          color: isActive ? Colors.white : ChartTheme.label,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isActive
-                                ? Colors.white
-                                : ChartTheme.label,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 14),
-          _buildVisualization(data),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVisualization(List<InverterDataModel> data) {
-    switch (selectedViz) {
-      case 'donut':
-        return _buildDonut(data);
-      case 'radar':
-        return _buildRadar(data);
-      case 'scatter':
-        return _buildScatter(data);
-      case 'bars':
-        return _buildMetricBars(data);
-      case 'gauge':
-      default:
-        return _buildGauge(data);
-    }
-  }
-
-  Widget _buildGauge(List<InverterDataModel> data) {
-    double latestPower = data.isNotEmpty ? data.last.genPower : 0;
-    double maxKw = 0;
-    final devicePower = Provider.of<SelectedDeviceProvider>(context).power;
-    if (devicePower != null && devicePower > 0) {
-      maxKw = devicePower / 1000.0;
-    }
-    if (maxKw <= 0) {
-      maxKw = data.fold(0.0, (m, d) => d.genPower > m ? d.genPower : m) * 1.1;
-    }
-    if (maxKw <= 0) maxKw = 1;
-    return PowerGaugeWidget(
-      value: latestPower,
-      max: maxKw,
-      subtitle: data.isNotEmpty
-          ? DateFormat('HH:mm').format(data.last.createdAt)
-          : 'Live',
-    );
-  }
-
-  Widget _buildDonut(List<InverterDataModel> data) {
-    double sumInRange(int from, int to) => data
-        .where((e) => e.createdAt.hour >= from && e.createdAt.hour < to)
-        .fold(0.0, (s, e) => s + e.energyConsumed);
-    final segments = [
-      DonutSegment(
-        label: 'Night',
-        value: sumInRange(0, 6),
-        color: ChartTheme.indigo,
-      ),
-      DonutSegment(
-        label: 'Morning',
-        value: sumInRange(6, 12),
-        color: ChartTheme.power,
-      ),
-      DonutSegment(
-        label: 'Afternoon',
-        value: sumInRange(12, 18),
-        color: ChartTheme.brand,
-      ),
-      DonutSegment(
-        label: 'Evening',
-        value: sumInRange(18, 24),
-        color: ChartTheme.cyan,
-      ),
-    ];
-    return EnergyDonutChart(segments: segments);
-  }
-
-  Widget _buildRadar(List<InverterDataModel> data) {
-    if (data.isEmpty) return const MetricRadarChart(metrics: []);
-    double maxOf(double Function(InverterDataModel) f) => data.fold(
-        0.0, (m, d) => f(d) > m ? f(d) : m);
-    final maxEnergy = maxOf((d) => d.energyConsumed);
-    final maxGen = maxOf((d) => d.genPower);
-    final maxPv = maxOf((d) => d.pvVoltage);
-    final maxOutV = maxOf((d) => d.outputVoltage);
-    final maxOutA = maxOf((d) => d.outputCurrent);
-    final last = data.last;
-    return MetricRadarChart(
-      metrics: [
-        RadarMetric(
-          label: 'Energy',
-          value: last.energyConsumed,
-          max: maxEnergy <= 0 ? 1 : maxEnergy,
-        ),
-        RadarMetric(
-          label: 'Power',
-          value: last.genPower,
-          max: maxGen <= 0 ? 1 : maxGen,
-        ),
-        RadarMetric(
-          label: 'PV V',
-          value: last.pvVoltage,
-          max: maxPv <= 0 ? 1 : maxPv,
-        ),
-        RadarMetric(
-          label: 'Out V',
-          value: last.outputVoltage,
-          max: maxOutV <= 0 ? 1 : maxOutV,
-        ),
-        RadarMetric(
-          label: 'Out A',
-          value: last.outputCurrent,
-          max: maxOutA <= 0 ? 1 : maxOutA,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScatter(List<InverterDataModel> data) {
-    final points = data
-        .map((d) => ScatterPoint(
-              x: d.outputVoltage,
-              y: d.outputCurrent,
-              label:
-                  '${d.outputVoltage.toStringAsFixed(1)} V · ${d.outputCurrent.toStringAsFixed(1)} A',
-            ))
-        .toList();
-    return ScatterCorrelationChart(points: points);
-  }
-
-  Widget _buildMetricBars(List<InverterDataModel> data) {
-    if (data.isEmpty) return const MetricBarChart(items: []);
-    final last = data.last;
-    return MetricBarChart(
-      items: [
-        MetricBarItem(
-          label: 'Units Consumed',
-          value: last.energyConsumed,
-          unit: 'kWh',
-          color: ChartTheme.energy,
-        ),
-        MetricBarItem(
-          label: 'Generation Power',
-          value: last.genPower,
-          unit: 'kW',
-          color: ChartTheme.power,
-        ),
-        MetricBarItem(
-          label: 'Solar Voltage',
-          value: last.pvVoltage,
-          unit: 'V',
-          color: ChartTheme.solarVoltage,
-        ),
-        MetricBarItem(
-          label: 'Output Voltage',
-          value: last.outputVoltage,
-          unit: 'V',
-          color: ChartTheme.outputVoltage,
-        ),
-        MetricBarItem(
-          label: 'Output Current',
-          value: last.outputCurrent,
-          unit: 'A',
-          color: ChartTheme.outputCurrent,
-        ),
-      ],
     );
   }
 
