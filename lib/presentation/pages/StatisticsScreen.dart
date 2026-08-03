@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:threepol_inverter_flutter/app/App_Colors.dart';
+import 'package:threepol_inverter_flutter/app/chart_theme.dart';
 
 import '../../core/network/dio_client.dart';
 import '../../data/models/inverter_data_model.dart';
@@ -12,9 +13,14 @@ import '../../domain/usecases/fetch_inverter_data_usecase.dart';
 import '../../domain/usecases/get_inverter_data_usecase.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/inverter_viewmodel1.dart';
+import '../widgets/EnergyDonutChart.dart';
 import '../widgets/HeaderWidget.dart';
 import '../widgets/InverterChart.dart';
 import '../widgets/LineChartWidget.dart';
+import '../widgets/MetricBarChart.dart';
+import '../widgets/MetricRadarChart.dart';
+import '../widgets/PowerGaugeWidget.dart';
+import '../widgets/ScatterCorrelationChart.dart';
 import '../widgets/WeeklyEnergyBarChart.dart';
 import '../widgets/WelcomeWidget.dart';
 import 'DailyBarChart.dart';
@@ -31,6 +37,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
     with WidgetsBindingObserver {
   int? selectedBarIndex;
   String selectedFilter = "daily";
+  String selectedViz = "gauge";
   bool isDataLoaded = false;
   String? lastLoadedMac;
   String? lastLoadedMonth;
@@ -262,6 +269,8 @@ class _StatisticsscreenState extends State<Statisticsscreen>
                     ),
                   ),
                   const SizedBox(height: 20),
+                  _visualizationsSection(filteredData),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -403,7 +412,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       barTouchData: BarTouchData(
         enabled: true,
         touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: AppColors.blue,
+          getTooltipColor: (_) => AppColors.blue,
           tooltipPadding: const EdgeInsets.all(4),
           tooltipMargin: 0,
           fitInsideVertically: true,
@@ -447,8 +456,251 @@ class _StatisticsscreenState extends State<Statisticsscreen>
     );
   }
 
-  Widget _filterDropdown(InverterViewModel1 viewModel) {
-    List<String> filters = ["daily", "weekly", "monthly", "yearly"];
+  Widget _visualizationsSection(List<InverterDataModel> data) {
+    const vizOptions = [
+      ('gauge', Icons.speed_outlined, 'Gauge'),
+      ('donut', Icons.donut_large_outlined, 'Donut'),
+      ('radar', Icons.radar, 'Radar'),
+      ('scatter', Icons.scatter_plot_outlined, 'Scatter'),
+      ('bars', Icons.bar_chart_outlined, 'Bars'),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 3, spreadRadius: 2),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Visualizations",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: vizOptions.map((option) {
+                final key = option.$1;
+                final icon = option.$2;
+                final label = option.$3;
+                final isActive = selectedViz == key;
+                return GestureDetector(
+                  onTap: () => setState(() => selectedViz = key),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isActive ? ChartTheme.brand : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isActive
+                            ? ChartTheme.brand
+                            : ChartTheme.gridStrong,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          icon,
+                          size: 14,
+                          color: isActive ? Colors.white : ChartTheme.label,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isActive
+                                ? Colors.white
+                                : ChartTheme.label,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _buildVisualization(data),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVisualization(List<InverterDataModel> data) {
+    switch (selectedViz) {
+      case 'donut':
+        return _buildDonut(data);
+      case 'radar':
+        return _buildRadar(data);
+      case 'scatter':
+        return _buildScatter(data);
+      case 'bars':
+        return _buildMetricBars(data);
+      case 'gauge':
+      default:
+        return _buildGauge(data);
+    }
+  }
+
+  Widget _buildGauge(List<InverterDataModel> data) {
+    double latestPower = data.isNotEmpty ? data.last.genPower : 0;
+    double maxKw = 0;
+    final devicePower = Provider.of<SelectedDeviceProvider>(context).power;
+    if (devicePower != null && devicePower > 0) {
+      maxKw = devicePower / 1000.0;
+    }
+    if (maxKw <= 0) {
+      maxKw = data.fold(0.0, (m, d) => d.genPower > m ? d.genPower : m) * 1.1;
+    }
+    if (maxKw <= 0) maxKw = 1;
+    return PowerGaugeWidget(
+      value: latestPower,
+      max: maxKw,
+      subtitle: data.isNotEmpty
+          ? DateFormat('HH:mm').format(data.last.createdAt)
+          : 'Live',
+    );
+  }
+
+  Widget _buildDonut(List<InverterDataModel> data) {
+    double sumInRange(int from, int to) => data
+        .where((e) => e.createdAt.hour >= from && e.createdAt.hour < to)
+        .fold(0.0, (s, e) => s + e.energyConsumed);
+    final segments = [
+      DonutSegment(
+        label: 'Night',
+        value: sumInRange(0, 6),
+        color: ChartTheme.indigo,
+      ),
+      DonutSegment(
+        label: 'Morning',
+        value: sumInRange(6, 12),
+        color: ChartTheme.power,
+      ),
+      DonutSegment(
+        label: 'Afternoon',
+        value: sumInRange(12, 18),
+        color: ChartTheme.brand,
+      ),
+      DonutSegment(
+        label: 'Evening',
+        value: sumInRange(18, 24),
+        color: ChartTheme.cyan,
+      ),
+    ];
+    return EnergyDonutChart(segments: segments);
+  }
+
+  Widget _buildRadar(List<InverterDataModel> data) {
+    if (data.isEmpty) return const MetricRadarChart(metrics: []);
+    double maxOf(double Function(InverterDataModel) f) => data.fold(
+        0.0, (m, d) => f(d) > m ? f(d) : m);
+    final maxEnergy = maxOf((d) => d.energyConsumed);
+    final maxGen = maxOf((d) => d.genPower);
+    final maxPv = maxOf((d) => d.pvVoltage);
+    final maxOutV = maxOf((d) => d.outputVoltage);
+    final maxOutA = maxOf((d) => d.outputCurrent);
+    final last = data.last;
+    return MetricRadarChart(
+      metrics: [
+        RadarMetric(
+          label: 'Energy',
+          value: last.energyConsumed,
+          max: maxEnergy <= 0 ? 1 : maxEnergy,
+        ),
+        RadarMetric(
+          label: 'Power',
+          value: last.genPower,
+          max: maxGen <= 0 ? 1 : maxGen,
+        ),
+        RadarMetric(
+          label: 'PV V',
+          value: last.pvVoltage,
+          max: maxPv <= 0 ? 1 : maxPv,
+        ),
+        RadarMetric(
+          label: 'Out V',
+          value: last.outputVoltage,
+          max: maxOutV <= 0 ? 1 : maxOutV,
+        ),
+        RadarMetric(
+          label: 'Out A',
+          value: last.outputCurrent,
+          max: maxOutA <= 0 ? 1 : maxOutA,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScatter(List<InverterDataModel> data) {
+    final points = data
+        .map((d) => ScatterPoint(
+              x: d.outputVoltage,
+              y: d.outputCurrent,
+              label:
+                  '${d.outputVoltage.toStringAsFixed(1)} V · ${d.outputCurrent.toStringAsFixed(1)} A',
+            ))
+        .toList();
+    return ScatterCorrelationChart(points: points);
+  }
+
+  Widget _buildMetricBars(List<InverterDataModel> data) {
+    if (data.isEmpty) return const MetricBarChart(items: []);
+    final last = data.last;
+    return MetricBarChart(
+      items: [
+        MetricBarItem(
+          label: 'Units Consumed',
+          value: last.energyConsumed,
+          unit: 'kWh',
+          color: ChartTheme.energy,
+        ),
+        MetricBarItem(
+          label: 'Generation Power',
+          value: last.genPower,
+          unit: 'kW',
+          color: ChartTheme.power,
+        ),
+        MetricBarItem(
+          label: 'Solar Voltage',
+          value: last.pvVoltage,
+          unit: 'V',
+          color: ChartTheme.solarVoltage,
+        ),
+        MetricBarItem(
+          label: 'Output Voltage',
+          value: last.outputVoltage,
+          unit: 'V',
+          color: ChartTheme.outputVoltage,
+        ),
+        MetricBarItem(
+          label: 'Output Current',
+          value: last.outputCurrent,
+          unit: 'A',
+          color: ChartTheme.outputCurrent,
+        ),
+      ],
+    );
+  }
+
+  Widget _filterDropdown(InverterViewModel1 viewModel) {    List<String> filters = ["daily", "weekly", "monthly", "yearly"];
     Map<String, String> filterLabels = {
       "daily": "Daily",
       "weekly": "Weekly",
@@ -569,169 +821,137 @@ class _StatisticsscreenState extends State<Statisticsscreen>
     //   // energyData[key] = (energyData[key] ?? 0) + item.energyConsumed;
     // }
 
+    double maxVal = 10;
+    for (final e in energyData.values) {
+      if (e > maxVal) maxVal = e;
+    }
+    final double niceMax = maxVal * 1.2;
+
     List<BarChartGroupData> barGroups = labels.asMap().entries.map((entry) {
       int index = entry.key;
       String label = entry.value;
       double totalEnergy = energyData[label] ?? 0.0;
+      final bool isSelected = selectedBarIndex == index;
+      final bool isCurrent = label == currentLabel;
+      final Color barColor = totalEnergy > 0
+          ? (isSelected || isCurrent
+              ? ChartTheme.brand
+              : ChartTheme.brand.withValues(alpha: 0.72))
+          : ChartTheme.gridStrong;
       return BarChartGroupData(
         x: index,
         barRods: [
           BarChartRodData(
             toY: totalEnergy,
-            width: 15,
-            color: totalEnergy > 0
-                ? (selectedBarIndex == index
-                    ? AppColors.blue
-                    : AppColors.blue)
-                : AppColors.gray1.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(4),
+            width: isSelected ? 20 : 13,
+            color: barColor,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(6),
+            ),
+            label: BarChartRodLabel(
+              show: totalEnergy > 0 && (isSelected || isCurrent),
+              text: ChartTheme.formatCompact(totalEnergy),
+              style: const TextStyle(
+                fontSize: 9,
+                color: ChartTheme.label,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
-              // toY: weekData.values.reduce((a, b) => a > b ? a : b) + 1,
-              color: Colors.grey.withOpacity(0.2),
+              toY: niceMax,
+              color: ChartTheme.grid,
             ),
           ),
         ],
       );
-      // return BarChartGroupData(
-      //   x: index,
-      //   barsSpace: 15,
-      //   barRods: [
-      //     BarChartRodData(
-      //       toY: totalEnergy,
-      //       color: totalEnergy > 0
-      //           ? (selectedBarIndex == index
-      //               ? AppColors.orange
-      //               : AppColors.blue)
-      //           : AppColors.gray1.withOpacity(0.2),
-      //       width: 25,
-      //       borderRadius: BorderRadius.circular(3),
-      //       backDrawRodData: BackgroundBarChartRodData(
-      //         show: true,
-      //         color: Colors.grey.withOpacity(0.2),
-      //       ),
-      //     ),
-      //   ],
-      //   showingTooltipIndicators: selectedBarIndex == index ? [0] : [],
-      // );
     }).toList();
 
     return BarChartData(
+      alignment: BarChartAlignment.spaceAround,
+      maxY: niceMax,
       barGroups: barGroups,
       titlesData: FlTitlesData(
-        // leftTitles: AxisTitles(
-        //   sideTitles: SideTitles(
-        //     showTitles: true,
-        //     // interval: 40,
-        //     reservedSize: 40,
-        //     getTitlesWidget: (value, meta) {
-        //       return Text('${value.toInt()} kWh',
-        //           style: const TextStyle(fontSize: 8, color: AppColors.white));
-        //     },
-        //   ),
-        // ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 20,
-            getTitlesWidget: (value, meta) {
-              return Text(_formatYAxisLabels(value + 1),
-                  style: const TextStyle(fontSize: 10, color: AppColors.white));
-            },
-          ),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 0,
-            getTitlesWidget: (value, meta) {
-              return Text('${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 0, color: AppColors.white));
-            },
-          ),
-        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 40,
+            reservedSize: 46,
             getTitlesWidget: (value, meta) {
               int index = value.toInt();
-              if (index >= 0 && index < labels.length) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedBarIndex = value.toInt();
-                    });
-                  },
-                  child: Transform.rotate(
-                    angle: 35 * 3.1415926535 / 180,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Center(
-                        child: Text(
-                          labels[value.toInt()],
-                          style: TextStyle(
-                            fontSize:
-                                labels[value.toInt()] == currentLabel ? 9 : 9,
-                            fontWeight: labels[value.toInt()] == currentLabel
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: labels[value.toInt()] == currentLabel
-                                ? AppColors.blue
-                                : Colors.white,
-                          ),
+              if (index < 0 || index >= labels.length) {
+                return const SizedBox.shrink();
+              }
+              final String label = labels[index];
+              final bool isCurrent = label == currentLabel;
+              return GestureDetector(
+                onTap: () => setState(() => selectedBarIndex = index),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label.contains('\n')
+                            ? label.split('\n')[0]
+                            : label,
+                        style: TextStyle(
+                          fontSize: isCurrent ? 10 : 9,
+                          fontWeight:
+                              isCurrent ? FontWeight.bold : FontWeight.w500,
+                          color: isCurrent
+                              ? ChartTheme.brand
+                              : ChartTheme.label,
                         ),
                       ),
-                    ),
+                      if (label.contains('\n'))
+                        Text(
+                          label.split('\n')[1],
+                          style: const TextStyle(
+                            fontSize: 8,
+                            color: ChartTheme.labelMuted,
+                          ),
+                        ),
+                    ],
                   ),
-                );
-              }
-              return const SizedBox.shrink();
+                ),
+              );
             },
           ),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30,
+            reservedSize: 36,
+            interval: niceMax / 4,
             getTitlesWidget: (value, meta) {
-              double min = meta.min;
-              double max = meta.max;
-              double mid = (min + max) / 2;
-
-              // Round values to 1 decimal place for comparison
-              double round(double val) => double.parse(val.toStringAsFixed(1));
-              double rVal = round(value);
-              double rMin = round(min);
-              double rMax = round(max);
-              double rMid = round(mid);
-
-              if (rVal == rMin || rVal == rMid || rVal == rMax) {
-                return Text(
-                  '${value.toInt()} kWh',
-                  style: const TextStyle(fontSize: 8, color: AppColors.white),
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-
-              //   if (value % 10 == 0) {
-              //     return Text(
-              //       '${value.toInt()} kWh',
-              //       style: const TextStyle(fontSize: 8, color: AppColors.white),
-              //     );
-              //   } else {
-              //     return const SizedBox.shrink();
-              //   }
+              return Text(
+                '${ChartTheme.formatCompact(value)} kWh',
+                style: ChartTheme.axisLabelStyle,
+              );
             },
-
-            // Use a calculated interval to include mid-point
-            interval: null, // Let FLChart auto pick ticks
           ),
         ),
       ),
-      gridData: const FlGridData(show: true),
-      borderData: FlBorderData(show: false),
+      gridData: FlGridData(
+        show: true,
+        drawVerticalLine: false,
+        horizontalInterval: niceMax / 4,
+        getDrawingHorizontalLine: (_) => const FlLine(
+          color: ChartTheme.grid,
+          strokeWidth: 1,
+          dashArray: [4, 4],
+        ),
+      ),
+      borderData: FlBorderData(
+        show: true,
+        border: const Border(
+          left: BorderSide(color: ChartTheme.gridStrong),
+          bottom: BorderSide(color: ChartTheme.gridStrong),
+        ),
+      ),
       barTouchData: BarTouchData(
         enabled: true,
         touchCallback: (FlTouchEvent event, barTouchResponse) {
@@ -742,18 +962,26 @@ class _StatisticsscreenState extends State<Statisticsscreen>
           }
         },
         touchTooltipData: BarTouchTooltipData(
-          tooltipPadding: const EdgeInsets.all(4),
-          tooltipMargin: 0,
-          fitInsideVertically: true,
-          fitInsideHorizontally: true,
+          tooltipBorderRadius: BorderRadius.circular(10),
+          getTooltipColor: (_) => const Color(0xF21A1A26),
+          tooltipPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          tooltipMargin: 10,
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
-            if (selectedBarIndex == groupIndex) {
-              return BarTooltipItem(
-                '${rod.toY.toStringAsFixed(1)} kWh',
-                const TextStyle(color: Colors.white, fontSize: 10),
-              );
-            }
-            return null; // Hide tooltip for unselected bars
+            if (selectedBarIndex != groupIndex) return null;
+            final String label =
+                groupIndex < labels.length ? labels[groupIndex] : '';
+            return BarTooltipItem(
+              '${label.replaceAll('\n', ' ')}\n'
+              '${rod.toY.toStringAsFixed(2)} kWh',
+              const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            );
           },
         ),
       ),
@@ -880,12 +1108,5 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       default:
         return DateFormat.yMd().format(date);
     }
-  }
-
-  String _formatYAxisLabels(double value) {
-    if (value >= 1e9) return '${(value / 1e9).toStringAsFixed(1)}B';
-    if (value >= 1e6) return '${(value / 1e6).toStringAsFixed(1)}M';
-    if (value >= 1e3) return '${(value / 1e3).toStringAsFixed(1)}k';
-    return value.toStringAsFixed(0);
   }
 }
