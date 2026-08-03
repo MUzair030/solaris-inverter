@@ -219,7 +219,15 @@ class _ZoomableLineChartState extends State<ZoomableLineChart> {
                   endOpacity: 0.02,
                 ),
               ),
-              dotData: const FlDotData(show: false),
+              dotData: FlDotData(
+                show: widget.spots.length <= 24,
+                getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                  radius: 3,
+                  color: widget.color.withValues(alpha: 0.9),
+                  strokeWidth: 1.5,
+                  strokeColor: Colors.white,
+                ),
+              ),
             ),
           ],
         ),
