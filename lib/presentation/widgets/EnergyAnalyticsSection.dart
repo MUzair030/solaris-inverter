@@ -193,21 +193,7 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
             ),
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final tab in AnalyticsTab.values)
-                _TabChip(
-                  label: tab.name[0].toUpperCase() + tab.name.substring(1),
-                  active: _tab == tab,
-                  onTap: () {
-                    setState(() => _tab = tab);
-                    _load();
-                  },
-                ),
-            ],
-          ),
+          _periodDropdown(),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -350,39 +336,41 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
     if (month == null || month < 1 || month > 12) return bucket;
     return _monthNames[month - 1];
   }
-}
 
-class _TabChip extends StatelessWidget {
-  final String label;
-  final bool active;
-  final VoidCallback onTap;
-
-  const _TabChip({
-    required this.label,
-    required this.active,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: active ? ChartTheme.brand : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: active ? ChartTheme.brand : ChartTheme.gridStrong,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
+  Widget _periodDropdown() {
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2E3F),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: ChartTheme.gridStrong),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<AnalyticsTab>(
+          value: _tab,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF1E2130),
+          icon: const Icon(Icons.arrow_drop_down, color: ChartTheme.label),
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
-            color: active ? Colors.white : ChartTheme.label,
           ),
+          onChanged: (value) {
+            if (value == null || value == _tab) return;
+            setState(() => _tab = value);
+            _load();
+          },
+          items: [
+            for (final tab in AnalyticsTab.values)
+              DropdownMenuItem<AnalyticsTab>(
+                value: tab,
+                child: Text(
+                  tab.name[0].toUpperCase() + tab.name.substring(1),
+                ),
+              ),
+          ],
         ),
       ),
     );

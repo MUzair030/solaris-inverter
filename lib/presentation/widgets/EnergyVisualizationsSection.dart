@@ -201,21 +201,7 @@ class _EnergyVisualizationsSectionState
             ),
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final period in VizPeriod.values)
-                _chip(
-                  label: period.name[0].toUpperCase() + period.name.substring(1),
-                  active: _period == period,
-                  onTap: () {
-                    setState(() => _period = period);
-                    _load();
-                  },
-                ),
-            ],
-          ),
+          _periodDropdown(),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -523,29 +509,40 @@ class _EnergyVisualizationsSectionState
     }
   }
 
-  Widget _chip({
-    required String label,
-    required bool active,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: active ? ChartTheme.brand : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: active ? ChartTheme.brand : ChartTheme.gridStrong,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
+  Widget _periodDropdown() {
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2E3F),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: ChartTheme.gridStrong),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<VizPeriod>(
+          value: _period,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF1E2130),
+          icon: const Icon(Icons.arrow_drop_down, color: ChartTheme.label),
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
-            color: active ? Colors.white : ChartTheme.label,
           ),
+          onChanged: (value) {
+            if (value == null || value == _period) return;
+            setState(() => _period = value);
+            _load();
+          },
+          items: [
+            for (final period in VizPeriod.values)
+              DropdownMenuItem<VizPeriod>(
+                value: period,
+                child: Text(
+                  period.name[0].toUpperCase() + period.name.substring(1),
+                ),
+              ),
+          ],
         ),
       ),
     );
