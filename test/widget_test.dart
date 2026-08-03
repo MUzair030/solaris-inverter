@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:threepol_inverter_flutter/app/chart_theme.dart';
+import 'package:threepol_inverter_flutter/data/models/inverter_data_model.dart';
+import 'package:threepol_inverter_flutter/domain/utils/energy_math.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/ChartEmptyState.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/EnergyDonutChart.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/LiveMetricsGrid.dart';
@@ -296,5 +298,70 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('No data available'), findsOneWidget);
+  });
+
+  test('energyTodayKwh uses delta of the day, not sum', () {
+    final now = DateTime(2026, 8, 3, 14, 0);
+    InverterDataModel row(double energy, DateTime at) => InverterDataModel(
+          id: 1,
+          energyConsumed: energy,
+          genPower: 2.0,
+          pvVoltage: 120,
+          outputVoltage: 230,
+          outputCurrent: 8,
+          macAddress: 'AA:BB',
+          error: 0,
+          deviceName: 'v1',
+          version: 'VER_3',
+          createdAt: at,
+        );
+
+    expect(energyTodayKwh(const [], now), 0.0);
+
+    // One reading today -> not enough to compute a delta.
+    expect(
+      energyTodayKwh(
+        [row(8945.82, DateTime(2026, 8, 3, 9, 0))],
+        now,
+      ),
+      0.0,
+    );
+
+    // Two readings today -> delta (this is what was producing 8945 before).
+    expect(
+      energyTodayKwh(
+        [
+          row(8900.0, DateTime(2026, 8, 3, 0, 30)),
+          row(8945.82, DateTime(2026, 8, 3, 14, 0)),
+        ],
+        now,
+      ),
+      closeTo(45.82, 1e-6),
+    );
+
+    // Yesterday's readings are excluded.
+    expect(
+      energyTodayKwh(
+        [
+          row(8000.0, DateTime(2026, 8, 2, 23, 59)),
+          row(8900.0, DateTime(2026, 8, 3, 0, 30)),
+          row(8945.82, DateTime(2026, 8, 3, 14, 0)),
+        ],
+        now,
+      ),
+      closeTo(45.82, 1e-6),
+    );
+
+    // Counter rollover / reset must not produce negative energy.
+    expect(
+      energyTodayKwh(
+        [
+          row(8945.82, DateTime(2026, 8, 3, 0, 30)),
+          row(12.4, DateTime(2026, 8, 3, 14, 0)),
+        ],
+        now,
+      ),
+      0.0,
+    );
   });
 }

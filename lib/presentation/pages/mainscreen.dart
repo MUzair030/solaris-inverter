@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../core/network/dio_client.dart';
 import '../../data/repositories_impl/inverter_repository_impl.dart';
 import '../../domain/usecases/get_inverter_data_usecase.dart';
+import '../../domain/utils/energy_math.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/inverter_viewmodel.dart';
 import '../widgets/ChartEmptyState.dart';
@@ -101,8 +102,7 @@ class _MainscreenState extends State<Mainscreen> {
 
                         final live = data.last;
                         final loadKw = live.outputVoltage * live.outputCurrent / 1000;
-                        final todayKwh = data.fold(
-                            0.0, (sum, d) => sum + d.energyConsumed);
+                        final todayKwh = energyTodayKwh(data, DateTime.now());
                         final devicePowerKw = (selectedDevice.power ?? 0) / 1000.0;
                         final flowNorm = devicePowerKw > 0
                             ? (live.genPower / devicePowerKw).clamp(0.0, 1.0)
