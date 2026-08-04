@@ -173,7 +173,6 @@ class _MainscreenState extends State<Mainscreen> {
                             const SizedBox(height: 16),
                             TodayProductionCard(
                               todayEnergyKwh: todayKwh,
-                              capacityKwh: devicePowerKw > 0 ? devicePowerKw * 8 : null,
                               updatedAt: updatedAt,
                             ),
                             const SizedBox(height: 16),

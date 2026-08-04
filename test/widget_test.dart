@@ -242,7 +242,6 @@ void main() {
         home: Scaffold(
           body: TodayProductionCard(
             todayEnergyKwh: 12.3,
-            capacityKwh: 20.0,
             updatedAt: '14:05',
           ),
         ),

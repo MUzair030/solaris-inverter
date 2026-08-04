@@ -834,13 +834,9 @@ class _StatisticsscreenState extends State<Statisticsscreen>
         break;
 
       case "yearly":
-        labels = [
-          (now.year - 2).toString(),
-          (now.year - 1).toString(),
-          now.year.toString(),
-          (now.year + 1).toString(),
-          (now.year + 2).toString(),
-        ];
+        for (int i = 4; i >= 0; i--) {
+          labels.add((now.year - i).toString());
+        }
         break;
     }
 

@@ -4,27 +4,19 @@ import '../../app/chart_theme.dart';
 
 /// "Today's Solar Production" summary card.
 ///
-/// Shows the system output for today (sum of today's energy readings) with a
-/// progress bar toward the device's rated capacity.
+/// Shows today's system output (the daily meter delta) as the measured value.
 class TodayProductionCard extends StatelessWidget {
   final double todayEnergyKwh;
-  final double? capacityKwh;
   final String updatedAt;
 
   const TodayProductionCard({
     super.key,
     required this.todayEnergyKwh,
-    this.capacityKwh,
     this.updatedAt = '--',
   });
 
   @override
   Widget build(BuildContext context) {
-    final capacity = capacityKwh;
-    final progress = (capacity != null && capacity > 0)
-        ? (todayEnergyKwh / capacity).clamp(0.0, 1.0)
-        : null;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -110,26 +102,6 @@ class TodayProductionCard extends StatelessWidget {
               ),
             ],
           ),
-          if (progress != null) ...[
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 8,
-                backgroundColor: ChartTheme.gridStrong,
-                valueColor: const AlwaysStoppedAnimation<Color>(ChartTheme.brand),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${(progress * 100).toStringAsFixed(0)}% of ${capacity!.toStringAsFixed(1)} kWh capacity',
-              style: const TextStyle(
-                fontSize: 11,
-                color: ChartTheme.label,
-              ),
-            ),
-          ],
         ],
       ),
     );
