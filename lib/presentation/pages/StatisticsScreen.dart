@@ -554,12 +554,24 @@ class _StatisticsscreenState extends State<Statisticsscreen>
     //   }
     // }).toList();
 
-    // Aggregate energy
+    // Aggregate energy per bar. `energyConsumed` is a cumulative meter, so the
+    // energy for each period is the delta between its highest and lowest
+    // readings — never the sum (summing an odometer massively over-counts).
+    final Map<String, List<double>> energies = {};
     for (var item in filteredData) {
       String key = _getFormattedLabel(item.createdAt);
-      // if (energyData.containsKey(key)) {
-      energyData[key] = (energyData[key] ?? 0) + item.energyConsumed;
-      // }
+      energies.putIfAbsent(key, () => []).add(item.energyConsumed);
+    }
+    for (final entry in energies.entries) {
+      final values = entry.value;
+      var min = double.infinity;
+      var max = -double.infinity;
+      for (final v in values) {
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+      final delta = (max - min) < 0 ? 0.0 : max - min;
+      energyData[entry.key] = delta;
     }
     // // Populate actual data from API
     // for (var item in inverterData) {

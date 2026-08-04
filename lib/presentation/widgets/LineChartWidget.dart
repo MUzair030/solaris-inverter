@@ -24,7 +24,7 @@ class LineChartWidget extends StatelessWidget {
   }
 
   LineChartData _buildLineChart() {
-    final hourly = _hourlyAverages();
+    final hourly = _hourlyEnergy();
     final hours = <int>[
       for (int h = 0; h < 24; h++)
         if (hourly[h] != null) h,
@@ -165,17 +165,23 @@ class LineChartWidget extends StatelessWidget {
     );
   }
 
-  List<double?> _hourlyAverages() {
-    final sums = List<double>.filled(24, 0);
-    final counts = List<int>.filled(24, 0);
+  List<double?> _hourlyEnergy() {
+    // `energyConsumed` is a cumulative meter, so the energy produced in each
+    // hour is the delta between the highest and lowest readings of that hour —
+    // never an average of the meter.
+    final mins = List<double?>.filled(24, null);
+    final maxs = List<double?>.filled(24, null);
     for (final item in inverterData) {
       final h = item.createdAt.hour;
-      sums[h] += item.energyConsumed;
-      counts[h]++;
+      final v = item.energyConsumed;
+      if (mins[h] == null || v < mins[h]!) mins[h] = v;
+      if (maxs[h] == null || v > maxs[h]!) maxs[h] = v;
     }
     return [
       for (int h = 0; h < 24; h++)
-        counts[h] == 0 ? null : sums[h] / counts[h],
+        (mins[h] == null || maxs[h] == null)
+            ? null
+            : ((maxs[h]! - mins[h]!) < 0 ? 0 : maxs[h]! - mins[h]!),
     ];
   }
 
