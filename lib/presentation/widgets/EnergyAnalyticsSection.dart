@@ -279,34 +279,69 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
   }
 
   List<FlSpot> _buildSpots(List<InverterStatsModel> stats) {
-    // Plot only the buckets the backend actually returned, in chronological
-    // order, with no zero-padding for missing intervals. Each bucket maps to a
-    // sequential x position and is labelled by its bucket key.
-    return [
-      for (var i = 0; i < stats.length; i++)
-        FlSpot(i.toDouble(), stats[i].energyConsumed),
-    ];
+    // Always render the full period as a continuous line. Buckets the backend
+    // did not report for that period are plotted as 0 so the chart stays a
+    // proper line (day = 24 hours, month = every day, year = 12 months).
+    switch (_tab) {
+      case AnalyticsTab.hour:
+        final hours = <int, double>{};
+        for (final item in stats) {
+          final hour = int.tryParse(
+              item.bucket.length > 13 ? item.bucket.substring(11, 13) : '');
+          if (hour != null) hours[hour] = item.energyConsumed;
+        }
+        return [
+          for (var h = 0; h < 24; h++)
+            FlSpot(h.toDouble(), hours[h] ?? 0),
+        ];
+      case AnalyticsTab.day:
+        final days = <int, double>{};
+        for (final item in stats) {
+          final day = int.tryParse(
+              item.bucket.length >= 10 ? item.bucket.substring(8, 10) : '');
+          if (day != null) days[day] = item.energyConsumed;
+        }
+        final total = _daysInMonth(_selectedMonth.year, _selectedMonth.month);
+        return [
+          for (var d = 1; d <= total; d++)
+            FlSpot((d - 1).toDouble(), days[d] ?? 0),
+        ];
+      case AnalyticsTab.week:
+        return [
+          for (var i = 0; i < stats.length; i++)
+            FlSpot(i.toDouble(), stats[i].energyConsumed),
+        ];
+      case AnalyticsTab.month:
+        final months = <int, double>{};
+        for (final item in stats) {
+          final month = int.tryParse(
+              item.bucket.length >= 7 ? item.bucket.substring(5, 7) : '');
+          if (month != null) months[month] = item.energyConsumed;
+        }
+        return [
+          for (var m = 1; m <= 12; m++)
+            FlSpot((m - 1).toDouble(), months[m] ?? 0),
+        ];
+      case AnalyticsTab.year:
+        return [
+          for (var i = 0; i < stats.length; i++)
+            FlSpot(i.toDouble(), stats[i].energyConsumed),
+        ];
+    }
   }
 
-  static const List<String> _monthNames = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  static const List<String> _hourLabels = [
+    '12AM', '', '', '', '4AM', '', '', '', '8AM', '', '', '',
+    '12PM', '', '', '', '4PM', '', '', '', '8PM', '', '', '',
   ];
 
   List<String> _buildLabels(List<InverterStatsModel> stats) {
     switch (_tab) {
       case AnalyticsTab.hour:
-        // bucket: "2026-08-03T05:00" -> "05:00"
-        return [
-          for (final item in stats)
-            item.bucket.length > 15 ? item.bucket.substring(11, 16) : item.bucket,
-        ];
+        return _hourLabels;
       case AnalyticsTab.day:
-        // bucket: "2026-08-15" -> "15"
-        return [
-          for (final item in stats)
-            item.bucket.length >= 10 ? item.bucket.substring(8, 10) : item.bucket,
-        ];
+        final total = _daysInMonth(_selectedMonth.year, _selectedMonth.month);
+        return [for (var d = 1; d <= total; d++) '$d'];
       case AnalyticsTab.week:
         // bucket: "2026-08-03" -> "08/03"
         return [
@@ -316,10 +351,8 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
                 : item.bucket,
         ];
       case AnalyticsTab.month:
-        // bucket: "2026-08" -> "Aug"
-        return [
-          for (final item in stats)
-            _monthFromBucket(item.bucket),
+        return const [
+          'Jan', '', '', 'Apr', '', '', 'Jul', '', '', 'Oct', '', '',
         ];
       case AnalyticsTab.year:
         // bucket: "2026" -> "2026"
@@ -328,13 +361,6 @@ class _EnergyAnalyticsSectionState extends State<EnergyAnalyticsSection> {
             item.bucket.length >= 4 ? item.bucket.substring(0, 4) : item.bucket,
         ];
     }
-  }
-
-  String _monthFromBucket(String bucket) {
-    if (bucket.length < 7) return bucket;
-    final month = int.tryParse(bucket.substring(5, 7));
-    if (month == null || month < 1 || month > 12) return bucket;
-    return _monthNames[month - 1];
   }
 
   Widget _periodDropdown() {
