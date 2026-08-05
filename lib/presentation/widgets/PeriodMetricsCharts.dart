@@ -1,56 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../app/chart_theme.dart';
+import '../../data/models/inverter_stats_model.dart';
 import '../utils/analytics_chart_data.dart';
-import '../viewmodels/live_inverter_viewmodel.dart';
-import 'ChartEmptyState.dart';
+import '../viewmodels/energy_analytics_viewmodel.dart';
 import 'ZoomableLineChart.dart';
 
-/// The "Live" entry in the shared Day/Week/Month/Year/Total/Live analytics
-/// selector. Unlike the others, this never calls `/stats` - it plots
-/// [LiveInverterViewModel]'s rolling history of the last ~5 minutes of
-/// distinct polled readings, updating automatically every time a new reading
-/// arrives. Every real metric the device reports gets its own small-multiple
-/// chart (Generation Power, Voltage, Output Current), matching the pattern
-/// used for the bucketed Day/Week/Month/Year charts - never one dual-axis
-/// chart mixing kW/V/A. Rendered identically on the dashboard's compact
-/// analytics card and the full Analytics screen - both read the same
-/// [LiveInverterViewModel] instance, so there's nothing duplicated here.
-class LiveEnergyChart extends StatelessWidget {
-  const LiveEnergyChart({super.key});
+/// Renders every metric a period bucket carries, as separate small-multiple
+/// charts sharing one x-axis - not one dual-axis chart. Energy (kWh),
+/// Generation Power (kW), and Output Current (A) each get their own chart
+/// since they're on different scales; PV Voltage and Output Voltage share one
+/// chart since both are Volts and are meaningfully comparable.
+///
+/// Shared by the dashboard's compact analytics card and the full Analytics
+/// screen's "Line" view - one implementation, not duplicated per screen.
+///
+/// Callers are expected to have already handled the loading/error/empty
+/// states for [buckets] (see `EnergyAnalyticsViewModel`) - this widget always
+/// assumes at least one bucket is present.
+class PeriodMetricsCharts extends StatelessWidget {
+  final List<InverterStatsBucket> buckets;
+  final AnalyticsPeriod period;
+
+  const PeriodMetricsCharts({
+    super.key,
+    required this.buckets,
+    required this.period,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final live = context.watch<LiveInverterViewModel>();
-    final history = live.history;
-
-    if (history.length < 2) {
-      return const SizedBox(
-        height: 200,
-        child: ChartEmptyState(
-          title: 'Waiting for live readings',
-          message: 'The chart will start plotting as the inverter reports.',
-          compact: true,
-        ),
-      );
-    }
-
-    final labels = buildLiveLabels(history);
+    final labels = buildAnalyticsLabels(period, buckets);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _chartBlock(
+          title: 'Energy',
+          unit: 'kWh',
+          height: 200,
+          child: ZoomableLineChart(
+            series: [
+              ChartSeries(
+                label: 'Energy',
+                color: ChartTheme.energy,
+                spots: buildAnalyticsSpots(buckets, (b) => b.energyDeltaKwh),
+              ),
+            ],
+            labels: labels,
+            unit: 'kWh',
+          ),
+        ),
+        const SizedBox(height: 18),
+        _chartBlock(
           title: 'Generation Power',
           unit: 'kW',
-          height: 200,
+          height: 160,
           child: ZoomableLineChart(
             series: [
               ChartSeries(
                 label: 'Generation Power',
                 color: ChartTheme.power,
-                spots: buildLiveSpots(history, (d) => d.genPower),
+                spots: buildAnalyticsSpots(buckets, (b) => b.avgGenPowerKw),
               ),
             ],
             labels: labels,
@@ -67,12 +78,12 @@ class LiveEnergyChart extends StatelessWidget {
               ChartSeries(
                 label: 'PV Voltage',
                 color: ChartTheme.solarVoltage,
-                spots: buildLiveSpots(history, (d) => d.pvVoltage),
+                spots: buildAnalyticsSpots(buckets, (b) => b.avgPvVoltage),
               ),
               ChartSeries(
                 label: 'Output Voltage',
                 color: ChartTheme.outputVoltage,
-                spots: buildLiveSpots(history, (d) => d.outputVoltage),
+                spots: buildAnalyticsSpots(buckets, (b) => b.avgOutputVoltage),
               ),
             ],
             labels: labels,
@@ -89,7 +100,7 @@ class LiveEnergyChart extends StatelessWidget {
               ChartSeries(
                 label: 'Output Current',
                 color: ChartTheme.outputCurrent,
-                spots: buildLiveSpots(history, (d) => d.outputCurrent),
+                spots: buildAnalyticsSpots(buckets, (b) => b.avgOutputCurrent),
               ),
             ],
             labels: labels,

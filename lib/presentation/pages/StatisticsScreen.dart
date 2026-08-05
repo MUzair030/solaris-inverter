@@ -13,10 +13,10 @@ import '../widgets/HeaderWidget.dart';
 import '../widgets/LiveEnergyChart.dart';
 import '../widgets/MetricBarChart.dart';
 import '../widgets/MetricRadarChart.dart';
+import '../widgets/PeriodMetricsCharts.dart';
 import '../widgets/PowerGaugeWidget.dart';
 import '../widgets/ScatterCorrelationChart.dart';
 import '../widgets/WelcomeWidget.dart';
-import '../widgets/ZoomableLineChart.dart';
 
 enum _VizType { line, bar, gauge, donut, radar, scatter }
 
@@ -225,14 +225,9 @@ class _StatisticsscreenState extends State<Statisticsscreen> {
   }
 
   Widget _buildLine(EnergyAnalyticsViewModel analytics) {
-    return SizedBox(
-      height: 240,
-      child: ZoomableLineChart(
-        spots: buildAnalyticsSpots(analytics.buckets),
-        labels: buildAnalyticsLabels(analytics.period, analytics.buckets),
-        color: ChartTheme.brand,
-        unit: 'kWh',
-      ),
+    return PeriodMetricsCharts(
+      buckets: analytics.buckets,
+      period: analytics.period,
     );
   }
 

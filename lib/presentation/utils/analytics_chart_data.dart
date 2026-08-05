@@ -7,16 +7,21 @@ import '../viewmodels/energy_analytics_viewmodel.dart';
 
 /// Maps [InverterStatsBucket]s (already zero-padded server-side for
 /// continuity) into the `FlSpot`/label pairs the shared [ZoomableLineChart]
-/// needs. Kept in one place so the dashboard's compact analytics card and the
-/// full Analytics screen render identically from the same
-/// [EnergyAnalyticsViewModel] buckets without re-deriving anything.
+/// needs, picking whichever field [valueOf] selects (energy delta, avg
+/// generation power, avg voltage, ...). Kept in one place so the dashboard's
+/// compact analytics card and the full Analytics screen render identically
+/// from the same [EnergyAnalyticsViewModel] buckets without re-deriving
+/// anything.
 ///
-/// `energyDeltaKwh` is used as-is (already a correct max-min delta computed
-/// server-side) — never re-summed here.
-List<FlSpot> buildAnalyticsSpots(List<InverterStatsBucket> buckets) {
+/// Bucket fields are used as-is (already correct, server-computed values) —
+/// never re-derived or re-summed here.
+List<FlSpot> buildAnalyticsSpots(
+  List<InverterStatsBucket> buckets,
+  double Function(InverterStatsBucket) valueOf,
+) {
   return [
     for (var i = 0; i < buckets.length; i++)
-      FlSpot(i.toDouble(), buckets[i].energyDeltaKwh),
+      FlSpot(i.toDouble(), valueOf(buckets[i])),
   ];
 }
 

@@ -8,7 +8,6 @@ import '../../core/network/dio_client.dart';
 import '../../data/repositories_impl/inverter_repository_impl.dart';
 import '../../domain/usecases/get_inverter_data_usecase.dart';
 import '../../domain/utils/energy_math.dart';
-import '../utils/analytics_chart_data.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/energy_analytics_viewmodel.dart';
 import '../viewmodels/inverter_viewmodel.dart';
@@ -18,10 +17,10 @@ import '../widgets/ChartEmptyState.dart';
 import '../widgets/HeaderWidget.dart';
 import '../widgets/LiveEnergyChart.dart';
 import '../widgets/LiveMetricsGrid.dart';
+import '../widgets/PeriodMetricsCharts.dart';
 import '../widgets/PowerFlowDiagram.dart';
 import '../widgets/TodayProductionCard.dart';
 import '../widgets/WelcomeWidget.dart';
-import '../widgets/ZoomableLineChart.dart';
 
 /// Dashboard: power-flow diagram -> live metrics grid -> today's production
 /// -> compact energy analytics, fed by the shared [LiveInverterViewModel] and
@@ -333,14 +332,9 @@ class _CompactAnalyticsSection extends StatelessWidget {
         ),
       );
     }
-    return SizedBox(
-      height: 200,
-      child: ZoomableLineChart(
-        spots: buildAnalyticsSpots(analytics.buckets),
-        labels: buildAnalyticsLabels(analytics.period, analytics.buckets),
-        color: ChartTheme.brand,
-        unit: 'kWh',
-      ),
+    return PeriodMetricsCharts(
+      buckets: analytics.buckets,
+      period: analytics.period,
     );
   }
 }
