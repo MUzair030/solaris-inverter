@@ -51,6 +51,16 @@ public class Inverter_Table_Model {
     @Column(name = "version")
     private String version;
 
+    // Full, unmodified JSON payload exactly as received from the hardware
+    // device (over the websocket ingestion path) or the /save REST caller,
+    // stored verbatim so nothing the device sends is ever lost even if a
+    // future firmware adds fields this backend doesn't parse yet. Not part
+    // of any existing API response (JsonIgnore) - it's a backend-only audit
+    // trail, not user-facing telemetry.
+    @JsonIgnore
+    @Column(name = "raw_payload", columnDefinition = "TEXT")
+    private String raw_payload;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -164,6 +174,14 @@ public class Inverter_Table_Model {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getRaw_payload() {
+        return raw_payload;
+    }
+
+    public void setRaw_payload(String raw_payload) {
+        this.raw_payload = raw_payload;
     }
 
 }

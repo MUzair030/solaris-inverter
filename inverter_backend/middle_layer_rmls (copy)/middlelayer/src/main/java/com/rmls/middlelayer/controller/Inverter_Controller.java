@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rmls.middlelayer.configuration.JwtUtils;
 import com.rmls.middlelayer.model.ERole;
 import com.rmls.middlelayer.model.Inverter_Table_Model;
@@ -47,7 +48,7 @@ public class Inverter_Controller {
     JwtUtils jwtUtils;
 
     @PostMapping(path = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveInverterData(@RequestBody Inverter_Table_Model inverter_Table_Model,
+    public ResponseEntity<?> saveInverterData(@RequestBody String rawBody,
             @RequestHeader("Authorization") String authorizationHeader) {
 
         logger.info("Inverter_Controller-save-inverter-data-Called");
@@ -55,6 +56,13 @@ public class Inverter_Controller {
         try {
             Boolean saveData;
             User user = new User();
+
+            // Parsed manually (instead of Spring's automatic @RequestBody binding) so
+            // the exact, unmodified JSON the caller sent can also be persisted verbatim
+            // in raw_payload, alongside the normal parsed/typed fields.
+            Inverter_Table_Model inverter_Table_Model = new ObjectMapper().readValue(rawBody,
+                    Inverter_Table_Model.class);
+            inverter_Table_Model.setRaw_payload(rawBody);
 
             User userDetails = jwtUtils.getUserDetailsFromJwtToken(authorizationHeader);
 

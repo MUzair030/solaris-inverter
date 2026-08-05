@@ -115,6 +115,7 @@ public class WebSocketHandlerService extends TextWebSocketHandler {
             inverterModel.setMac_address(mac);
             inverterModel.setError(error_bit);
             inverterModel.setDevice_name(device_name);
+            inverterModel.setRaw_payload(receivedMessage);
 
             if (version == null) {
                 inverterModel.setVersion("VER_3");
