@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:threepol_inverter_flutter/data/models/DeviceModel.dart';
-import 'package:threepol_inverter_flutter/data/models/inverter_data_model.dart';
-import 'package:threepol_inverter_flutter/domain/entities/UserModel.dart';
-import 'package:threepol_inverter_flutter/presentation/widgets/HeaderWidget.dart';
-import 'package:threepol_inverter_flutter/presentation/widgets/WelcomeWidget.dart';
 
+import '../../app/App_Colors.dart';
+import '../../app/chart_theme.dart';
 import '../../core/network/dio_client.dart';
 import '../../data/repositories_impl/inverter_repository_impl.dart';
 import '../../domain/usecases/get_inverter_data_usecase.dart';
+import '../../domain/utils/energy_math.dart';
+import '../utils/analytics_chart_data.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
+import '../viewmodels/energy_analytics_viewmodel.dart';
 import '../viewmodels/inverter_viewmodel.dart';
-import '../widgets/buildInverterCard.dart';
+import '../viewmodels/live_inverter_viewmodel.dart';
+import '../widgets/AnalyticsPeriodSelector.dart';
+import '../widgets/ChartEmptyState.dart';
+import '../widgets/HeaderWidget.dart';
+import '../widgets/LiveMetricsGrid.dart';
+import '../widgets/PowerFlowDiagram.dart';
+import '../widgets/TodayProductionCard.dart';
+import '../widgets/WelcomeWidget.dart';
+import '../widgets/ZoomableLineChart.dart';
 
+/// Dashboard: power-flow diagram -> live metrics grid -> today's production
+/// -> compact energy analytics, fed by the shared [LiveInverterViewModel] and
+/// [EnergyAnalyticsViewModel] instances owned by the tab shell
+/// (`Mainbottomnavigationview`), plus a dashboard-local [InverterViewModel]
+/// used only to source "today's" raw readings for the production card.
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
 
@@ -21,117 +34,18 @@ class Mainscreen extends StatefulWidget {
   State<Mainscreen> createState() => _MainscreenState();
 }
 
-class _MainscreenState extends State<Mainscreen> with WidgetsBindingObserver {
-  // // @override
-  // // void initState() {
-  // //   super.initState();
-  // //   WidgetsBinding.instance.addObserver(this);
-  // //
-  // //   // loadStoredDeviceData(); // NEW: Load stored name/mac/power
-  // //
-  // //   // final dioClient = DioClient();
-  // //   // final repo = InverterRepositoryImpl(dioClient);
-  // //   // final useCase = FetchInverterDataUseCase(repo);
-  // //   // _vm = InverterViewModel(useCase);
-  // //   Future.microtask(() {
-  // //     //   _vm.fetchInverterData();
-  // //     //   _vm.startAutoRefresh();
-  // //     Provider.of<InverterViewModel>(context, listen: false)
-  // //         .fetchInverterData();
-  // //     Provider.of<InverterViewModel>(context, listen: false).startAutoRefresh();
-  // //   });
-  // // }
-  // //
-  // // @override
-  // // void dispose() {
-  // //   WidgetsBinding.instance.removeObserver(this);
-  // //   try {
-  // //     if (mounted) {
-  // //       Provider.of<InverterViewModel>(context, listen: false)
-  // //           .stopAutoRefresh();
-  // //     }
-  // //   } catch (e) {
-  // //     debugPrint("Error stopping auto-refresh: $e");
-  // //   }
-  // //   super.dispose();
-  // // }
-  // //
-  // // @override
-  // // void didChangeAppLifecycleState(AppLifecycleState state) {
-  // //   final inverterViewModel =
-  // //       Provider.of<InverterViewModel>(context, listen: false);
-  // //   if (state == AppLifecycleState.resumed) {
-  // //     // Fluttertoast.showToast(msg: "onresume");
-  // //     // print("resume");
-  // //     inverterViewModel.startAutoRefresh(); // Restart when app is in foreground
-  // //   } else if (state == AppLifecycleState.paused) {
-  // //     // print("pause");
-  // //     // Fluttertoast.showToast(msg: "onpause");
-  // //     // inverterViewModel.stopAutoRefresh(); // Stop when app goes to background
-  // //   }
-  // // }
-  //
-  // late InverterViewModel viewModel;
-  // @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   final dioClient = DioClient();
-  //   final repository = InverterRepositoryImpl(dioClient);
-  //   final useCase = FetchInverterDataUseCase(repository);
-  //   viewModel = InverterViewModel(useCase);
-  //
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     viewModel.fetchInverterData(); // call once on screen open
-  //   });
-  // }
-  //
-  // // @override
-  // // void initState() {
-  // //   super.initState();
-  // //   WidgetsBinding.instance.addObserver(this);
-  // //
-  // //   // Initialize ViewModel directly here
-  // //   final dioClient = DioClient();
-  // //   final repo = InverterRepositoryImpl(dioClient);
-  // //   final useCase = FetchInverterDataUseCase(repo);
-  // //   _vm = InverterViewModel(useCase);
-  // //
-  // //   // Start fetching and auto-refreshing inverter data
-  // //   Future.microtask(() async {
-  // //     await _vm.fetchInverterData();
-  // //     _vm.startAutoRefresh();
-  // //   });
-  // // }
-  //
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   viewModel.stopAutoRefresh();
-  //   super.dispose();
-  // }
-  //
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     viewModel.startAutoRefresh();
-  //   } else if (state == AppLifecycleState.paused) {
-  //     viewModel.stopAutoRefresh();
-  //   }
-  // }
+class _MainscreenState extends State<Mainscreen> {
   late InverterViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize ViewModel here
     final dioClient = DioClient();
     final repo = InverterRepositoryImpl(dioClient);
     final useCase = FetchInverterDataUseCase(repo);
     _viewModel = InverterViewModel(useCase);
 
-    // Start fetching after first frame (to ensure context is ready)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _viewModel.setContext(context);
       _viewModel.fetchInverterData();
@@ -152,7 +66,7 @@ class _MainscreenState extends State<Mainscreen> with WidgetsBindingObserver {
         fit: StackFit.expand,
         children: [
           Image.asset("assets/bg.png", fit: BoxFit.cover),
-          Container(color: Colors.black.withOpacity(0.1)),
+          Container(color: Colors.black.withValues(alpha: 0.1)),
           Padding(
             padding:
                 const EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 30),
@@ -163,152 +77,18 @@ class _MainscreenState extends State<Mainscreen> with WidgetsBindingObserver {
                   const HeaderWidget(),
                   const SizedBox(height: 20),
                   const WelcomeWidget(),
-                  const SizedBox(height: 10),
-
-                  // Consumer listens to ViewModel updates
+                  const SizedBox(height: 16),
+                  const _PowerFlowSection(),
+                  const SizedBox(height: 16),
+                  const _LiveMetricsSection(),
+                  const SizedBox(height: 16),
                   ChangeNotifierProvider<InverterViewModel>.value(
                     value: _viewModel,
-                    child: Consumer<InverterViewModel>(
-                      builder: (context, viewModel, child) {
-                        final selectedDevice =
-                            Provider.of<SelectedDeviceProvider>(context);
-                        final _storedName = selectedDevice.name ?? "Unknown";
-                        final _storedPower = selectedDevice.power ?? 0;
-                        final deviceviewMo = DeviceModel(
-                            id: 0,
-                            macAddress: "",
-                            invertername: "unknown",
-                            inverterPower: 0,
-                            user: UserModel(
-                                id: 0,
-                                username: "",
-                                email: "",
-                                address: "",
-                                phone: ""));
-                        final inverterdata = InverterDataModel(
-                            id: 0,
-                            energyConsumed: 00,
-                            genPower: 00,
-                            pvVoltage: 00,
-                            outputVoltage: 00,
-                            outputCurrent: 00,
-                            macAddress: "",
-                            error: 00,
-                            deviceName: "",
-                            version: "",
-                            createdAt: DateTime.now());
-                        if (viewModel.errorMessage != null) {
-                          // return CardDesign(message: "No data available...");
-
-                          if (viewModel.errorMessage != null ||
-                              viewModel.inverterData.isEmpty) {
-                            return buildInverterCard(
-                              dataoverall: [],
-                              energydata: "N/A",
-                              endate: "N/A",
-                              entime: "N/A",
-                              data: inverterdata,
-                              date: "N/A",
-                              time: "N/A",
-                              deviceName: "N/A",
-                              // device: deviceviewMo,
-                              devicename: _storedName,
-                              storedPower: _storedPower,
-                            );
-                          }
-                        }
-                        if (viewModel.inverterData.isEmpty) {
-                          // return CardDesign(message: "No data available...");
-                          if (viewModel.errorMessage != null ||
-                              viewModel.inverterData.isEmpty) {
-                            return buildInverterCard(
-                              dataoverall: [],
-                              energydata: "N/A",
-                              endate: "N/A",
-                              entime: "N/A",
-                              data: inverterdata,
-                              date: "N/A",
-                              time: "N/A",
-                              deviceName: "N/A",
-                              // device: deviceviewMo,
-                              devicename: _storedName,
-                              storedPower: _storedPower,
-                            );
-                          }
-                        }
-                        final dataoverall = viewModel.inverterData;
-                        final data = viewModel.inverterData.last;
-                        String? timestamp = "${data.createdAt}" ?? "";
-                        String date = "N/A", time = "N/A";
-
-                        if (timestamp.isNotEmpty) {
-                          List<String> parts = timestamp.split(' ');
-                          if (parts.length == 2) {
-                            date = parts[0];
-                            time = parts[1].split('.')[0];
-                          }
-                        }
-
-                        String original = data.deviceName ?? "Unknown";
-                        List<String> parts = original.split('_');
-                        String deviceName = parts.length > 1
-                            ? parts.sublist(1).join('_')
-                            : original;
-
-                        // final device = deviceviewModel.devices.isNotEmpty
-                        //     ? deviceviewModel.devices.last
-                        //     : deviceviewMo;
-                        // final device = deviceviewModel.devices.last;
-
-                        // for graph
-                        String dategraph = "N/A",
-                            timegraph = "N/A",
-                            energydata = "N/A",
-                            timestamp1 = "N/A";
-                        final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-                        // final lastDate = dateFormat
-                        //     .format(viewModel.inverterData.last.createdAt);
-                        final lastDate = dataoverall.isNotEmpty
-                            ? dateFormat.format(dataoverall.last.createdAt)
-                            : "N/A";
-
-                        if (lastDate != "N/A") {
-                          Set<String> uniqueEntries = {};
-
-                          final filteredData =
-                              viewModel.inverterData.where((item) {
-                            return dateFormat.format(item.createdAt) ==
-                                lastDate;
-                          }).toList();
-
-                          for (var item in filteredData) {
-                            timestamp1 = DateFormat('yyyy-MM-dd HH:mm:ss')
-                                .format(item.createdAt);
-                            timegraph =
-                                DateFormat('HH:mm:ss').format(item.createdAt);
-                            dategraph =
-                                DateFormat('yyyy-MM-dd').format(item.createdAt);
-                            if (uniqueEntries.add(timestamp1)) {
-                              energydata = "${item.energyConsumed}";
-                            }
-                          }
-                        }
-                        return buildInverterCard(
-                          dataoverall: dataoverall,
-                          energydata: energydata,
-                          endate: dategraph,
-                          entime: timegraph,
-                          data: data,
-                          date: date,
-                          time: time,
-                          deviceName: deviceName,
-                          // device: device,
-                          devicename: _storedName,
-                          storedPower: _storedPower,
-                        );
-                      },
-                    ),
+                    child: const _TodayProductionSection(),
                   ),
+                  const SizedBox(height: 16),
+                  const _CompactAnalyticsSection(),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -317,171 +97,345 @@ class _MainscreenState extends State<Mainscreen> with WidgetsBindingObserver {
       ),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   // final deviceviewModel = Provider.of<DeviceViewModel>(context);
-  //   return Scaffold(
-  //     body: Stack(
-  //       fit: StackFit.expand,
-  //       children: [
-  //         Image.asset("assets/bg.png", fit: BoxFit.cover),
-  //         Container(color: Colors.black.withOpacity(0.1)),
-  //         Padding(
-  //           padding:
-  //               const EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 30),
-  //           child: SingleChildScrollView(
-  //             child: Column(
-  //               children: [
-  //                 const SizedBox(height: 35),
-  //                 const HeaderWidget(),
-  //                 const SizedBox(height: 20),
-  //                 const WelcomeWidget(),
-  //                 const SizedBox(height: 10),
-  //                 Consumer<InverterViewModel>(
-  //                   builder: (context, viewModel, child) {
-  //                     final selectedDevice =
-  //                         Provider.of<SelectedDeviceProvider>(context);
-  //                     final _storedName = selectedDevice.name ?? "Unknown";
-  //                     final _storedPower = selectedDevice.power ?? 0;
-  //                     final deviceviewMo = DeviceModel(
-  //                         id: 0,
-  //                         macAddress: "",
-  //                         invertername: "unknown",
-  //                         inverterPower: 0,
-  //                         user: UserModel(
-  //                             id: 0,
-  //                             username: "",
-  //                             email: "",
-  //                             address: "",
-  //                             phone: ""));
-  //                     final inverterdata = InverterDataModel(
-  //                         id: 0,
-  //                         energyConsumed: 00,
-  //                         genPower: 00,
-  //                         pvVoltage: 00,
-  //                         outputVoltage: 00,
-  //                         outputCurrent: 00,
-  //                         macAddress: "",
-  //                         error: 00,
-  //                         deviceName: "",
-  //                         version: "",
-  //                         createdAt: DateTime.now());
-  //                     if (viewModel.errorMessage != null) {
-  //                       // return CardDesign(message: "No data available...");
-  //
-  //                       if (viewModel.errorMessage != null ||
-  //                           viewModel.inverterData.isEmpty) {
-  //                         return buildInverterCard(
-  //                           dataoverall: [],
-  //                           energydata: "N/A",
-  //                           endate: "N/A",
-  //                           entime: "N/A",
-  //                           data: inverterdata,
-  //                           date: "N/A",
-  //                           time: "N/A",
-  //                           deviceName: "N/A",
-  //                           // device: deviceviewMo,
-  //                           devicename: _storedName,
-  //                           storedPower: _storedPower,
-  //                         );
-  //                       }
-  //                     }
-  //                     if (viewModel.inverterData.isEmpty) {
-  //                       // return CardDesign(message: "No data available...");
-  //                       if (viewModel.errorMessage != null ||
-  //                           viewModel.inverterData.isEmpty) {
-  //                         return buildInverterCard(
-  //                           dataoverall: [],
-  //                           energydata: "N/A",
-  //                           endate: "N/A",
-  //                           entime: "N/A",
-  //                           data: inverterdata,
-  //                           date: "N/A",
-  //                           time: "N/A",
-  //                           deviceName: "N/A",
-  //                           // device: deviceviewMo,
-  //                           devicename: _storedName,
-  //                           storedPower: _storedPower,
-  //                         );
-  //                       }
-  //                     }
-  //                     final dataoverall = viewModel.inverterData;
-  //                     final data = viewModel.inverterData.last;
-  //                     String? timestamp = "${data.createdAt}" ?? "";
-  //                     String date = "N/A", time = "N/A";
-  //
-  //                     if (timestamp.isNotEmpty) {
-  //                       List<String> parts = timestamp.split(' ');
-  //                       if (parts.length == 2) {
-  //                         date = parts[0];
-  //                         time = parts[1].split('.')[0];
-  //                       }
-  //                     }
-  //
-  //                     String original = data.deviceName ?? "Unknown";
-  //                     List<String> parts = original.split('_');
-  //                     String deviceName = parts.length > 1
-  //                         ? parts.sublist(1).join('_')
-  //                         : original;
-  //
-  //                     // final device = deviceviewModel.devices.isNotEmpty
-  //                     //     ? deviceviewModel.devices.last
-  //                     //     : deviceviewMo;
-  //                     // final device = deviceviewModel.devices.last;
-  //
-  //                     // for graph
-  //                     String dategraph = "N/A",
-  //                         timegraph = "N/A",
-  //                         energydata = "N/A",
-  //                         timestamp1 = "N/A";
-  //                     final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-  //                     // final lastDate = dateFormat
-  //                     //     .format(viewModel.inverterData.last.createdAt);
-  //                     final lastDate = dataoverall.isNotEmpty
-  //                         ? dateFormat.format(dataoverall.last.createdAt)
-  //                         : "N/A";
-  //
-  //                     if (lastDate != "N/A") {
-  //                       Set<String> uniqueEntries = {};
-  //
-  //                       final filteredData =
-  //                           viewModel.inverterData.where((item) {
-  //                         return dateFormat.format(item.createdAt) == lastDate;
-  //                       }).toList();
-  //
-  //                       for (var item in filteredData) {
-  //                         timestamp1 = DateFormat('yyyy-MM-dd HH:mm:ss')
-  //                             .format(item.createdAt);
-  //                         timegraph =
-  //                             DateFormat('HH:mm:ss').format(item.createdAt);
-  //                         dategraph =
-  //                             DateFormat('yyyy-MM-dd').format(item.createdAt);
-  //                         if (uniqueEntries.add(timestamp1)) {
-  //                           energydata = "${item.energyConsumed}";
-  //                         }
-  //                       }
-  //                     }
-  //                     return buildInverterCard(
-  //                       dataoverall: dataoverall,
-  //                       energydata: energydata,
-  //                       endate: dategraph,
-  //                       entime: timegraph,
-  //                       data: data,
-  //                       date: date,
-  //                       time: time,
-  //                       deviceName: deviceName,
-  //                       // device: device,
-  //                       devicename: _storedName,
-  //                       storedPower: _storedPower,
-  //                     );
-  //                   },
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+}
+
+/// Card wrapper matching the dark card look used across the revamped
+/// dashboard sections.
+class _SectionCard extends StatelessWidget {
+  final String? title;
+  final Widget child;
+
+  const _SectionCard({this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E2130),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 3, spreadRadius: 2),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(
+              title!,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _PowerFlowSection extends StatelessWidget {
+  const _PowerFlowSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final live = context.watch<LiveInverterViewModel>();
+    final devicePower = context.watch<SelectedDeviceProvider>().power;
+    final latest = live.latest;
+
+    if (latest == null) {
+      return const _SectionCard(
+        title: 'Live Power Flow',
+        child: SizedBox(
+          height: 160,
+          child: ChartEmptyState(
+            title: 'Waiting for live data',
+            message: 'The power flow will animate once the inverter reports.',
+            compact: true,
+          ),
+        ),
+      );
+    }
+
+    final genPowerKw = latest.genPower;
+    final loadKw = latest.outputVoltage * latest.outputCurrent / 1000.0;
+    double flow = 0.4;
+    if (devicePower != null && devicePower > 0) {
+      flow = (genPowerKw * 1000 / devicePower).clamp(0.0, 1.0);
+    }
+
+    return _SectionCard(
+      title: 'Live Power Flow',
+      child: PowerFlowDiagram(
+        genPowerKw: genPowerKw,
+        loadKw: loadKw,
+        pvVoltage: latest.pvVoltage,
+        outputVoltage: latest.outputVoltage,
+        outputCurrent: latest.outputCurrent,
+        flow: flow,
+      ),
+    );
+  }
+}
+
+class _LiveMetricsSection extends StatelessWidget {
+  const _LiveMetricsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final live = context.watch<LiveInverterViewModel>();
+    final latest = live.latest;
+
+    if (latest == null) {
+      return const _SectionCard(
+        title: 'Live Metrics',
+        child: SizedBox(
+          height: 100,
+          child: ChartEmptyState(
+            title: 'No live readings yet',
+            compact: true,
+          ),
+        ),
+      );
+    }
+
+    final loadKw = latest.outputVoltage * latest.outputCurrent / 1000.0;
+
+    return _SectionCard(
+      title: 'Live Metrics',
+      child: LiveMetricsGrid(
+        metrics: [
+          LiveMetric(
+            label: 'Solar Generation',
+            value: latest.genPower.toStringAsFixed(2),
+            unit: 'kW',
+            icon: Icons.solar_power_outlined,
+            color: ChartTheme.power,
+          ),
+          LiveMetric(
+            label: 'House Load',
+            value: loadKw.toStringAsFixed(2),
+            unit: 'kW',
+            icon: Icons.home_outlined,
+            color: ChartTheme.cyan,
+          ),
+          LiveMetric(
+            label: 'PV Voltage',
+            value: latest.pvVoltage.toStringAsFixed(1),
+            unit: 'V',
+            icon: Icons.bolt_outlined,
+            color: ChartTheme.solarVoltage,
+          ),
+          LiveMetric(
+            label: 'Output Voltage',
+            value: latest.outputVoltage.toStringAsFixed(1),
+            unit: 'V',
+            icon: Icons.electrical_services,
+            color: ChartTheme.outputVoltage,
+          ),
+          LiveMetric(
+            label: 'Output Current',
+            value: latest.outputCurrent.toStringAsFixed(1),
+            unit: 'A',
+            icon: Icons.electric_meter_outlined,
+            color: ChartTheme.outputCurrent,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TodayProductionSection extends StatelessWidget {
+  const _TodayProductionSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<InverterViewModel>();
+    final now = DateTime.now();
+    final data = viewModel.inverterData;
+
+    final todayEnergyKwh = energyTodayKwh(data, now);
+    final hourly = hourlyEnergyDeltasToday(data, now);
+    final updatedAt = data.isNotEmpty
+        ? DateFormat('HH:mm').format(data.last.createdAt)
+        : '--';
+
+    return TodayProductionCard(
+      todayEnergyKwh: todayEnergyKwh,
+      updatedAt: updatedAt,
+      hourlySparkline: hourly,
+    );
+  }
+}
+
+class _CompactAnalyticsSection extends StatelessWidget {
+  const _CompactAnalyticsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final analytics = context.watch<EnergyAnalyticsViewModel>();
+
+    return _SectionCard(
+      title: 'Energy Analytics',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const AnalyticsPeriodSelector(),
+          const SizedBox(height: 16),
+          if (analytics.period == AnalyticsPeriod.total)
+            _LifetimeSummary(analytics: analytics)
+          else
+            _buildChart(analytics),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChart(EnergyAnalyticsViewModel analytics) {
+    if (analytics.isLoading && analytics.buckets.isEmpty) {
+      return const SizedBox(
+        height: 200,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            color: ChartTheme.brand,
+          ),
+        ),
+      );
+    }
+    if (analytics.errorMessage != null && analytics.buckets.isEmpty) {
+      return const SizedBox(
+        height: 200,
+        child: ChartEmptyState(
+          title: 'Could not load analytics',
+          message: 'Check your connection and try again.',
+          compact: true,
+        ),
+      );
+    }
+    if (analytics.buckets.isEmpty) {
+      return const SizedBox(
+        height: 200,
+        child: ChartEmptyState(
+          title: 'No data for this range',
+          message: 'The inverter has not reported in this period.',
+          compact: true,
+        ),
+      );
+    }
+    return SizedBox(
+      height: 200,
+      child: ZoomableLineChart(
+        spots: buildAnalyticsSpots(analytics.buckets),
+        labels: buildAnalyticsLabels(analytics.period, analytics.buckets),
+        color: ChartTheme.brand,
+        unit: 'kWh',
+      ),
+    );
+  }
+}
+
+/// Compact lifetime total shown for [AnalyticsPeriod.total] instead of a
+/// chart — the backend returns one (already-correct, un-padded) bucket per
+/// calendar year, so summing those per-year deltas is a valid lifetime total
+/// (never a sum of raw cumulative meter readings).
+class _LifetimeSummary extends StatelessWidget {
+  final EnergyAnalyticsViewModel analytics;
+
+  const _LifetimeSummary({required this.analytics});
+
+  @override
+  Widget build(BuildContext context) {
+    if (analytics.isLoading && analytics.buckets.isEmpty) {
+      return const SizedBox(
+        height: 120,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            color: ChartTheme.brand,
+          ),
+        ),
+      );
+    }
+    if (analytics.buckets.isEmpty) {
+      return const SizedBox(
+        height: 120,
+        child: ChartEmptyState(
+          title: 'No lifetime data yet',
+          compact: true,
+        ),
+      );
+    }
+
+    final total =
+        analytics.buckets.fold<double>(0.0, (sum, b) => sum + b.energyDeltaKwh);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'LIFETIME ENERGY PRODUCED',
+          style: TextStyle(
+            fontSize: 11,
+            letterSpacing: 1.2,
+            color: ChartTheme.labelMuted,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              total.toStringAsFixed(1),
+              style: const TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                height: 1,
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 6, bottom: 4),
+              child: Text(
+                'kWh',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: ChartTheme.brand,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final bucket in analytics.buckets)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.card,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${bucket.bucket}: ${bucket.energyDeltaKwh.toStringAsFixed(1)} kWh',
+                  style: const TextStyle(fontSize: 11, color: ChartTheme.label),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 }

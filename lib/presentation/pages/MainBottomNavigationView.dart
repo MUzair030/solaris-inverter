@@ -12,11 +12,17 @@ import 'package:threepol_inverter_flutter/presentation/pages/StatisticsScreen.da
 import 'package:threepol_inverter_flutter/presentation/pages/ap_provisioning_screen.dart';
 import 'package:threepol_inverter_flutter/presentation/widgets/DataCollectionConsentDialog.dart';
 
+import '../../core/network/dio_client.dart';
+import '../../data/repositories_impl/inverter_repository_impl.dart';
 import '../../di/update_checker.dart';
+import '../../domain/usecases/fetch_inverter_stats_usecase.dart';
+import '../../domain/usecases/fetch_latest_inverter_data_usecase.dart';
 import '../viewmodels/DeviceViewModel.dart';
 import '../viewmodels/NetworkMonitor.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/UserDetailsViewModel.dart';
+import '../viewmodels/energy_analytics_viewmodel.dart';
+import '../viewmodels/live_inverter_viewmodel.dart';
 import '../widgets/AddDevicesBottomSheet.dart';
 import '../widgets/showExitConfirmationDialog.dart';
 import 'AddDevicePage.dart';
@@ -42,6 +48,14 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
   late final UserDetailsViewModel viewModel;
   // late final InverterViewModel1 inverterVM1;
 
+  /// Single shared instances for the dashboard's compact analytics card and
+  /// the Analytics screen (StatisticsScreen) — created once here so both
+  /// consumers read/write the exact same period/date/bucket state, and for
+  /// the live power-flow/metrics section on the dashboard.
+  late final EnergyAnalyticsViewModel _analyticsViewModel;
+  late final LiveInverterViewModel _liveViewModel;
+  SelectedDeviceProvider? _selectedDeviceProviderRef;
+
   Timer? _debounce;
   bool _isInit = true;
   String? lastLoadedMac;
@@ -49,6 +63,13 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
   @override
   void initState() {
     super.initState();
+
+    final dioClient = DioClient();
+    final inverterRepository = InverterRepositoryImpl(dioClient);
+    _analyticsViewModel =
+        EnergyAnalyticsViewModel(FetchInverterStatsUseCase(inverterRepository));
+    _liveViewModel = LiveInverterViewModel(
+        FetchLatestInverterDataUseCase(inverterRepository));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       UpdateChecker.checkForUpdate(context);
@@ -64,6 +85,11 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       viewModel = Provider.of<UserDetailsViewModel>(context, listen: false);
       viewModel.fetchUserDetails();
+
+      _selectedDeviceProviderRef =
+          Provider.of<SelectedDeviceProvider>(context, listen: false);
+      _syncSelectedMac(_selectedDeviceProviderRef!.mac);
+      _selectedDeviceProviderRef!.addListener(_onSelectedDeviceChanged);
       // final selectedDeviceProvider =
       //     Provider.of<SelectedDeviceProvider>(context, listen: false);
       // final currentMac = selectedDeviceProvider.mac;
@@ -83,6 +109,20 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
       //   inverterVM1.startAutoRefresh("daily", macAddress: currentMac);
       // }
     });
+  }
+
+  void _onSelectedDeviceChanged() {
+    _syncSelectedMac(_selectedDeviceProviderRef?.mac);
+  }
+
+  void _syncSelectedMac(String? mac) {
+    _analyticsViewModel.setMacAddress(mac);
+    _liveViewModel.setMacAddress(mac);
+    if (mac != null && mac.isNotEmpty) {
+      _liveViewModel.startAutoRefresh();
+    } else {
+      _liveViewModel.stopAutoRefresh();
+    }
   }
 
   @override
@@ -162,109 +202,124 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
   void dispose() {
     _debounce?.cancel();
     // inverterVM1.toastMessage.removeListener(_onToastMessage);
+    _selectedDeviceProviderRef?.removeListener(_onSelectedDeviceChanged);
+    _liveViewModel.stopAutoRefresh();
+    _liveViewModel.dispose();
+    _analyticsViewModel.dispose();
     _selectedIndexNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, Object? result) async {
-        if (didPop) return;
-        if (_selectedIndexNotifier.value != 0) {
-          _selectedIndexNotifier.value = 0;
-        } else {
-          bool exitApp =
-              await ExitConfirmationDialog.showExitConfirmationDialog(context);
-          if (exitApp) {
-            SystemNavigator.pop();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<EnergyAnalyticsViewModel>.value(
+          value: _analyticsViewModel,
+        ),
+        ChangeNotifierProvider<LiveInverterViewModel>.value(
+          value: _liveViewModel,
+        ),
+      ],
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) async {
+          if (didPop) return;
+          if (_selectedIndexNotifier.value != 0) {
+            _selectedIndexNotifier.value = 0;
+          } else {
+            bool exitApp =
+                await ExitConfirmationDialog.showExitConfirmationDialog(
+                    context);
+            if (exitApp) {
+              SystemNavigator.pop();
+            }
           }
-        }
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            ValueListenableBuilder<int>(
-              valueListenable: _selectedIndexNotifier,
-              builder: (context, selectedIndex, child) {
-                return IndexedStack(
-                  index: selectedIndex,
-                  children: _screens,
-                );
-              },
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.navigationColor,
-                  borderRadius: BorderRadius.circular(0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                    )
-                  ],
-                ),
-                child: ValueListenableBuilder<int>(
-                  valueListenable: _selectedIndexNotifier,
-                  builder: (context, selectedIndex, child) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildBottomMenuItem(
-                            "assets/home.png", "Home", 0, selectedIndex),
-                        _buildBottomMenuItem("assets/statistics.png",
-                            "Statistic", 1, selectedIndex),
-                        const SizedBox(
-                            width: 60), // Space for the floating Add button
-                        _buildBottomMenuItem(
-                            "assets/devices.png", "Devices", 2, selectedIndex),
-                        _buildBottomMenuItem(
-                            "assets/profile.png", "Profile", 3, selectedIndex),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 45, // Adjust height to float above the bottom bar
-              left: MediaQuery.of(context).size.width / 2 -
-                  30, // Center horizontally
-              child: ElevatedButton(
-                onPressed: () {
-                  // _showDeviceDetailBottomSheet(context);
-                  handlePermissionsAndShowBottomSheet(context);
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              ValueListenableBuilder<int>(
+                valueListenable: _selectedIndexNotifier,
+                builder: (context, selectedIndex, child) {
+                  return IndexedStack(
+                    index: selectedIndex,
+                    children: _screens,
+                  );
                 },
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: EdgeInsets.zero,
-                  shape: const CircleBorder(), // Maintains circular shape
-                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
                 child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.navigationColor,
+                    borderRadius: BorderRadius.circular(0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                      )
+                    ],
                   ),
-                  child: Image.asset(
-                    "assets/addbtn.png",
-                    fit: BoxFit.cover,
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _selectedIndexNotifier,
+                    builder: (context, selectedIndex, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildBottomMenuItem(
+                              "assets/home.png", "Home", 0, selectedIndex),
+                          _buildBottomMenuItem("assets/statistics.png",
+                              "Statistic", 1, selectedIndex),
+                          const SizedBox(
+                              width: 60), // Space for the floating Add button
+                          _buildBottomMenuItem("assets/devices.png", "Devices",
+                              2, selectedIndex),
+                          _buildBottomMenuItem("assets/profile.png", "Profile",
+                              3, selectedIndex),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                bottom: 45, // Adjust height to float above the bottom bar
+                left: MediaQuery.of(context).size.width / 2 -
+                    30, // Center horizontally
+                child: ElevatedButton(
+                  onPressed: () {
+                    // _showDeviceDetailBottomSheet(context);
+                    handlePermissionsAndShowBottomSheet(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.zero,
+                    shape: const CircleBorder(), // Maintains circular shape
+                  ),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                    ),
+                    child: Image.asset(
+                      "assets/addbtn.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
