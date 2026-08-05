@@ -3,16 +3,20 @@ import 'package:flutter/foundation.dart';
 import '../../data/models/inverter_stats_model.dart';
 import '../../domain/usecases/fetch_inverter_stats_usecase.dart';
 
-/// The 5 periods the shared analytics UI (dashboard card + Analytics screen)
-/// can show. Each maps to a backend `groupBy` value plus a date range derived
-/// from the matching anchor below:
+/// The periods the shared analytics UI (dashboard card + Analytics screen)
+/// can show. [day]/[week]/[month]/[year]/[total] each map to a backend
+/// `groupBy` value plus a date range derived from the matching anchor below:
 ///
 /// - [day]   -> groupBy=hour,  range = the single [selectedDay]      (24 hourly buckets)
 /// - [week]  -> groupBy=day,   range = the Mon-Sun week containing [selectedDay]
 /// - [month] -> groupBy=day,   range = the whole [selectedMonth]     (every day of month)
 /// - [year]  -> groupBy=month, range = the whole [selectedYear]      (12 monthly buckets)
 /// - [total] -> groupBy=total, no range (one entry per calendar year, lifetime)
-enum AnalyticsPeriod { day, week, month, year, total }
+///
+/// [live] is different in kind: it never calls `/stats` at all. It has no
+/// date range or backend fetch - the UI renders it straight from
+/// [LiveInverterViewModel]'s rolling poll history instead.
+enum AnalyticsPeriod { day, week, month, year, total, live }
 
 /// Single source of truth for the period/date selection and the fetched
 /// `/stats` buckets, shared by the dashboard's compact analytics card and the
@@ -56,11 +60,16 @@ class EnergyAnalyticsViewModel extends ChangeNotifier {
     if (newPeriod == _period) return;
     _period = newPeriod;
     notifyListeners();
-    load();
+    // Live never calls /stats - it renders straight from
+    // LiveInverterViewModel's poll history, so there's nothing to load here.
+    if (newPeriod != AnalyticsPeriod.live) {
+      load();
+    }
   }
 
   /// Moves the current period's anchor by [delta] steps (±1 for prev/next
-  /// chevrons). No-op for [AnalyticsPeriod.total], which has no date range.
+  /// chevrons). No-op for [AnalyticsPeriod.total]/[AnalyticsPeriod.live],
+  /// neither of which has a date range.
   void shift(int delta) {
     switch (_period) {
       case AnalyticsPeriod.day:
@@ -73,6 +82,7 @@ class EnergyAnalyticsViewModel extends ChangeNotifier {
       case AnalyticsPeriod.year:
         _selectedYear = DateTime(_selectedYear.year + delta);
       case AnalyticsPeriod.total:
+      case AnalyticsPeriod.live:
         return;
     }
     notifyListeners();
@@ -91,6 +101,7 @@ class EnergyAnalyticsViewModel extends ChangeNotifier {
       case AnalyticsPeriod.year:
         _selectedYear = DateTime(picked.year);
       case AnalyticsPeriod.total:
+      case AnalyticsPeriod.live:
         return;
     }
     notifyListeners();
@@ -108,6 +119,7 @@ class EnergyAnalyticsViewModel extends ChangeNotifier {
       case AnalyticsPeriod.year:
         return _selectedYear;
       case AnalyticsPeriod.total:
+      case AnalyticsPeriod.live:
         return DateTime.now();
     }
   }
@@ -140,6 +152,9 @@ class EnergyAnalyticsViewModel extends ChangeNotifier {
         return ('month', '$y-01-01', '$y-12-31');
       case AnalyticsPeriod.total:
         return ('total', null, null);
+      case AnalyticsPeriod.live:
+        // Never actually invoked: setPeriod() skips load() for live.
+        throw StateError('queryParams() is not valid for AnalyticsPeriod.live');
     }
   }
 

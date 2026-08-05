@@ -39,6 +39,31 @@ class _ZoomableLineChartState extends State<ZoomableLineChart> {
   double get _fullStart => -0.5;
   double get _fullEnd => math.max(1, widget.spots.length - 1) + 0.5;
 
+  /// Picks a "nice" axis step (1/2/5 x a power of 10) for [targetSteps]
+  /// divisions of [rawMax], plus how many decimals are needed to show
+  /// distinct labels at that step (avoids e.g. 0, 0.72, 1.44 all rounding to
+  /// "0, 1, 1" when maxY is small, as happens often with hourly kWh deltas).
+  (double, int) _niceAxisStep(double rawMax, int targetSteps) {
+    if (rawMax <= 0) return (1.0, 0);
+    final rawStep = rawMax / targetSteps;
+    final magnitude =
+        math.pow(10, (math.log(rawStep) / math.ln10).floor()).toDouble();
+    final residual = rawStep / magnitude;
+    double niceResidual;
+    if (residual >= 5) {
+      niceResidual = 10;
+    } else if (residual >= 2) {
+      niceResidual = 5;
+    } else if (residual >= 1) {
+      niceResidual = 2;
+    } else {
+      niceResidual = 1;
+    }
+    final step = niceResidual * magnitude;
+    final decimals = step >= 1 ? 0 : (step >= 0.1 ? 1 : 2);
+    return (step, decimals);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -104,7 +129,9 @@ class _ZoomableLineChartState extends State<ZoomableLineChart> {
     }
 
     final maxY = widget.spots.map((s) => s.y).reduce(math.max);
-    final niceMax = maxY <= 0 ? 1.0 : maxY * 1.15;
+    final rawMax = maxY <= 0 ? 1.0 : maxY * 1.15;
+    final (axisStep, axisDecimals) = _niceAxisStep(rawMax, 4);
+    final niceMax = axisStep * 4;
 
     final labelStep = math.max(1, (widget.spots.length / 5).ceil());
 
@@ -141,7 +168,7 @@ class _ZoomableLineChartState extends State<ZoomableLineChart> {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: true,
-            horizontalInterval: niceMax / 4,
+            horizontalInterval: axisStep,
             getDrawingHorizontalLine: (_) => const FlLine(
               color: ChartTheme.grid,
               strokeWidth: 1,
@@ -163,10 +190,10 @@ class _ZoomableLineChartState extends State<ZoomableLineChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 36,
-                interval: niceMax / 4,
+                interval: axisStep,
                 getTitlesWidget: (value, meta) {
                   return Text(
-                    value.toStringAsFixed(0),
+                    value.toStringAsFixed(axisDecimals),
                     style: ChartTheme.axisLabelStyle,
                   );
                 },

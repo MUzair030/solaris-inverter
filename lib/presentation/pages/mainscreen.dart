@@ -16,6 +16,7 @@ import '../viewmodels/live_inverter_viewmodel.dart';
 import '../widgets/AnalyticsPeriodSelector.dart';
 import '../widgets/ChartEmptyState.dart';
 import '../widgets/HeaderWidget.dart';
+import '../widgets/LiveEnergyChart.dart';
 import '../widgets/LiveMetricsGrid.dart';
 import '../widgets/PowerFlowDiagram.dart';
 import '../widgets/TodayProductionCard.dart';
@@ -289,7 +290,9 @@ class _CompactAnalyticsSection extends StatelessWidget {
         children: [
           const AnalyticsPeriodSelector(),
           const SizedBox(height: 16),
-          if (analytics.period == AnalyticsPeriod.total)
+          if (analytics.period == AnalyticsPeriod.live)
+            const LiveEnergyChart()
+          else if (analytics.period == AnalyticsPeriod.total)
             _LifetimeSummary(analytics: analytics)
           else
             _buildChart(analytics),

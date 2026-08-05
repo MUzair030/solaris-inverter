@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
+import '../../data/models/inverter_data_model.dart';
 import '../../data/models/inverter_stats_model.dart';
 import '../viewmodels/energy_analytics_viewmodel.dart';
 
@@ -35,5 +36,28 @@ List<String> buildAnalyticsLabels(
       return [for (final b in buckets) DateFormat('MMM').format(b.bucketStart)];
     case AnalyticsPeriod.total:
       return [for (final b in buckets) b.bucket];
+    case AnalyticsPeriod.live:
+      // Live never renders through this bucket-based helper - see
+      // buildLiveSpots/buildLiveLabels below.
+      throw StateError('buildAnalyticsLabels() is not valid for AnalyticsPeriod.live');
   }
+}
+
+/// Maps [LiveInverterViewModel]'s rolling poll history into the
+/// `FlSpot`/label pairs the shared [ZoomableLineChart] needs for the "Live"
+/// period. Unlike the bucket-based helpers above, this reflects raw
+/// individual readings (already deduped by id in the view model), not a
+/// server-aggregated series - each point is one real reading, not a bucket.
+List<FlSpot> buildLiveSpots(
+  List<InverterDataModel> history,
+  double Function(InverterDataModel) valueOf,
+) {
+  return [
+    for (var i = 0; i < history.length; i++)
+      FlSpot(i.toDouble(), valueOf(history[i])),
+  ];
+}
+
+List<String> buildLiveLabels(List<InverterDataModel> history) {
+  return [for (final d in history) DateFormat('HH:mm:ss').format(d.createdAt)];
 }

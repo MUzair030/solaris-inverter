@@ -17,6 +17,15 @@ class LiveInverterViewModel extends ChangeNotifier {
 
   LiveInverterViewModel(this._useCase);
 
+  /// Rolling window of the most recent *distinct* readings (deduped by id),
+  /// oldest first, capped at [_maxHistory]. Backs the "Live" chart. Deduping
+  /// matters because polling (every 2s) is far more frequent than the device
+  /// typically reports - most polls just return the same latest row again,
+  /// and re-plotting that unchanged reading would flatten/mislabel the chart.
+  static const int _maxHistory = 150;
+  final List<InverterDataModel> _history = [];
+  List<InverterDataModel> get history => List.unmodifiable(_history);
+
   InverterDataModel? _latest;
   InverterDataModel? get latest => _latest;
 
@@ -29,6 +38,7 @@ class LiveInverterViewModel extends ChangeNotifier {
   void setMacAddress(String? mac) {
     if (mac == _macAddress) return;
     _macAddress = mac;
+    _history.clear();
     if (mac == null || mac.isEmpty) {
       _latest = null;
       notifyListeners();
@@ -46,6 +56,14 @@ class LiveInverterViewModel extends ChangeNotifier {
     try {
       _latest = await _useCase.execute(mac);
       errorMessage = null;
+      final latest = _latest;
+      if (latest != null &&
+          (_history.isEmpty || _history.last.id != latest.id)) {
+        _history.add(latest);
+        while (_history.length > _maxHistory) {
+          _history.removeAt(0);
+        }
+      }
     } catch (e) {
       errorMessage = e.toString();
     } finally {

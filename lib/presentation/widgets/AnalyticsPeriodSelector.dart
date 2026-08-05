@@ -31,8 +31,13 @@ class AnalyticsPeriodSelector extends StatelessWidget {
         return vm.selectedYear.year.toString();
       case AnalyticsPeriod.total:
         return 'All Time';
+      case AnalyticsPeriod.live:
+        return 'Right Now';
     }
   }
+
+  bool _hasDateNav(AnalyticsPeriod period) =>
+      period != AnalyticsPeriod.total && period != AnalyticsPeriod.live;
 
   Future<void> _openCalendar(
       BuildContext context, EnergyAnalyticsViewModel vm) async {
@@ -98,7 +103,7 @@ class AnalyticsPeriodSelector extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            if (vm.period != AnalyticsPeriod.total) ...[
+            if (_hasDateNav(vm.period)) ...[
               _IconButton(icon: Icons.chevron_left, onTap: () => vm.shift(-1)),
               const SizedBox(width: 8),
             ],
@@ -113,7 +118,7 @@ class AnalyticsPeriodSelector extends StatelessWidget {
                 ),
               ),
             ),
-            if (vm.period != AnalyticsPeriod.total) ...[
+            if (_hasDateNav(vm.period)) ...[
               const SizedBox(width: 8),
               _IconButton(icon: Icons.chevron_right, onTap: () => vm.shift(1)),
               const SizedBox(width: 8),

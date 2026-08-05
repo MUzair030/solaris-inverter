@@ -10,6 +10,7 @@ import '../widgets/AnalyticsPeriodSelector.dart';
 import '../widgets/ChartEmptyState.dart';
 import '../widgets/EnergyDonutChart.dart';
 import '../widgets/HeaderWidget.dart';
+import '../widgets/LiveEnergyChart.dart';
 import '../widgets/MetricBarChart.dart';
 import '../widgets/MetricRadarChart.dart';
 import '../widgets/PowerGaugeWidget.dart';
@@ -95,9 +96,13 @@ class _StatisticsscreenState extends State<Statisticsscreen> {
                         const SizedBox(height: 12),
                         const AnalyticsPeriodSelector(),
                         const SizedBox(height: 14),
-                        _vizSwitcher(),
-                        const SizedBox(height: 14),
-                        _buildBody(analytics),
+                        if (analytics.period == AnalyticsPeriod.live)
+                          const LiveEnergyChart()
+                        else ...[
+                          _vizSwitcher(),
+                          const SizedBox(height: 14),
+                          _buildBody(analytics),
+                        ],
                       ],
                     ),
                   ),
