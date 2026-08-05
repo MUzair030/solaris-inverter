@@ -182,7 +182,7 @@ class LineChartWidget extends StatelessWidget {
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
           // tooltipBgColor: AppColors.blue,
-          tooltipRoundedRadius: 8,
+          tooltipBorderRadius: BorderRadius.circular(8),
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
               return LineTooltipItem(

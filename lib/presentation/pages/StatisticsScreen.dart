@@ -403,7 +403,7 @@ class _StatisticsscreenState extends State<Statisticsscreen>
       barTouchData: BarTouchData(
         enabled: true,
         touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: AppColors.blue,
+          getTooltipColor: (group) => AppColors.blue,
           tooltipPadding: const EdgeInsets.all(4),
           tooltipMargin: 0,
           fitInsideVertically: true,

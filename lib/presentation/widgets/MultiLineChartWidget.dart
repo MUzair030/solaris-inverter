@@ -284,7 +284,7 @@ class _MultiLineChartWidgetState extends State<MultiLineChartWidget> {
         handleBuiltInTouches: true,
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          tooltipRoundedRadius: 8,
+          tooltipBorderRadius: BorderRadius.circular(8),
           fitInsideHorizontally: true,
           fitInsideVertically: true,
           tooltipHorizontalAlignment: FLHorizontalAlignment.center,
