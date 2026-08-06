@@ -4,15 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../app/chart_theme.dart';
 
-/// Animated solar -> inverter -> house power flow diagram.
-///
-/// Laid out as a vertical hub-and-spoke (Solar above, House below, Inverter
-/// as the central hub) - deliberately similar to the inverter's own on-device
-/// display (a central inverter icon with dashed lines radiating to each real
-/// flow), but not an exact copy, and with only the two flows this hardware
-/// actually reports (no Grid/Battery spoke - that telemetry doesn't exist).
-/// Each spoke is an animated dashed line with glowing particles traveling
-/// along it, and the hub pulses gently to read as "live."
+/// Animated power flow diagram, laid out like the inverter's own on-device
+/// display: Grid (left) - Inverter (center) - Solar (right) on top, House
+/// centered below. Grid is shown as a disabled/greyed slot with no
+/// fabricated number - there is no grid telemetry anywhere in the hardware
+/// payload, only its screen position is mirrored for visual familiarity.
+/// Solar and House are real, animated, glowing dashed spokes.
 class PowerFlowDiagram extends StatefulWidget {
   final double genPowerKw;
   final double loadKw;
@@ -41,6 +38,10 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
+  static const double _slotHeight = 84;
+  static const double _sideNodeWidth = 78;
+  static const double _hubSize = 84;
+
   @override
   void initState() {
     super.initState();
@@ -61,33 +62,103 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _FlowNode(
-          icon: Icons.solar_power_outlined,
-          color: ChartTheme.power,
-          label: 'Solar',
-          value: '${widget.genPowerKw.toStringAsFixed(2)} kW',
-          sub: widget.pvVoltage > 0
-              ? '${widget.pvVoltage.toStringAsFixed(0)} V'
-              : '--',
+        // Icon row: Grid -- connector -- Inverter hub -- connector -- Solar.
+        SizedBox(
+          height: _slotHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: _sideNodeWidth,
+                child: Center(
+                  child: _NodeIcon(
+                    icon: Icons.cell_tower,
+                    color: ChartTheme.labelMuted,
+                    disabled: true,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: _Connector(
+                  axis: Axis.horizontal,
+                  controller: _controller,
+                  flow: 0,
+                  color: ChartTheme.labelMuted,
+                  animated: false,
+                ),
+              ),
+              SizedBox(
+                width: _hubSize,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    final pulse =
+                        1.0 + 0.035 * math.sin(_controller.value * 2 * math.pi);
+                    return Transform.scale(scale: pulse, child: child);
+                  },
+                  child: const _InverterHub(size: _hubSize),
+                ),
+              ),
+              Expanded(
+                child: _Connector(
+                  axis: Axis.horizontal,
+                  controller: _controller,
+                  flow: widget.flow,
+                  color: ChartTheme.power,
+                  reverse: true, // dots travel Solar -> Inverter
+                ),
+              ),
+              SizedBox(
+                width: _sideNodeWidth,
+                child: Center(
+                  child: _NodeIcon(
+                    icon: Icons.solar_power_outlined,
+                    color: ChartTheme.power,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        _FlowConnector(
-          controller: _controller,
-          flow: widget.flow,
-          color: ChartTheme.power,
+        const SizedBox(height: 8),
+        // Label row - same column widths as the icon row above, so each
+        // label sits directly under its icon.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: _sideNodeWidth,
+              child: const _NodeLabel(
+                label: 'Grid',
+                value: '--',
+                sub: 'No data',
+                color: ChartTheme.labelMuted,
+                dim: true,
+              ),
+            ),
+            const Expanded(child: SizedBox()),
+            const SizedBox(width: _hubSize),
+            const Expanded(child: SizedBox()),
+            SizedBox(
+              width: _sideNodeWidth,
+              child: _NodeLabel(
+                label: 'Solar',
+                value: '${widget.genPowerKw.toStringAsFixed(2)} kW',
+                sub: widget.pvVoltage > 0
+                    ? '${widget.pvVoltage.toStringAsFixed(0)} V'
+                    : '--',
+                color: ChartTheme.power,
+              ),
+            ),
+          ],
         ),
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final pulse = 1.0 + 0.035 * math.sin(_controller.value * 2 * math.pi);
-            return Transform.scale(scale: pulse, child: child);
-          },
-          child: const _InverterHub(),
-        ),
-        _FlowConnector(
+        _Connector(
+          axis: Axis.vertical,
           controller: _controller,
           flow: widget.flow,
           color: ChartTheme.cyan,
           badge: '${widget.outputCurrent.toStringAsFixed(1)} A',
+          height: 56,
         ),
         _FlowNode(
           icon: Icons.home_outlined,
@@ -106,13 +177,15 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
 /// The central hub - a gradient-filled circle with an icon + label inside,
 /// mirroring the inverter's own on-device "INVERTER" bubble.
 class _InverterHub extends StatelessWidget {
-  const _InverterHub();
+  final double size;
+
+  const _InverterHub({required this.size});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 96,
-      height: 96,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
@@ -127,7 +200,7 @@ class _InverterHub extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: ChartTheme.brand.withValues(alpha: 0.45),
-            blurRadius: 24,
+            blurRadius: 22,
             spreadRadius: 1,
           ),
         ],
@@ -136,15 +209,15 @@ class _InverterHub extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bolt, color: Colors.white, size: 26),
+          Icon(Icons.bolt, color: Colors.white, size: 24),
           SizedBox(height: 2),
           Text(
             'INVERTER',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.6,
+              letterSpacing: 0.5,
             ),
           ),
         ],
@@ -153,61 +226,180 @@ class _InverterHub extends StatelessWidget {
   }
 }
 
-/// A fixed-height slot containing one animated dashed spoke between two
-/// nodes, with an optional floating value badge (e.g. output current)
-/// sitting on the line, matching how the hardware display floats its own
-/// current reading directly on the inverter-to-house spoke.
-class _FlowConnector extends StatelessWidget {
-  final AnimationController controller;
-  final double flow;
+/// A bare icon circle (no text) - used for the Grid/Solar slots in the top
+/// row, whose labels live in a separate row below so every icon lines up on
+/// the same horizontal axis regardless of how long its label text is.
+class _NodeIcon extends StatelessWidget {
+  final IconData icon;
   final Color color;
-  final String? badge;
+  final bool disabled;
 
-  const _FlowConnector({
-    required this.controller,
-    required this.flow,
+  const _NodeIcon({
+    required this.icon,
     required this.color,
-    this.badge,
+    this.disabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 60,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: controller,
-              builder: (context, _) => CustomPaint(
-                painter: _ConnectorPainter(
-                  progress: controller.value,
-                  flow: flow,
-                  color: color,
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: disabled ? 0.08 : 0.14),
+        border: Border.all(
+          color: color.withValues(alpha: disabled ? 0.35 : 0.7),
+          width: 1.5,
+        ),
+        boxShadow: disabled
+            ? const []
+            : [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.45),
+                  blurRadius: 16,
+                  spreadRadius: 1,
                 ),
-              ),
-            ),
-          ),
-          if (badge != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFF14151F),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: color.withValues(alpha: 0.45)),
-              ),
-              child: Text(
-                badge!,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-            ),
-        ],
+              ],
       ),
+      child: Icon(icon, color: color.withValues(alpha: disabled ? 0.5 : 1), size: 22),
+    );
+  }
+}
+
+/// Label/value/sub text block for the Grid/Solar slots (their icon is drawn
+/// separately above, in the icon row).
+class _NodeLabel extends StatelessWidget {
+  final String label;
+  final String value;
+  final String sub;
+  final Color color;
+  final bool dim;
+
+  const _NodeLabel({
+    required this.label,
+    required this.value,
+    required this.sub,
+    required this.color,
+    this.dim = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 10,
+            color: ChartTheme.labelMuted,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: dim ? ChartTheme.labelMuted : Colors.white,
+          ),
+        ),
+        Text(
+          sub,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 10,
+            color: color.withValues(alpha: dim ? 0.7 : 0.85),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A connector slot containing one animated dashed spoke, on either axis,
+/// with an optional floating value badge sitting on the line (matching how
+/// the hardware display floats its own current reading directly on the
+/// inverter-to-house spoke). [animated]=false renders a static, dimmed dashed
+/// line with no traveling particles - used for the Grid spoke, since there's
+/// no real flow to represent.
+class _Connector extends StatelessWidget {
+  final AnimationController? controller;
+  final double flow;
+  final Color color;
+  final Axis axis;
+  final bool animated;
+  final bool reverse;
+  final String? badge;
+  final double? height;
+
+  const _Connector({
+    required this.axis,
+    required this.flow,
+    required this.color,
+    this.controller,
+    this.animated = true,
+    this.reverse = false,
+    this.badge,
+    this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final painterChild = animated && controller != null
+        ? AnimatedBuilder(
+            animation: controller!,
+            builder: (context, _) => CustomPaint(
+              painter: _ConnectorPainter(
+                progress: controller!.value,
+                flow: flow,
+                color: color,
+                axis: axis,
+                animated: true,
+                reverse: reverse,
+              ),
+            ),
+          )
+        : CustomPaint(
+            painter: _ConnectorPainter(
+              progress: 0,
+              flow: 0,
+              color: color,
+              axis: axis,
+              animated: false,
+              reverse: reverse,
+            ),
+          );
+
+    final sized = axis == Axis.horizontal
+        ? SizedBox(height: _PowerFlowDiagramState._slotHeight, child: painterChild)
+        : SizedBox(height: height ?? 60, width: double.infinity, child: painterChild);
+
+    if (badge == null) return sized;
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        sized,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF14151F),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color.withValues(alpha: 0.45)),
+          ),
+          child: Text(
+            badge!,
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -216,23 +408,39 @@ class _ConnectorPainter extends CustomPainter {
   final double progress;
   final double flow;
   final Color color;
+  final Axis axis;
+  final bool animated;
+  final bool reverse;
 
   _ConnectorPainter({
     required this.progress,
     required this.flow,
     required this.color,
+    required this.axis,
+    required this.animated,
+    required this.reverse,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final x = size.width / 2;
-    final top = Offset(x, 0);
-    final bottom = Offset(x, size.height);
+    var start = axis == Axis.horizontal
+        ? Offset(0, size.height / 2)
+        : Offset(size.width / 2, 0);
+    var end = axis == Axis.horizontal
+        ? Offset(size.width, size.height / 2)
+        : Offset(size.width / 2, size.height);
+    if (reverse) {
+      final tmp = start;
+      start = end;
+      end = tmp;
+    }
 
     final dashPaint = Paint()
-      ..color = color.withValues(alpha: 0.30)
+      ..color = color.withValues(alpha: animated ? 0.30 : 0.20)
       ..strokeWidth = 2;
-    _drawDashedLine(canvas, top, bottom, dashPaint);
+    _drawDashedLine(canvas, start, end, dashPaint);
+
+    if (!animated) return;
 
     const dotCount = 4;
     final glowPaint = Paint()
@@ -242,7 +450,7 @@ class _ConnectorPainter extends CustomPainter {
 
     for (var i = 0; i < dotCount; i++) {
       final t = ((i / dotCount) + progress) % 1.0;
-      final pos = Offset.lerp(top, bottom, t)!;
+      final pos = Offset.lerp(start, end, t)!;
       canvas.drawCircle(pos, 4.5, glowPaint);
       canvas.drawCircle(pos, 2.2, dotPaint);
     }
@@ -267,6 +475,9 @@ class _ConnectorPainter extends CustomPainter {
   bool shouldRepaint(covariant _ConnectorPainter oldDelegate) => true;
 }
 
+/// Standalone icon+label+value+sub block, used for the House node below the
+/// top row (no need to split it across two rows like Grid/Solar, since it
+/// isn't sharing a horizontal axis with anything else).
 class _FlowNode extends StatelessWidget {
   final IconData icon;
   final Color color;
