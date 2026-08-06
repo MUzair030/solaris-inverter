@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 import '../../app/chart_theme.dart';
 
 /// One live metric definition shown in the dashboard grid.
+///
+/// [disabled] renders a dimmed placeholder card (e.g. Grid Input, which this
+/// hardware doesn't report yet) - never a fabricated value. When true,
+/// [value]/[unit] should just be `'--'`/`'No data'`, not an invented number.
 class LiveMetric {
   final String label;
   final String value;
   final String unit;
   final IconData icon;
   final Color color;
+  final bool disabled;
 
   const LiveMetric({
     required this.label,
@@ -16,6 +21,7 @@ class LiveMetric {
     required this.unit,
     required this.icon,
     required this.color,
+    this.disabled = false,
   });
 }
 
@@ -27,12 +33,15 @@ class LiveMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final disabled = metric.disabled;
+    final color = disabled ? ChartTheme.labelMuted : metric.color;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: metric.color.withValues(alpha: 0.08),
+        color: color.withValues(alpha: disabled ? 0.04 : 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: metric.color.withValues(alpha: 0.25)),
+        border: Border.all(color: color.withValues(alpha: disabled ? 0.15 : 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +49,7 @@ class LiveMetricCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(metric.icon, size: 16, color: metric.color),
+              Icon(metric.icon, size: 16, color: color.withValues(alpha: disabled ? 0.6 : 1)),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -67,10 +76,10 @@ class LiveMetricCard extends StatelessWidget {
                     key: ValueKey<String>(metric.value),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: disabled ? ChartTheme.labelMuted : Colors.white,
                     ),
                   ),
                 ),
@@ -80,7 +89,7 @@ class LiveMetricCard extends StatelessWidget {
                 metric.unit,
                 style: TextStyle(
                   fontSize: 10,
-                  color: metric.color,
+                  color: color,
                   fontWeight: FontWeight.w700,
                 ),
               ),

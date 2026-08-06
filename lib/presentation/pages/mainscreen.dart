@@ -214,6 +214,17 @@ class _LiveMetricsSection extends StatelessWidget {
             icon: Icons.electric_meter_outlined,
             color: ChartTheme.outputCurrent,
           ),
+          // No grid telemetry exists in the hardware payload yet - shown as
+          // a disabled placeholder (never a fabricated value) so the slot is
+          // ready to light up the moment grid metering is added.
+          const LiveMetric(
+            label: 'Grid Input',
+            value: '--',
+            unit: 'No data',
+            icon: Icons.cell_tower,
+            color: ChartTheme.labelMuted,
+            disabled: true,
+          ),
         ],
       ),
     );
