@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-    // checkBatteryOptimization();
+    checkBatteryOptimization();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final consented = await showDataCollectionConsentDialog(

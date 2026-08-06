@@ -16,9 +16,11 @@ class NotificationService {
     if (_initialized) return;
     try {
       debugPrint("NotificationService: Initializing...");
-      // Use proper icon in res/drawable/ic_notification.png
-      const androidSettings = AndroidInitializationSettings('ic_notification');
-      // Use consistent working icon
+      // res/drawable/ic_notification.png does not exist - only
+      // ic_notifications.png (plural) does, already used elsewhere for FCM's
+      // default_notification_icon meta-data in AndroidManifest.xml. Reuse it
+      // here too so both notification paths reference a real asset.
+      const androidSettings = AndroidInitializationSettings('ic_notifications');
       await _plugin
           .initialize(const InitializationSettings(android: androidSettings));
 
