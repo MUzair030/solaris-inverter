@@ -70,7 +70,7 @@ class _MainscreenState extends State<Mainscreen> {
           Container(color: Colors.black.withValues(alpha: 0.1)),
           Padding(
             padding:
-                const EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 30),
+                const EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 110),
             child: SingleChildScrollView(
               child: Column(
                 children: [

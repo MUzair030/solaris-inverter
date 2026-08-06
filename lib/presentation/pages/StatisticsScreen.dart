@@ -40,13 +40,15 @@ class Statisticsscreen extends StatefulWidget {
 class _StatisticsscreenState extends State<Statisticsscreen> {
   _VizType _viz = _VizType.line;
 
+  // Only Line and Donut are enabled for now - the rest are commented out
+  // (not deleted) so they're a one-line change to bring back later.
   static const List<(_VizType, IconData, String)> _vizOptions = [
     (_VizType.line, Icons.show_chart, 'Line'),
-    (_VizType.bar, Icons.bar_chart_outlined, 'Bar'),
-    (_VizType.gauge, Icons.speed_outlined, 'Gauge'),
+    // (_VizType.bar, Icons.bar_chart_outlined, 'Bar'),
+    // (_VizType.gauge, Icons.speed_outlined, 'Gauge'),
     (_VizType.donut, Icons.donut_large_outlined, 'Donut'),
-    (_VizType.radar, Icons.radar, 'Radar'),
-    (_VizType.scatter, Icons.scatter_plot_outlined, 'Scatter'),
+    // (_VizType.radar, Icons.radar, 'Radar'),
+    // (_VizType.scatter, Icons.scatter_plot_outlined, 'Scatter'),
   ];
 
   @override
@@ -61,7 +63,7 @@ class _StatisticsscreenState extends State<Statisticsscreen> {
           Container(color: Colors.black.withValues(alpha: 0.1)),
           Padding(
             padding:
-                const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 70),
+                const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 110),
             child: SingleChildScrollView(
               child: Column(
                 children: [
