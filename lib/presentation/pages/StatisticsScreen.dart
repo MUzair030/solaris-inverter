@@ -16,6 +16,7 @@ import '../widgets/MetricRadarChart.dart';
 import '../widgets/PeriodMetricsCharts.dart';
 import '../widgets/PowerGaugeWidget.dart';
 import '../widgets/ScatterCorrelationChart.dart';
+import '../widgets/SectionCard.dart';
 import '../widgets/WelcomeWidget.dart';
 
 enum _VizType { line, bar, gauge, donut, radar, scatter }
@@ -69,31 +70,13 @@ class _StatisticsscreenState extends State<Statisticsscreen> {
                   const SizedBox(height: 20),
                   const WelcomeWidget(),
                   const SizedBox(height: 20),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E2130),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 3,
-                            spreadRadius: 2),
-                      ],
-                    ),
+                  SectionCard(
+                    title: 'Analytics',
+                    icon: Icons.insights_outlined,
+                    accentColor: ChartTheme.brand,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Analytics',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
                         const AnalyticsPeriodSelector(),
                         const SizedBox(height: 14),
                         if (analytics.period == AnalyticsPeriod.live)

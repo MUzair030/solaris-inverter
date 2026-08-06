@@ -19,6 +19,7 @@ import '../widgets/LiveEnergyChart.dart';
 import '../widgets/LiveMetricsGrid.dart';
 import '../widgets/PeriodMetricsCharts.dart';
 import '../widgets/PowerFlowDiagram.dart';
+import '../widgets/SectionCard.dart';
 import '../widgets/TodayProductionCard.dart';
 import '../widgets/WelcomeWidget.dart';
 
@@ -99,47 +100,6 @@ class _MainscreenState extends State<Mainscreen> {
   }
 }
 
-/// Card wrapper matching the dark card look used across the revamped
-/// dashboard sections.
-class _SectionCard extends StatelessWidget {
-  final String? title;
-  final Widget child;
-
-  const _SectionCard({this.title, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E2130),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 3, spreadRadius: 2),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title != null) ...[
-            Text(
-              title!,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
-          child,
-        ],
-      ),
-    );
-  }
-}
-
 class _PowerFlowSection extends StatelessWidget {
   const _PowerFlowSection();
 
@@ -150,8 +110,10 @@ class _PowerFlowSection extends StatelessWidget {
     final latest = live.latest;
 
     if (latest == null) {
-      return const _SectionCard(
+      return const SectionCard(
         title: 'Live Power Flow',
+        icon: Icons.bolt,
+        accentColor: ChartTheme.brand,
         child: SizedBox(
           height: 160,
           child: ChartEmptyState(
@@ -170,8 +132,10 @@ class _PowerFlowSection extends StatelessWidget {
       flow = (genPowerKw * 1000 / devicePower).clamp(0.0, 1.0);
     }
 
-    return _SectionCard(
+    return SectionCard(
       title: 'Live Power Flow',
+      icon: Icons.bolt,
+      accentColor: ChartTheme.brand,
       child: PowerFlowDiagram(
         genPowerKw: genPowerKw,
         loadKw: loadKw,
@@ -193,8 +157,10 @@ class _LiveMetricsSection extends StatelessWidget {
     final latest = live.latest;
 
     if (latest == null) {
-      return const _SectionCard(
+      return const SectionCard(
         title: 'Live Metrics',
+        icon: Icons.dashboard_outlined,
+        accentColor: ChartTheme.cyan,
         child: SizedBox(
           height: 100,
           child: ChartEmptyState(
@@ -207,8 +173,10 @@ class _LiveMetricsSection extends StatelessWidget {
 
     final loadKw = latest.outputVoltage * latest.outputCurrent / 1000.0;
 
-    return _SectionCard(
+    return SectionCard(
       title: 'Live Metrics',
+      icon: Icons.dashboard_outlined,
+      accentColor: ChartTheme.cyan,
       child: LiveMetricsGrid(
         metrics: [
           LiveMetric(
@@ -282,8 +250,10 @@ class _CompactAnalyticsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final analytics = context.watch<EnergyAnalyticsViewModel>();
 
-    return _SectionCard(
+    return SectionCard(
       title: 'Energy Analytics',
+      icon: Icons.show_chart,
+      accentColor: ChartTheme.brand,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
