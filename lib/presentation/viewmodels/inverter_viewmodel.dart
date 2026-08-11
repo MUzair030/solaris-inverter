@@ -126,7 +126,10 @@ class InverterViewModel extends ChangeNotifier {
 
         final differenceInSeconds = (nowInSeconds - apiInSeconds).abs();
 
-        final int errorCode = _inverterData.last.error;
+        // `error` is absent (null) on newer-firmware payloads - treat that
+        // as "no known error" (same as an explicit 0) rather than
+        // fabricating an error state the device never reported.
+        final int errorCode = _inverterData.last.error ?? 0;
         _errorTypeMessage = getErrorMessageFromCode(errorCode);
 
         // Fluttertoast.showToast(msg: "inverter viewmodel: $errorCode");

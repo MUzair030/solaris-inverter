@@ -6,16 +6,33 @@ import '../../app/chart_theme.dart';
 
 /// Animated power flow diagram, laid out like the inverter's own on-device
 /// display: Grid (left) - Inverter (center) - Solar (right) on top, House
-/// centered below. Grid is shown as a disabled/greyed slot with no
-/// fabricated number - there is no grid telemetry anywhere in the hardware
-/// payload, only its screen position is mirrored for visual familiarity.
-/// Solar and House are real, animated, glowing dashed spokes.
+/// centered below. Solar and House are always real, animated, glowing dashed
+/// spokes. Grid lights up the same way once [gridPowerKw] is non-null
+/// (newer-firmware devices); it renders as a disabled/greyed slot with no
+/// fabricated number for devices that don't report grid telemetry - only its
+/// screen position is mirrored for visual familiarity in that case.
 class PowerFlowDiagram extends StatefulWidget {
   final double genPowerKw;
   final double loadKw;
   final double pvVoltage;
   final double outputVoltage;
   final double outputCurrent;
+
+  /// Grid contribution power in kW. Sign indicates direction: positive =
+  /// importing from the grid, negative = exporting to it (inferred from
+  /// hardware sample physics, not yet confirmed by the hardware team - the
+  /// `>= 0` check below is the single, easy-to-flip place this is decided).
+  /// Null when the device doesn't report grid telemetry at all - keeps
+  /// rendering the disabled/greyed placeholder exactly as before.
+  final double? gridPowerKw;
+
+  /// Grid voltage in V. Accepted for API completeness/future use (Solar and
+  /// House both show their voltage as a sub-label) but the Grid node's
+  /// sub-label is reserved for the Import/Export direction instead, since
+  /// direction is the more important thing to surface here and there's only
+  /// room for one sub-label line. Has no bearing on the disabled/live
+  /// decision, which is driven by [gridPowerKw] alone.
+  final double? gridVoltage;
 
   /// Normalized flow intensity 0..1 (drives particle speed / glow).
   final double flow;
@@ -27,6 +44,8 @@ class PowerFlowDiagram extends StatefulWidget {
     required this.pvVoltage,
     required this.outputVoltage,
     required this.outputCurrent,
+    this.gridPowerKw,
+    this.gridVoltage,
     this.flow = 0.4,
   });
 
@@ -59,6 +78,17 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
 
   @override
   Widget build(BuildContext context) {
+    final gridPowerKw = widget.gridPowerKw;
+    final gridLive = gridPowerKw != null;
+    // Positive = importing (Grid -> Inverter, into the hub - the box's local
+    // left edge sits nearest Grid, right edge nearest the hub, so the
+    // default un-reversed connector already flows left-to-right = into the
+    // hub, same "into the hub" visual as the Solar spoke's reverse:true).
+    // Negative = exporting (Inverter -> Grid, out of the hub), which needs
+    // the connector reversed for this left-side geometry.
+    final gridImporting = !gridLive || gridPowerKw >= 0;
+    final gridColor = gridLive ? ChartTheme.indigo : ChartTheme.labelMuted;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -73,8 +103,8 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
                 child: Center(
                   child: _NodeIcon(
                     icon: Icons.cell_tower,
-                    color: ChartTheme.labelMuted,
-                    disabled: true,
+                    color: gridColor,
+                    disabled: !gridLive,
                   ),
                 ),
               ),
@@ -82,9 +112,14 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
                 child: _Connector(
                   axis: Axis.horizontal,
                   controller: _controller,
-                  flow: 0,
-                  color: ChartTheme.labelMuted,
-                  animated: false,
+                  // Reuses the same 0..1 flow value passed into the whole
+                  // widget (as Solar/House already do) rather than deriving
+                  // a separate grid-specific intensity, for visual
+                  // consistency across all three spokes.
+                  flow: gridLive ? widget.flow : 0,
+                  color: gridColor,
+                  animated: gridLive,
+                  reverse: gridLive && !gridImporting,
                 ),
               ),
               SizedBox(
@@ -128,13 +163,20 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
           children: [
             SizedBox(
               width: _sideNodeWidth,
-              child: const _NodeLabel(
-                label: 'Grid',
-                value: '--',
-                sub: 'No data',
-                color: ChartTheme.labelMuted,
-                dim: true,
-              ),
+              child: gridLive
+                  ? _NodeLabel(
+                      label: 'Grid',
+                      value: '${gridPowerKw.abs().toStringAsFixed(2)} kW',
+                      sub: gridImporting ? 'Import' : 'Export',
+                      color: ChartTheme.indigo,
+                    )
+                  : const _NodeLabel(
+                      label: 'Grid',
+                      value: '--',
+                      sub: 'No data',
+                      color: ChartTheme.labelMuted,
+                      dim: true,
+                    ),
             ),
             const Expanded(child: SizedBox()),
             const SizedBox(width: _hubSize),

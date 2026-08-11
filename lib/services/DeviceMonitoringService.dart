@@ -400,7 +400,10 @@ class DeviceMonitoringService {
 
           if (data.isNotEmpty) {
             final inverter = data.last;
-            final errorCode = inverter.error;
+            // `error` is absent (null) on newer-firmware payloads - treat
+            // that as "no known error" (same as an explicit 0) rather than
+            // fabricating an error state the device never reported.
+            final errorCode = inverter.error ?? 0;
             final apiTime = inverter.createdAt;
             final now = DateTime.now();
 

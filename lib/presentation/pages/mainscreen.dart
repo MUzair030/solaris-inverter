@@ -23,6 +23,14 @@ import '../widgets/SectionCard.dart';
 import '../widgets/TodayProductionCard.dart';
 import '../widgets/WelcomeWidget.dart';
 
+/// Prefers a real, backend-measured value (e.g. newer firmware's
+/// `solar_power`/`output_power`) over a legacy fallback (old-firmware
+/// `gen_power`/the voltage*current estimate) - never fabricates a number,
+/// just picks the best real one already available. Shared by the power
+/// flow diagram and live metrics grid below so the "prefer real, else old
+/// value" check isn't repeated inline for every metric.
+double _preferReal(double? real, double fallback) => real ?? fallback;
+
 /// Dashboard: power-flow diagram -> live metrics grid -> today's production
 /// -> compact energy analytics, fed by the shared [LiveInverterViewModel] and
 /// [EnergyAnalyticsViewModel] instances owned by the tab shell
@@ -125,8 +133,13 @@ class _PowerFlowSection extends StatelessWidget {
       );
     }
 
-    final genPowerKw = latest.genPower;
-    final loadKw = latest.outputVoltage * latest.outputCurrent / 1000.0;
+    // Prefer the real newer-firmware values; fall back to the old-firmware
+    // fields/estimate exactly as today when a device hasn't reported them.
+    final genPowerKw = _preferReal(latest.solarPower, latest.genPower);
+    final loadKw = _preferReal(
+      latest.outputPower,
+      latest.outputVoltage * latest.outputCurrent / 1000.0,
+    );
     double flow = 0.4;
     if (devicePower != null && devicePower > 0) {
       flow = (genPowerKw * 1000 / devicePower).clamp(0.0, 1.0);
@@ -139,6 +152,8 @@ class _PowerFlowSection extends StatelessWidget {
       child: PowerFlowDiagram(
         genPowerKw: genPowerKw,
         loadKw: loadKw,
+        gridPowerKw: latest.gridPower,
+        gridVoltage: latest.gridVoltage,
         pvVoltage: latest.pvVoltage,
         outputVoltage: latest.outputVoltage,
         outputCurrent: latest.outputCurrent,
@@ -171,7 +186,14 @@ class _LiveMetricsSection extends StatelessWidget {
       );
     }
 
-    final loadKw = latest.outputVoltage * latest.outputCurrent / 1000.0;
+    // Prefer the real newer-firmware values; fall back to the old-firmware
+    // fields/estimate exactly as today when a device hasn't reported them.
+    final solarPowerKw = _preferReal(latest.solarPower, latest.genPower);
+    final loadKw = _preferReal(
+      latest.outputPower,
+      latest.outputVoltage * latest.outputCurrent / 1000.0,
+    );
+    final gridPowerKw = latest.gridPower;
 
     return SectionCard(
       title: 'Live Metrics',
@@ -181,7 +203,7 @@ class _LiveMetricsSection extends StatelessWidget {
         metrics: [
           LiveMetric(
             label: 'Solar Generation',
-            value: latest.genPower.toStringAsFixed(2),
+            value: solarPowerKw.toStringAsFixed(2),
             unit: 'kW',
             icon: Icons.solar_power_outlined,
             color: ChartTheme.power,
@@ -214,17 +236,29 @@ class _LiveMetricsSection extends StatelessWidget {
             icon: Icons.electric_meter_outlined,
             color: ChartTheme.outputCurrent,
           ),
-          // No grid telemetry exists in the hardware payload yet - shown as
-          // a disabled placeholder (never a fabricated value) so the slot is
-          // ready to light up the moment grid metering is added.
-          const LiveMetric(
-            label: 'Grid Input',
-            value: '--',
-            unit: 'No data',
-            icon: Icons.cell_tower,
-            color: ChartTheme.labelMuted,
-            disabled: true,
-          ),
+          // Grid telemetry only exists on newer firmware - stays the
+          // disabled placeholder (never a fabricated value) for devices that
+          // don't report it, and lights up live the moment they do.
+          if (gridPowerKw == null)
+            const LiveMetric(
+              label: 'Grid Input',
+              value: '--',
+              unit: 'No data',
+              icon: Icons.cell_tower,
+              color: ChartTheme.labelMuted,
+              disabled: true,
+            )
+          else
+            LiveMetric(
+              label: 'Grid Input',
+              value: gridPowerKw.abs().toStringAsFixed(2),
+              // Sign convention inferred from hardware sample physics (not
+              // yet hardware-team-confirmed): positive = importing from the
+              // grid, negative = exporting to it.
+              unit: gridPowerKw >= 0 ? 'kW · Import' : 'kW · Export',
+              icon: Icons.cell_tower,
+              color: ChartTheme.indigo,
+            ),
         ],
       ),
     );

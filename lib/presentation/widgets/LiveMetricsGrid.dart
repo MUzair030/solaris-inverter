@@ -85,12 +85,16 @@ class LiveMetricCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                metric.unit,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: color,
-                  fontWeight: FontWeight.w700,
+              Flexible(
+                child: Text(
+                  metric.unit,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

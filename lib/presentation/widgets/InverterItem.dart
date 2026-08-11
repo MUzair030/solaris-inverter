@@ -11,7 +11,8 @@ class InverterItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(inverter.deviceName),
+        // `deviceName` is absent (null) on newer-firmware payloads.
+        title: Text(inverter.deviceName ?? 'Unknown device'),
         subtitle: Text(
           'Energy: ${inverter.energyConsumed} kWh',
           style: TextStyle(color: AppColors.black),
