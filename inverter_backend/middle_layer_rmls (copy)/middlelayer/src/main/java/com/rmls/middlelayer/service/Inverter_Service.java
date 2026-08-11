@@ -287,11 +287,28 @@ public class Inverter_Service {
             double energyDelta = (minEnergy == null || maxEnergy == null) ? 0.0
                     : Math.max(0, maxEnergy - minEnergy);
 
+            // New-format solar/grid telemetry (columns 8-15) - see findHourlyBuckets etc. for the
+            // exact SELECT list. Null-safe the same way as the existing columns above; buckets
+            // containing only old-format rows simply get 0.0 here, same as avgGenPower etc.
+            Double minSolarUnits = row[8] == null ? null : ((Number) row[8]).doubleValue();
+            Double maxSolarUnits = row[9] == null ? null : ((Number) row[9]).doubleValue();
+            Double minGridUnits = row[10] == null ? null : ((Number) row[10]).doubleValue();
+            Double maxGridUnits = row[11] == null ? null : ((Number) row[11]).doubleValue();
+            double avgSolarPower = row[12] == null ? 0.0 : ((Number) row[12]).doubleValue();
+            double avgOutputPower = row[13] == null ? 0.0 : ((Number) row[13]).doubleValue();
+            double avgGridPower = row[14] == null ? 0.0 : ((Number) row[14]).doubleValue();
+            double avgGridVoltage = row[15] == null ? 0.0 : ((Number) row[15]).doubleValue();
+            double solarEnergyDelta = (minSolarUnits == null || maxSolarUnits == null) ? 0.0
+                    : Math.max(0, maxSolarUnits - minSolarUnits);
+            double gridEnergyDelta = (minGridUnits == null || maxGridUnits == null) ? 0.0
+                    : Math.max(0, maxGridUnits - minGridUnits);
+
             InverterStatsBucketDTO existing = bucketMap.get(label);
             String bucketStart = existing != null ? existing.getBucketStart() : label;
 
             bucketMap.put(label, new InverterStatsBucketDTO(label, bucketStart, count, energyDelta, avgGenPower,
-                    avgPvVoltage, avgOutputVoltage, avgOutputCurrent, false));
+                    avgPvVoltage, avgOutputVoltage, avgOutputCurrent, false, solarEnergyDelta, gridEnergyDelta,
+                    avgSolarPower, avgOutputPower, avgGridPower, avgGridVoltage));
         }
 
         return new ArrayList<>(bucketMap.values());

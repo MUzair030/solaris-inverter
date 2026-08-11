@@ -51,6 +51,37 @@ public class Inverter_Table_Model {
     @Column(name = "version")
     private String version;
 
+    // ------------------------------------------------------------------
+    // Additions below this line support the newer hardware firmware's JSON
+    // payload format (solar_power/solar_units/output_power/grid_* /device_type),
+    // which finally separates PV-only power from grid contribution and total
+    // load power - the old format's gen_power historically meant "output
+    // power", not "solar power". See WebSocketHandlerService for the dual
+    // format parsing that populates these. All nullable; old-format rows
+    // simply never populate them.
+    // ------------------------------------------------------------------
+
+    @Column(name = "solar_power")
+    private Double solar_power;
+
+    @Column(name = "solar_units")
+    private Double solar_units;
+
+    @Column(name = "output_power")
+    private Double output_power;
+
+    @Column(name = "grid_voltage")
+    private Double grid_voltage;
+
+    @Column(name = "grid_power")
+    private Double grid_power;
+
+    @Column(name = "grid_units")
+    private Double grid_units;
+
+    @Column(name = "device_type")
+    private Integer device_type;
+
     // Full, unmodified JSON payload exactly as received from the hardware
     // device (over the websocket ingestion path) or the /save REST caller,
     // stored verbatim so nothing the device sends is ever lost even if a
@@ -182,6 +213,62 @@ public class Inverter_Table_Model {
 
     public void setRaw_payload(String raw_payload) {
         this.raw_payload = raw_payload;
+    }
+
+    public Double getSolar_power() {
+        return solar_power;
+    }
+
+    public void setSolar_power(Double solar_power) {
+        this.solar_power = solar_power;
+    }
+
+    public Double getSolar_units() {
+        return solar_units;
+    }
+
+    public void setSolar_units(Double solar_units) {
+        this.solar_units = solar_units;
+    }
+
+    public Double getOutput_power() {
+        return output_power;
+    }
+
+    public void setOutput_power(Double output_power) {
+        this.output_power = output_power;
+    }
+
+    public Double getGrid_voltage() {
+        return grid_voltage;
+    }
+
+    public void setGrid_voltage(Double grid_voltage) {
+        this.grid_voltage = grid_voltage;
+    }
+
+    public Double getGrid_power() {
+        return grid_power;
+    }
+
+    public void setGrid_power(Double grid_power) {
+        this.grid_power = grid_power;
+    }
+
+    public Double getGrid_units() {
+        return grid_units;
+    }
+
+    public void setGrid_units(Double grid_units) {
+        this.grid_units = grid_units;
+    }
+
+    public Integer getDevice_type() {
+        return device_type;
+    }
+
+    public void setDevice_type(Integer device_type) {
+        this.device_type = device_type;
     }
 
 }

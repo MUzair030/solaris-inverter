@@ -34,6 +34,29 @@ public class InverterStatsBucketDTO {
     // true when this bucket had zero real rows and was synthesized as a zero-valued placeholder
     private boolean padded;
 
+    // ------------------------------------------------------------------
+    // Additions below this line support the newer hardware firmware's
+    // solar/grid telemetry (see Inverter_Table_Model and
+    // WebSocketHandlerService for the dual-format parsing that populates the
+    // underlying columns). These default to 0.0 for buckets containing only
+    // old-format rows (or no rows at all), same as the existing avg* fields.
+    // ------------------------------------------------------------------
+
+    // max(solar_units) - min(solar_units) within the bucket, floored at 0; 0.0 if no non-null
+    // solar_units samples fell in this bucket (e.g. old-format-only rows, or a padded bucket).
+    private double solarEnergyDeltaKwh;
+
+    // Same pattern as solarEnergyDeltaKwh, using grid_units (cumulative grid import energy).
+    private double gridEnergyDeltaKwh;
+
+    private double avgSolarPowerKw;
+
+    private double avgOutputPowerKw;
+
+    private double avgGridPowerKw;
+
+    private double avgGridVoltage;
+
     public InverterStatsBucketDTO() {
     }
 
@@ -49,6 +72,25 @@ public class InverterStatsBucketDTO {
         this.avgOutputVoltage = avgOutputVoltage;
         this.avgOutputCurrent = avgOutputCurrent;
         this.padded = padded;
+    }
+
+    // Overload additionally carrying the new solar/grid telemetry fields. Used wherever the
+    // bucketing query rows have been extended with the new aggregate columns (see
+    // Inverter_Service#getTimeSeriesStats); other call sites (padded placeholders,
+    // getYearStats/getTotalStats) keep using the 9-arg constructor above, which leaves these
+    // new fields at their default 0.0.
+    public InverterStatsBucketDTO(String bucket, String bucketStart, int count, double energyDeltaKwh,
+            double avgGenPowerKw, double avgPvVoltage, double avgOutputVoltage, double avgOutputCurrent,
+            boolean padded, double solarEnergyDeltaKwh, double gridEnergyDeltaKwh, double avgSolarPowerKw,
+            double avgOutputPowerKw, double avgGridPowerKw, double avgGridVoltage) {
+        this(bucket, bucketStart, count, energyDeltaKwh, avgGenPowerKw, avgPvVoltage, avgOutputVoltage,
+                avgOutputCurrent, padded);
+        this.solarEnergyDeltaKwh = solarEnergyDeltaKwh;
+        this.gridEnergyDeltaKwh = gridEnergyDeltaKwh;
+        this.avgSolarPowerKw = avgSolarPowerKw;
+        this.avgOutputPowerKw = avgOutputPowerKw;
+        this.avgGridPowerKw = avgGridPowerKw;
+        this.avgGridVoltage = avgGridVoltage;
     }
 
     public String getBucket() {
@@ -121,6 +163,54 @@ public class InverterStatsBucketDTO {
 
     public void setPadded(boolean padded) {
         this.padded = padded;
+    }
+
+    public double getSolarEnergyDeltaKwh() {
+        return solarEnergyDeltaKwh;
+    }
+
+    public void setSolarEnergyDeltaKwh(double solarEnergyDeltaKwh) {
+        this.solarEnergyDeltaKwh = solarEnergyDeltaKwh;
+    }
+
+    public double getGridEnergyDeltaKwh() {
+        return gridEnergyDeltaKwh;
+    }
+
+    public void setGridEnergyDeltaKwh(double gridEnergyDeltaKwh) {
+        this.gridEnergyDeltaKwh = gridEnergyDeltaKwh;
+    }
+
+    public double getAvgSolarPowerKw() {
+        return avgSolarPowerKw;
+    }
+
+    public void setAvgSolarPowerKw(double avgSolarPowerKw) {
+        this.avgSolarPowerKw = avgSolarPowerKw;
+    }
+
+    public double getAvgOutputPowerKw() {
+        return avgOutputPowerKw;
+    }
+
+    public void setAvgOutputPowerKw(double avgOutputPowerKw) {
+        this.avgOutputPowerKw = avgOutputPowerKw;
+    }
+
+    public double getAvgGridPowerKw() {
+        return avgGridPowerKw;
+    }
+
+    public void setAvgGridPowerKw(double avgGridPowerKw) {
+        this.avgGridPowerKw = avgGridPowerKw;
+    }
+
+    public double getAvgGridVoltage() {
+        return avgGridVoltage;
+    }
+
+    public void setAvgGridVoltage(double avgGridVoltage) {
+        this.avgGridVoltage = avgGridVoltage;
     }
 
 }

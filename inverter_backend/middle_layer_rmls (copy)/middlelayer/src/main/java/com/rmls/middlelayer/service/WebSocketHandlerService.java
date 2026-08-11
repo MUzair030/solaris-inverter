@@ -65,63 +65,155 @@ public class WebSocketHandlerService extends TextWebSocketHandler {
             // Convert string to JSON
             JsonNode jsonNode = objectMapper.readTree(receivedMessage);
 
-            // Variable Defined
-            Double energy_consumed = null;
-            Double gen_power = null;
-            Double pv_voltage = null;
-            Double output_voltage = null;
-            Double output_current = null;
-            Integer error_bit = null;
-            String device_name = null;
-            String mac = null;
-            String version = null;
-
-            // Extract fields from the JSON
-            if (jsonNode.has("energy")) {
-                energy_consumed = jsonNode.get("energy").asDouble();
-            }
-            if (jsonNode.has("gen_power")) {
-                gen_power = jsonNode.get("gen_power").asDouble();
-            }
-            if (jsonNode.has("pv_vol")) {
-                pv_voltage = jsonNode.get("pv_vol").asDouble();
-            }
-            if (jsonNode.has("op_vol")) {
-                output_voltage = jsonNode.get("op_vol").asDouble();
-            }
-            if (jsonNode.has("op_cur")) {
-                output_current = jsonNode.get("op_cur").asDouble();
-            }
-            if (jsonNode.has("err")) {
-                error_bit = jsonNode.get("err").asInt();
-            }
-            if (jsonNode.has("device_name")) {
-                device_name = jsonNode.get("device_name").asText();
-            }
-            if (jsonNode.has("mac")) {
-                mac = jsonNode.get("mac").asText();
-            }
-            if (jsonNode.has("ver")) {
-                version = jsonNode.get("ver").asText();
-            }
-
             Inverter_Table_Model inverterModel = new Inverter_Table_Model();
+            String mac = null;
 
-            inverterModel.setEnergy_consumed(energy_consumed);
-            inverterModel.setGen_power(gen_power);
-            inverterModel.setPv_voltage(pv_voltage);
-            inverterModel.setOutput_voltage(output_voltage);
-            inverterModel.setOutput_current(output_current);
-            inverterModel.setMac_address(mac);
-            inverterModel.setError(error_bit);
-            inverterModel.setDevice_name(device_name);
-            inverterModel.setRaw_payload(receivedMessage);
+            // Newer firmware sends "solar_power" (PV-only power, distinct from total output
+            // power); older firmware never sends this key. Use its presence to detect format.
+            boolean isNewFormat = jsonNode.has("solar_power");
 
-            if (version == null) {
-                inverterModel.setVersion("VER_3");
+            if (isNewFormat) {
+
+                // New hardware format - see class-level firmware notes. err/device_name/ver are
+                // simply absent from this format, so those columns (and version's old-format-only
+                // "VER_3" fallback below) are intentionally left null - never fabricated.
+                Double solarVoltage = null;
+                Double solarPower = null;
+                Double solarUnits = null;
+                Double outputVoltage = null;
+                Double outputCurrent = null;
+                Double outputPower = null;
+                Double energyConsumed = null;
+                Double gridVoltage = null;
+                Double gridPower = null;
+                Double gridUnits = null;
+                Integer deviceType = null;
+
+                if (jsonNode.has("solar_voltage")) {
+                    solarVoltage = jsonNode.get("solar_voltage").asDouble();
+                }
+                if (jsonNode.has("solar_power")) {
+                    solarPower = jsonNode.get("solar_power").asDouble();
+                }
+                if (jsonNode.has("solar_units")) {
+                    solarUnits = jsonNode.get("solar_units").asDouble();
+                }
+                if (jsonNode.has("output_voltage")) {
+                    outputVoltage = jsonNode.get("output_voltage").asDouble();
+                }
+                if (jsonNode.has("output_current")) {
+                    outputCurrent = jsonNode.get("output_current").asDouble();
+                }
+                if (jsonNode.has("output_power")) {
+                    outputPower = jsonNode.get("output_power").asDouble();
+                }
+                if (jsonNode.has("energy_consumed")) {
+                    energyConsumed = jsonNode.get("energy_consumed").asDouble();
+                }
+                if (jsonNode.has("grid_voltage")) {
+                    gridVoltage = jsonNode.get("grid_voltage").asDouble();
+                }
+                if (jsonNode.has("grid_power")) {
+                    // Assumption (NOT yet confirmed by the hardware team - only sane reading of
+                    // the sample payload's numbers): positive = importing from grid, negative =
+                    // exporting to grid.
+                    gridPower = jsonNode.get("grid_power").asDouble();
+                }
+                if (jsonNode.has("grid_units")) {
+                    gridUnits = jsonNode.get("grid_units").asDouble();
+                }
+                if (jsonNode.has("device_type")) {
+                    deviceType = jsonNode.get("device_type").asInt();
+                }
+                if (jsonNode.has("mac")) {
+                    mac = jsonNode.get("mac").asText();
+                }
+
+                // Direct 1:1 mappings into the SAME existing columns the old format used, so
+                // every existing feature that already reads these columns (stats bucketing,
+                // live dashboard, etc.) keeps working unchanged.
+                inverterModel.setPv_voltage(solarVoltage);
+                inverterModel.setOutput_voltage(outputVoltage);
+                inverterModel.setOutput_current(outputCurrent);
+                inverterModel.setEnergy_consumed(energyConsumed);
+                inverterModel.setMac_address(mac);
+                // Historical analysis confirmed old gen_power always actually represented total
+                // output power, not solar-only power, so output_power is the historically-correct
+                // backward-compatible value for it.
+                inverterModel.setGen_power(outputPower);
+
+                // New columns.
+                inverterModel.setSolar_power(solarPower);
+                inverterModel.setSolar_units(solarUnits);
+                inverterModel.setOutput_power(outputPower);
+                inverterModel.setGrid_voltage(gridVoltage);
+                inverterModel.setGrid_power(gridPower);
+                inverterModel.setGrid_units(gridUnits);
+                inverterModel.setDevice_type(deviceType);
+
+                // Not present in the new format - leave genuinely null, no defaults fabricated.
+                inverterModel.setError(null);
+                inverterModel.setDevice_name(null);
+                inverterModel.setVersion(null);
+
             } else {
-                inverterModel.setVersion(version);
+
+                // Old hardware format (unchanged behavior).
+                Double energy_consumed = null;
+                Double gen_power = null;
+                Double pv_voltage = null;
+                Double output_voltage = null;
+                Double output_current = null;
+                Integer error_bit = null;
+                String device_name = null;
+                String version = null;
+
+                // Extract fields from the JSON
+                if (jsonNode.has("energy")) {
+                    energy_consumed = jsonNode.get("energy").asDouble();
+                }
+                if (jsonNode.has("gen_power")) {
+                    gen_power = jsonNode.get("gen_power").asDouble();
+                }
+                if (jsonNode.has("pv_vol")) {
+                    pv_voltage = jsonNode.get("pv_vol").asDouble();
+                }
+                if (jsonNode.has("op_vol")) {
+                    output_voltage = jsonNode.get("op_vol").asDouble();
+                }
+                if (jsonNode.has("op_cur")) {
+                    output_current = jsonNode.get("op_cur").asDouble();
+                }
+                if (jsonNode.has("err")) {
+                    error_bit = jsonNode.get("err").asInt();
+                }
+                if (jsonNode.has("device_name")) {
+                    device_name = jsonNode.get("device_name").asText();
+                }
+                if (jsonNode.has("mac")) {
+                    mac = jsonNode.get("mac").asText();
+                }
+                if (jsonNode.has("ver")) {
+                    version = jsonNode.get("ver").asText();
+                }
+
+                inverterModel.setEnergy_consumed(energy_consumed);
+                inverterModel.setGen_power(gen_power);
+                inverterModel.setPv_voltage(pv_voltage);
+                inverterModel.setOutput_voltage(output_voltage);
+                inverterModel.setOutput_current(output_current);
+                inverterModel.setMac_address(mac);
+                inverterModel.setError(error_bit);
+                inverterModel.setDevice_name(device_name);
+
+                if (version == null) {
+                    inverterModel.setVersion("VER_3");
+                } else {
+                    inverterModel.setVersion(version);
+                }
             }
+
+            inverterModel.setRaw_payload(receivedMessage);
 
             try {
                 Optional<User_Devices_Model> userAgainstMacAddress = user_Devices_Repository.findAgainstMACAddress(mac);
