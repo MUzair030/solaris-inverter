@@ -89,134 +89,145 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
     final gridImporting = !gridLive || gridPowerKw >= 0;
     final gridColor = gridLive ? ChartTheme.indigo : ChartTheme.labelMuted;
 
+    // Grid/Solar labels used to live in a separate Row below the icons,
+    // which forced a gap in the vertical connector below the hub (its own
+    // height, ~50px of mostly-empty center space, before the House spoke
+    // even started) - patched previously by stitching two connector
+    // segments together to fake continuity. Restructured as a Stack
+    // instead: the vertical Inverter->House spoke is ONE continuous
+    // connector spanning the hub's bottom edge straight down to the House
+    // node, and the Grid/Solar labels are independently positioned beside
+    // it rather than sharing its row and adding to its length.
+    const labelTopGap = 6.0;
+    const connectorHeight = 60.0;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Icon row: Grid -- connector -- Inverter hub -- connector -- Solar.
         SizedBox(
-          height: _slotHeight,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          height: _slotHeight + connectorHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              SizedBox(
-                width: _sideNodeWidth,
-                child: Center(
-                  child: _NodeIcon(
-                    icon: Icons.cell_tower,
-                    color: gridColor,
-                    disabled: !gridLive,
-                  ),
+              // Icon row: Grid -- connector -- Inverter hub -- connector -- Solar.
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: _slotHeight,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: _sideNodeWidth,
+                      child: Center(
+                        child: _NodeIcon(
+                          icon: Icons.cell_tower,
+                          color: gridColor,
+                          disabled: !gridLive,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: _Connector(
+                        axis: Axis.horizontal,
+                        controller: _controller,
+                        // Reuses the same 0..1 flow value passed into the
+                        // whole widget (as Solar/House already do) rather
+                        // than deriving a separate grid-specific intensity,
+                        // for visual consistency across all three spokes.
+                        flow: gridLive ? widget.flow : 0,
+                        color: gridColor,
+                        animated: gridLive,
+                        reverse: gridLive && !gridImporting,
+                      ),
+                    ),
+                    SizedBox(
+                      width: _hubSize,
+                      child: AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          final pulse = 1.0 +
+                              0.035 * math.sin(_controller.value * 2 * math.pi);
+                          return Transform.scale(scale: pulse, child: child);
+                        },
+                        child: const _InverterHub(size: _hubSize),
+                      ),
+                    ),
+                    Expanded(
+                      child: _Connector(
+                        axis: Axis.horizontal,
+                        controller: _controller,
+                        flow: widget.flow,
+                        color: ChartTheme.power,
+                        reverse: true, // dots travel Solar -> Inverter
+                      ),
+                    ),
+                    SizedBox(
+                      width: _sideNodeWidth,
+                      child: Center(
+                        child: _NodeIcon(
+                          icon: Icons.solar_power_outlined,
+                          color: ChartTheme.power,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
+              // One continuous vertical spoke, hub bottom edge straight
+              // through to the House node below - no stitched segments.
+              Positioned(
+                top: _slotHeight,
+                left: 0,
+                right: 0,
+                height: connectorHeight,
                 child: _Connector(
-                  axis: Axis.horizontal,
-                  controller: _controller,
-                  // Reuses the same 0..1 flow value passed into the whole
-                  // widget (as Solar/House already do) rather than deriving
-                  // a separate grid-specific intensity, for visual
-                  // consistency across all three spokes.
-                  flow: gridLive ? widget.flow : 0,
-                  color: gridColor,
-                  animated: gridLive,
-                  reverse: gridLive && !gridImporting,
-                ),
-              ),
-              SizedBox(
-                width: _hubSize,
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    final pulse =
-                        1.0 + 0.035 * math.sin(_controller.value * 2 * math.pi);
-                    return Transform.scale(scale: pulse, child: child);
-                  },
-                  child: const _InverterHub(size: _hubSize),
-                ),
-              ),
-              Expanded(
-                child: _Connector(
-                  axis: Axis.horizontal,
+                  axis: Axis.vertical,
                   controller: _controller,
                   flow: widget.flow,
-                  color: ChartTheme.power,
-                  reverse: true, // dots travel Solar -> Inverter
+                  color: ChartTheme.cyan,
+                  badge: '${widget.outputCurrent.toStringAsFixed(1)} A',
+                  height: connectorHeight,
                 ),
               ),
-              SizedBox(
+              // Grid label, positioned independently below its icon - never
+              // adds height to the vertical connector above.
+              Positioned(
+                top: _slotHeight + labelTopGap,
+                left: 0,
                 width: _sideNodeWidth,
-                child: Center(
-                  child: _NodeIcon(
-                    icon: Icons.solar_power_outlined,
-                    color: ChartTheme.power,
-                  ),
+                child: gridLive
+                    ? _NodeLabel(
+                        label: 'Grid',
+                        value: '${gridPowerKw.abs().toStringAsFixed(2)} kW',
+                        sub: gridImporting ? 'Import' : 'Export',
+                        color: ChartTheme.indigo,
+                      )
+                    : const _NodeLabel(
+                        label: 'Grid',
+                        value: '--',
+                        sub: 'No data',
+                        color: ChartTheme.labelMuted,
+                        dim: true,
+                      ),
+              ),
+              // Solar label, positioned independently below its icon.
+              Positioned(
+                top: _slotHeight + labelTopGap,
+                right: 0,
+                width: _sideNodeWidth,
+                child: _NodeLabel(
+                  label: 'Solar',
+                  value: '${widget.genPowerKw.toStringAsFixed(2)} kW',
+                  sub: widget.pvVoltage > 0
+                      ? '${widget.pvVoltage.toStringAsFixed(0)} V'
+                      : '--',
+                  color: ChartTheme.power,
                 ),
               ),
             ],
           ),
-        ),
-        // Fills the gap between the hub and the label row with its own
-        // animated dashed spoke (same color/direction as the connector
-        // below), so the House flow reads as one continuous line starting
-        // right at the hub - not just the short badge-bearing segment below.
-        _Connector(
-          axis: Axis.vertical,
-          controller: _controller,
-          flow: widget.flow,
-          color: ChartTheme.cyan,
-          height: 30,
-        ),
-        const SizedBox(height: 8),
-        // Label row - same column widths as the icon row above, so each
-        // label sits directly under its icon.
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: _sideNodeWidth,
-              child: gridLive
-                  ? _NodeLabel(
-                      label: 'Grid',
-                      value: '${gridPowerKw.abs().toStringAsFixed(2)} kW',
-                      sub: gridImporting ? 'Import' : 'Export',
-                      color: ChartTheme.indigo,
-                    )
-                  : const _NodeLabel(
-                      label: 'Grid',
-                      value: '--',
-                      sub: 'No data',
-                      color: ChartTheme.labelMuted,
-                      dim: true,
-                    ),
-            ),
-            const Expanded(child: SizedBox()),
-            const SizedBox(width: _hubSize),
-            const Expanded(child: SizedBox()),
-            SizedBox(
-              width: _sideNodeWidth,
-              child: _NodeLabel(
-                label: 'Solar',
-                value: '${widget.genPowerKw.toStringAsFixed(2)} kW',
-                sub: widget.pvVoltage > 0
-                    ? '${widget.pvVoltage.toStringAsFixed(0)} V'
-                    : '--',
-                color: ChartTheme.power,
-              ),
-            ),
-          ],
-        ),
-        _Connector(
-          axis: Axis.vertical,
-          controller: _controller,
-          flow: widget.flow,
-          color: ChartTheme.cyan,
-          badge: '${widget.outputCurrent.toStringAsFixed(1)} A',
-          // The badge sits vertically centered on top of the dashed line, so
-          // too little height here leaves almost no visible line/dots above
-          // or below it (looked "disconnected" from the hub at 28) - this
-          // gives the animation room to actually read as continuous while
-          // still staying tighter than the original 56.
-          height: 28,
         ),
         _FlowNode(
           icon: Icons.home_outlined,
