@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../app/App_Colors.dart';
 import '../../app/chart_theme.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/energy_analytics_viewmodel.dart';
 import '../viewmodels/live_inverter_viewmodel.dart';
 import '../viewmodels/today_production_viewmodel.dart';
-import '../widgets/AnalyticsPeriodSelector.dart';
 import '../widgets/ChartEmptyState.dart';
 import '../widgets/HeaderWidget.dart';
 import '../widgets/LiveEnergyChart.dart';
@@ -302,13 +300,26 @@ class _TodayProductionSection extends StatelessWidget {
   }
 }
 
-class _CompactAnalyticsSection extends StatelessWidget {
+/// Home's chart mode - deliberately just Today/Live. Day(any
+/// date)/Week/Month/Year/Total live exclusively on the Analytics screen
+/// (Statistic tab), so the two screens never show the same navigable chart
+/// twice - Home is always pinned to "right now" (today, or live), nothing
+/// to navigate.
+enum _HomeChartMode { today, live }
+
+class _CompactAnalyticsSection extends StatefulWidget {
   const _CompactAnalyticsSection();
 
   @override
-  Widget build(BuildContext context) {
-    final analytics = context.watch<EnergyAnalyticsViewModel>();
+  State<_CompactAnalyticsSection> createState() =>
+      _CompactAnalyticsSectionState();
+}
 
+class _CompactAnalyticsSectionState extends State<_CompactAnalyticsSection> {
+  _HomeChartMode _mode = _HomeChartMode.today;
+
+  @override
+  Widget build(BuildContext context) {
     return SectionCard(
       title: 'Energy Analytics',
       icon: Icons.show_chart,
@@ -316,21 +327,28 @@ class _CompactAnalyticsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AnalyticsPeriodSelector(),
+          _ModeToggle(
+            mode: _mode,
+            onChanged: (mode) => setState(() => _mode = mode),
+          ),
           const SizedBox(height: 16),
-          if (analytics.period == AnalyticsPeriod.live)
+          if (_mode == _HomeChartMode.live)
             const LiveEnergyChart()
-          else if (analytics.period == AnalyticsPeriod.total)
-            _LifetimeSummary(analytics: analytics)
           else
-            _buildChart(analytics),
+            _buildTodayChart(context),
         ],
       ),
     );
   }
 
-  Widget _buildChart(EnergyAnalyticsViewModel analytics) {
-    if (analytics.isLoading && analytics.buckets.isEmpty) {
+  Widget _buildTodayChart(BuildContext context) {
+    // Reuses TodayProductionViewModel's already-fetched hourly buckets (the
+    // same data backing the sparkline above) instead of a separate
+    // EnergyAnalyticsViewModel fetch - no extra network call, and Home's
+    // "Today" never drifts out of sync with whatever period the Analytics
+    // screen happens to be showing, since it doesn't share that state at all.
+    final today = context.watch<TodayProductionViewModel>();
+    if (today.isLoading && today.todayBuckets.isEmpty) {
       return const SizedBox(
         height: 200,
         child: Center(
@@ -341,127 +359,73 @@ class _CompactAnalyticsSection extends StatelessWidget {
         ),
       );
     }
-    if (analytics.errorMessage != null && analytics.buckets.isEmpty) {
+    if (today.errorMessage != null && today.todayBuckets.isEmpty) {
       return const SizedBox(
         height: 200,
         child: ChartEmptyState(
-          title: 'Could not load analytics',
+          title: 'Could not load today\'s data',
           message: 'Check your connection and try again.',
           compact: true,
         ),
       );
     }
-    if (analytics.buckets.isEmpty) {
+    if (today.todayBuckets.isEmpty) {
       return const SizedBox(
         height: 200,
         child: ChartEmptyState(
-          title: 'No data for this range',
-          message: 'The inverter has not reported in this period.',
+          title: 'No data for today',
+          message: 'The inverter has not reported yet today.',
           compact: true,
         ),
       );
     }
     return PeriodMetricsCharts(
-      buckets: analytics.buckets,
-      period: analytics.period,
+      buckets: today.todayBuckets,
+      period: AnalyticsPeriod.day,
     );
   }
 }
 
-/// Compact lifetime total shown for [AnalyticsPeriod.total] instead of a
-/// chart — the backend returns one (already-correct, un-padded) bucket per
-/// calendar year, so summing those per-year deltas is a valid lifetime total
-/// (never a sum of raw cumulative meter readings).
-class _LifetimeSummary extends StatelessWidget {
-  final EnergyAnalyticsViewModel analytics;
+class _ModeToggle extends StatelessWidget {
+  final _HomeChartMode mode;
+  final ValueChanged<_HomeChartMode> onChanged;
 
-  const _LifetimeSummary({required this.analytics});
+  const _ModeToggle({required this.mode, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    if (analytics.isLoading && analytics.buckets.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2.5,
-            color: ChartTheme.brand,
-          ),
-        ),
-      );
-    }
-    if (analytics.buckets.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: ChartEmptyState(
-          title: 'No lifetime data yet',
-          compact: true,
-        ),
-      );
-    }
-
-    final total =
-        analytics.buckets.fold<double>(0.0, (sum, b) => sum + b.energyDeltaKwh);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        const Text(
-          'LIFETIME ENERGY PRODUCED',
-          style: TextStyle(
-            fontSize: 11,
-            letterSpacing: 1.2,
-            color: ChartTheme.labelMuted,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              total.toStringAsFixed(1),
-              style: const TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                height: 1,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 6, bottom: 4),
-              child: Text(
-                'kWh',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: ChartTheme.brand,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final bucket in analytics.buckets)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '${bucket.bucket}: ${bucket.energyDeltaKwh.toStringAsFixed(1)} kWh',
-                  style: const TextStyle(fontSize: 11, color: ChartTheme.label),
-                ),
-              ),
-          ],
-        ),
+        _pill('Today', _HomeChartMode.today),
+        const SizedBox(width: 8),
+        _pill('Live', _HomeChartMode.live),
       ],
     );
   }
+
+  Widget _pill(String label, _HomeChartMode value) {
+    final isActive = mode == value;
+    return GestureDetector(
+      onTap: () => onChanged(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? ChartTheme.brand : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isActive ? ChartTheme.brand : ChartTheme.gridStrong,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isActive ? Colors.white : ChartTheme.label,
+          ),
+        ),
+      ),
+    );
+  }
 }
+
