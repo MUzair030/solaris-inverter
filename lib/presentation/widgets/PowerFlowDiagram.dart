@@ -155,6 +155,17 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
             ],
           ),
         ),
+        // Fills the gap between the hub and the label row with its own
+        // animated dashed spoke (same color/direction as the connector
+        // below), so the House flow reads as one continuous line starting
+        // right at the hub - not just the short badge-bearing segment below.
+        _Connector(
+          axis: Axis.vertical,
+          controller: _controller,
+          flow: widget.flow,
+          color: ChartTheme.cyan,
+          height: 30,
+        ),
         const SizedBox(height: 8),
         // Label row - same column widths as the icon row above, so each
         // label sits directly under its icon.
