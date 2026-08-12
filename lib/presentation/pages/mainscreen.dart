@@ -27,6 +27,22 @@ import '../widgets/WelcomeWidget.dart';
 /// value" check isn't repeated inline for every metric.
 double _preferReal(double? real, double fallback) => real ?? fallback;
 
+/// Maps the newer firmware's `device_type` enum to a display label. Null for
+/// old-firmware devices (field absent) or an unrecognized value - never a
+/// guessed/default label.
+String? _deviceTypeLabel(int? type) {
+  switch (type) {
+    case 1:
+      return 'Battery-less Inverter';
+    case 2:
+      return 'Grid-Share Inverter';
+    case 3:
+      return 'Hybrid Inverter';
+    default:
+      return null;
+  }
+}
+
 /// Dashboard: power-flow diagram -> live metrics grid -> today's production
 /// -> compact energy analytics, fed by the shared [LiveInverterViewModel],
 /// [TodayProductionViewModel] and [EnergyAnalyticsViewModel] instances all
@@ -108,19 +124,37 @@ class _PowerFlowSection extends StatelessWidget {
       flow = (genPowerKw * 1000 / devicePower).clamp(0.0, 1.0);
     }
 
+    final deviceTypeLabel = _deviceTypeLabel(latest.deviceType);
+
     return SectionCard(
       title: 'Live Power Flow',
       icon: Icons.bolt,
       accentColor: ChartTheme.brand,
-      child: PowerFlowDiagram(
-        genPowerKw: genPowerKw,
-        loadKw: loadKw,
-        gridPowerKw: latest.gridPower,
-        gridVoltage: latest.gridVoltage,
-        pvVoltage: latest.pvVoltage,
-        outputVoltage: latest.outputVoltage,
-        outputCurrent: latest.outputCurrent,
-        flow: flow,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (deviceTypeLabel != null) ...[
+            Text(
+              deviceTypeLabel,
+              style: const TextStyle(
+                fontSize: 11,
+                color: ChartTheme.labelMuted,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          PowerFlowDiagram(
+            genPowerKw: genPowerKw,
+            loadKw: loadKw,
+            gridPowerKw: latest.gridPower,
+            gridVoltage: latest.gridVoltage,
+            pvVoltage: latest.pvVoltage,
+            outputVoltage: latest.outputVoltage,
+            outputCurrent: latest.outputCurrent,
+            flow: flow,
+          ),
+        ],
       ),
     );
   }
@@ -222,6 +256,27 @@ class _LiveMetricsSection extends StatelessWidget {
               icon: Icons.cell_tower,
               color: ChartTheme.indigo,
             ),
+          // Same disabled/live pattern as Grid Input, driven by grid
+          // voltage rather than grid power - PV Voltage and Output Voltage
+          // both get their own tile, so Grid Voltage should too whenever a
+          // device actually reports it.
+          if (latest.gridVoltage == null)
+            const LiveMetric(
+              label: 'Grid Voltage',
+              value: '--',
+              unit: 'No data',
+              icon: Icons.power_outlined,
+              color: ChartTheme.labelMuted,
+              disabled: true,
+            )
+          else
+            LiveMetric(
+              label: 'Grid Voltage',
+              value: latest.gridVoltage!.toStringAsFixed(1),
+              unit: 'V',
+              icon: Icons.power_outlined,
+              color: ChartTheme.indigo,
+            ),
         ],
       ),
     );
@@ -242,6 +297,7 @@ class _TodayProductionSection extends StatelessWidget {
       todayEnergyKwh: viewModel.todayEnergyKwh,
       updatedAt: updatedAt,
       hourlySparkline: viewModel.hourlySparkline,
+      todayGridImportKwh: viewModel.todayGridImportKwh,
     );
   }
 }

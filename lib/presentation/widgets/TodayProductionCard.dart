@@ -16,11 +16,17 @@ class TodayProductionCard extends StatelessWidget {
   /// Pass an empty list to hide the sparkline row.
   final List<double> hourlySparkline;
 
+  /// Today's grid import total (kWh), only on devices with a real grid
+  /// meter. Null hides this row entirely - never shown as a fabricated 0
+  /// for devices/firmware that don't report it.
+  final double? todayGridImportKwh;
+
   const TodayProductionCard({
     super.key,
     required this.todayEnergyKwh,
     this.updatedAt = '--',
     this.hourlySparkline = const [],
+    this.todayGridImportKwh,
   });
 
   @override
@@ -115,6 +121,23 @@ class TodayProductionCard extends StatelessWidget {
             SizedBox(
               height: 32,
               child: _HourlySparkline(values: hourlySparkline),
+            ),
+          ],
+          if (todayGridImportKwh != null) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.cell_tower, size: 13, color: ChartTheme.indigo),
+                const SizedBox(width: 6),
+                Text(
+                  'Grid Import Today: ${todayGridImportKwh!.toStringAsFixed(2)} kWh',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: ChartTheme.label,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ],
         ],

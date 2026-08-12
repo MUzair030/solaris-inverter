@@ -33,15 +33,39 @@ class TodayProductionViewModel extends ChangeNotifier {
   String? _macAddress;
   Timer? _timer;
 
-  /// Sum of today's real hourly energy deltas - never a sum of the
-  /// cumulative meter itself, matching every other energy total in this app.
-  double get todayEnergyKwh =>
-      _todayBuckets.fold(0.0, (sum, b) => sum + b.energyDeltaKwh);
+  /// True once at least one of today's buckets actually reports the newer
+  /// firmware's dedicated solar_units meter (never inferred - the backend
+  /// only sets this non-zero from real samples).
+  bool get hasSolarData =>
+      _todayBuckets.any((b) => b.solarEnergyDeltaKwh != 0);
+
+  /// True once at least one of today's buckets actually reports grid_units.
+  bool get hasGridData => _todayBuckets.any((b) => b.gridEnergyDeltaKwh != 0);
+
+  /// Today's real solar production when the device reports the dedicated
+  /// solar_units meter; falls back to the total energy_consumed delta for
+  /// older-firmware devices, where solar-specific data doesn't exist and
+  /// this total is the closest available measurement - the same behavior
+  /// this card always had before solar_units existed. Never a sum of a
+  /// cumulative meter itself - always a delta, matching every other energy
+  /// total in this app.
+  double get todayEnergyKwh => hasSolarData
+      ? _todayBuckets.fold<double>(0.0, (sum, b) => sum + b.solarEnergyDeltaKwh)
+      : _todayBuckets.fold<double>(0.0, (sum, b) => sum + b.energyDeltaKwh);
+
+  /// Today's grid import total, only when the device actually reports it -
+  /// null (not 0.0) means "not available", never a fabricated number for a
+  /// device/firmware that simply doesn't have a grid meter.
+  double? get todayGridImportKwh => hasGridData
+      ? _todayBuckets.fold<double>(0.0, (sum, b) => sum + b.gridEnergyDeltaKwh)
+      : null;
 
   /// One value per hour bucket (already zero-padded server-side), for the
-  /// card's sparkline.
-  List<double> get hourlySparkline =>
-      [for (final b in _todayBuckets) b.energyDeltaKwh];
+  /// card's sparkline - same solar-preferred/total-fallback choice as
+  /// [todayEnergyKwh], so the sparkline always matches the headline number.
+  List<double> get hourlySparkline => hasSolarData
+      ? [for (final b in _todayBuckets) b.solarEnergyDeltaKwh]
+      : [for (final b in _todayBuckets) b.energyDeltaKwh];
 
   /// The most recent hour that actually had real samples, or null if the
   /// device hasn't reported at all today.
