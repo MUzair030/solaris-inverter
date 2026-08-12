@@ -4,14 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../../app/App_Colors.dart';
 import '../../app/chart_theme.dart';
-import '../../core/network/dio_client.dart';
-import '../../data/repositories_impl/inverter_repository_impl.dart';
-import '../../domain/usecases/get_inverter_data_usecase.dart';
-import '../../domain/utils/energy_math.dart';
 import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/energy_analytics_viewmodel.dart';
-import '../viewmodels/inverter_viewmodel.dart';
 import '../viewmodels/live_inverter_viewmodel.dart';
+import '../viewmodels/today_production_viewmodel.dart';
 import '../widgets/AnalyticsPeriodSelector.dart';
 import '../widgets/ChartEmptyState.dart';
 import '../widgets/HeaderWidget.dart';
@@ -32,41 +28,11 @@ import '../widgets/WelcomeWidget.dart';
 double _preferReal(double? real, double fallback) => real ?? fallback;
 
 /// Dashboard: power-flow diagram -> live metrics grid -> today's production
-/// -> compact energy analytics, fed by the shared [LiveInverterViewModel] and
-/// [EnergyAnalyticsViewModel] instances owned by the tab shell
-/// (`Mainbottomnavigationview`), plus a dashboard-local [InverterViewModel]
-/// used only to source "today's" raw readings for the production card.
-class Mainscreen extends StatefulWidget {
+/// -> compact energy analytics, fed by the shared [LiveInverterViewModel],
+/// [TodayProductionViewModel] and [EnergyAnalyticsViewModel] instances all
+/// owned by the tab shell (`Mainbottomnavigationview`).
+class Mainscreen extends StatelessWidget {
   const Mainscreen({super.key});
-
-  @override
-  State<Mainscreen> createState() => _MainscreenState();
-}
-
-class _MainscreenState extends State<Mainscreen> {
-  late InverterViewModel _viewModel;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final dioClient = DioClient();
-    final repo = InverterRepositoryImpl(dioClient);
-    final useCase = FetchInverterDataUseCase(repo);
-    _viewModel = InverterViewModel(useCase);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _viewModel.setContext(context);
-      _viewModel.fetchInverterData();
-      _viewModel.startAutoRefresh();
-    });
-  }
-
-  @override
-  void dispose() {
-    _viewModel.stopAutoRefresh();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +57,7 @@ class _MainscreenState extends State<Mainscreen> {
                   const SizedBox(height: 16),
                   const _LiveMetricsSection(),
                   const SizedBox(height: 16),
-                  ChangeNotifierProvider<InverterViewModel>.value(
-                    value: _viewModel,
-                    child: const _TodayProductionSection(),
-                  ),
+                  const _TodayProductionSection(),
                   const SizedBox(height: 16),
                   const _CompactAnalyticsSection(),
                   const SizedBox(height: 20),
@@ -270,20 +233,15 @@ class _TodayProductionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<InverterViewModel>();
-    final now = DateTime.now();
-    final data = viewModel.inverterData;
-
-    final todayEnergyKwh = energyTodayKwh(data, now);
-    final hourly = hourlyEnergyDeltasToday(data, now);
-    final updatedAt = data.isNotEmpty
-        ? DateFormat('HH:mm').format(data.last.createdAt)
-        : '--';
+    final viewModel = context.watch<TodayProductionViewModel>();
+    final lastReal = viewModel.lastRealBucketStart;
+    final updatedAt =
+        lastReal != null ? DateFormat('HH:mm').format(lastReal) : '--';
 
     return TodayProductionCard(
-      todayEnergyKwh: todayEnergyKwh,
+      todayEnergyKwh: viewModel.todayEnergyKwh,
       updatedAt: updatedAt,
-      hourlySparkline: hourly,
+      hourlySparkline: viewModel.hourlySparkline,
     );
   }
 }

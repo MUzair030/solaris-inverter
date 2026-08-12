@@ -23,6 +23,7 @@ import '../viewmodels/SelectedDeviceProvider.dart';
 import '../viewmodels/UserDetailsViewModel.dart';
 import '../viewmodels/energy_analytics_viewmodel.dart';
 import '../viewmodels/live_inverter_viewmodel.dart';
+import '../viewmodels/today_production_viewmodel.dart';
 import '../widgets/AddDevicesBottomSheet.dart';
 import '../widgets/showExitConfirmationDialog.dart';
 import 'AddDevicePage.dart';
@@ -54,6 +55,7 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
   /// the live power-flow/metrics section on the dashboard.
   late final EnergyAnalyticsViewModel _analyticsViewModel;
   late final LiveInverterViewModel _liveViewModel;
+  late final TodayProductionViewModel _todayViewModel;
   SelectedDeviceProvider? _selectedDeviceProviderRef;
 
   Timer? _debounce;
@@ -70,6 +72,8 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
         EnergyAnalyticsViewModel(FetchInverterStatsUseCase(inverterRepository));
     _liveViewModel = LiveInverterViewModel(
         FetchLatestInverterDataUseCase(inverterRepository));
+    _todayViewModel = TodayProductionViewModel(
+        FetchInverterStatsUseCase(inverterRepository));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       UpdateChecker.checkForUpdate(context);
@@ -118,10 +122,13 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
   void _syncSelectedMac(String? mac) {
     _analyticsViewModel.setMacAddress(mac);
     _liveViewModel.setMacAddress(mac);
+    _todayViewModel.setMacAddress(mac);
     if (mac != null && mac.isNotEmpty) {
       _liveViewModel.startAutoRefresh();
+      _todayViewModel.startAutoRefresh();
     } else {
       _liveViewModel.stopAutoRefresh();
+      _todayViewModel.stopAutoRefresh();
     }
   }
 
@@ -205,6 +212,8 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
     _selectedDeviceProviderRef?.removeListener(_onSelectedDeviceChanged);
     _liveViewModel.stopAutoRefresh();
     _liveViewModel.dispose();
+    _todayViewModel.stopAutoRefresh();
+    _todayViewModel.dispose();
     _analyticsViewModel.dispose();
     _selectedIndexNotifier.dispose();
     super.dispose();
@@ -219,6 +228,9 @@ class _MainbottomnavigationviewState extends State<Mainbottomnavigationview> {
         ),
         ChangeNotifierProvider<LiveInverterViewModel>.value(
           value: _liveViewModel,
+        ),
+        ChangeNotifierProvider<TodayProductionViewModel>.value(
+          value: _todayViewModel,
         ),
       ],
       child: PopScope(
