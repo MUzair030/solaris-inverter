@@ -200,7 +200,12 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
           flow: widget.flow,
           color: ChartTheme.cyan,
           badge: '${widget.outputCurrent.toStringAsFixed(1)} A',
-          height: 28,
+          // The badge sits vertically centered on top of the dashed line, so
+          // too little height here leaves almost no visible line/dots above
+          // or below it (looked "disconnected" from the hub at 28) - this
+          // gives the animation room to actually read as continuous while
+          // still staying tighter than the original 56.
+          height: 46,
         ),
         _FlowNode(
           icon: Icons.home_outlined,
