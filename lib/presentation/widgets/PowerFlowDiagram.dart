@@ -216,7 +216,7 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
           // or below it (looked "disconnected" from the hub at 28) - this
           // gives the animation room to actually read as continuous while
           // still staying tighter than the original 56.
-          height: 46,
+          height: 28,
         ),
         _FlowNode(
           icon: Icons.home_outlined,
