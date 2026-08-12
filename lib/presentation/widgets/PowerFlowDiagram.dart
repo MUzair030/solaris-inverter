@@ -200,7 +200,7 @@ class _PowerFlowDiagramState extends State<PowerFlowDiagram>
           flow: widget.flow,
           color: ChartTheme.cyan,
           badge: '${widget.outputCurrent.toStringAsFixed(1)} A',
-          height: 56,
+          height: 28,
         ),
         _FlowNode(
           icon: Icons.home_outlined,
