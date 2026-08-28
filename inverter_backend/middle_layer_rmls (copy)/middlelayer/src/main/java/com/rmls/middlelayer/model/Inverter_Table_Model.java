@@ -82,6 +82,9 @@ public class Inverter_Table_Model {
     @Column(name = "device_type")
     private Integer device_type;
 
+    @Column(name = "rated_power")
+    private Double rated_power;
+
     // Full, unmodified JSON payload exactly as received from the hardware
     // device (over the websocket ingestion path) or the /save REST caller,
     // stored verbatim so nothing the device sends is ever lost even if a
@@ -269,6 +272,14 @@ public class Inverter_Table_Model {
 
     public void setDevice_type(Integer device_type) {
         this.device_type = device_type;
+    }
+
+    public Double getRated_power() {
+        return rated_power;
+    }
+
+    public void setRated_power(Double rated_power) {
+        this.rated_power = rated_power;
     }
 
 }

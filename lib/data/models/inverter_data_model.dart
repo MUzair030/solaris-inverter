@@ -46,6 +46,10 @@ class InverterDataModel {
   /// Firmware-reported device type. Null for old-firmware rows.
   final int? deviceType;
 
+  /// Inverter rated/installed capacity (W). Only sent by new-firmware
+  /// hardware. Null for old-firmware rows.
+  final double? ratedPower;
+
   InverterDataModel({
     required this.id,
     required this.energyConsumed,
@@ -65,27 +69,30 @@ class InverterDataModel {
     this.gridPower,
     this.gridUnits,
     this.deviceType,
+    this.ratedPower,
   });
 
   factory InverterDataModel.fromJson(Map<String, dynamic> json) {
     return InverterDataModel(
-      id: json["id"] as int,
-      // These 5 fields stay required/non-null - the backend contract
-      // guarantees them populated for both old- and new-firmware rows - but
-      // still use explicit `num` casts (rather than a blind `.toDouble()`)
-      // so the expected JSON type is documented, not just assumed.
+      // Old firmware sends "id", new hardware payload may omit it.
+      id: (json["id"] as int?) ?? 0,
       energyConsumed: (json["energy_consumed"] as num).toDouble(),
-      genPower: (json["gen_power"] as num).toDouble(),
-      pvVoltage: (json["pv_voltage"] as num).toDouble(),
+      // "gen_power" (old) -> "solar_power" (new). Fallback keeps both
+      // hardware generations working.
+      genPower: (json["gen_power"] ?? json["solar_power"] as num).toDouble(),
+      // "pv_voltage" (old) -> "solar_voltage" (new).
+      pvVoltage: (json["solar_voltage"] ?? json["pv_voltage"] as num).toDouble(),
       outputVoltage: (json["output_voltage"] as num).toDouble(),
       outputCurrent: (json["output_current"] as num).toDouble(),
-      macAddress: json["mac_address"] as String,
-      // Absent (null) on newer-firmware rows - never blindly cast.
+      // "mac_address" (old) -> "mac" (new).
+      macAddress: (json["mac"] ?? json["mac_address"]) as String,
       error: json["error"] as int?,
       deviceName: json["device_name"] as String?,
       version: json["version"] as String?,
-      createdAt: DateTime.parse(json["createdAt"]),
-      // New fields - null for old-firmware rows, never fabricated.
+      // Old firmware sends "createdAt"; new hardware payload omits it.
+      createdAt: json["createdAt"] != null
+          ? DateTime.parse(json["createdAt"] as String)
+          : DateTime.now(),
       solarPower: (json["solar_power"] as num?)?.toDouble(),
       solarUnits: (json["solar_units"] as num?)?.toDouble(),
       outputPower: (json["output_power"] as num?)?.toDouble(),
@@ -93,6 +100,8 @@ class InverterDataModel {
       gridPower: (json["grid_power"] as num?)?.toDouble(),
       gridUnits: (json["grid_units"] as num?)?.toDouble(),
       deviceType: json["device_type"] as int?,
+      // New-firmware only: inverter rated capacity in watts.
+      ratedPower: (json["rated_power"] as num?)?.toDouble(),
     );
   }
 
@@ -116,6 +125,7 @@ class InverterDataModel {
       'grid_power': gridPower,
       'grid_units': gridUnits,
       'device_type': deviceType,
+      'rated_power': ratedPower,
     };
   }
 }

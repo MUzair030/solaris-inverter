@@ -30,7 +30,6 @@ import '../widgets/AddDevicesBottomSheet5.dart';
 import '../widgets/CustomInkWellItem2.dart';
 import '../widgets/HeaderWidget.dart';
 import '../viewmodels/MacViewModel.dart';
-import '../widgets/NoLeadingZeroFormatter.dart';
 import '../widgets/PasswordTextField.dart';
 import '../widgets/PasswordTextFieldAddDevice.dart';
 import 'MainBottomNavigationView.dart';
@@ -308,11 +307,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
           if (received.isEmpty) {
             Fluttertoast.showToast(msg: 'Empty MAC Address, please try again');
           } else {
-            // Split by comma
+            // Split by comma — new firmware sends: mac,version,rated_power
             List<String> parts = received.split(',');
 
             String macAddress = parts[0];
             String version = parts.length > 1 ? parts[1] : "";
+            String ratedPower = parts.length > 2 ? parts[2] : "";
 
             print("MAC Address: ${macAddress.trim()}");
             print("Version: $version");
@@ -329,7 +329,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               setState(() {
                 _isLoading = false;
               });
-              showMacDialog(context, macAddress, version);
+              showMacDialog(context, macAddress, version, ratedPower);
             }
           }
         },
@@ -774,9 +774,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   bool isLoading1 = false;
 
-  void showMacDialog(BuildContext context, String macAddress, String version) {
+  void showMacDialog(BuildContext context, String macAddress, String version, String ratedPower) {
     TextEditingController nameController = TextEditingController();
-    TextEditingController powerController = TextEditingController();
+    TextEditingController powerController = TextEditingController(text: ratedPower);
     TextEditingController macController =
         TextEditingController(text: macAddress);
 
@@ -784,7 +784,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        int maxPowerLimit = 2;
+        int maxPowerLimit = 5;
         int maxnameLimit = 15;
         int maxmacLimit = 17;
         return AlertDialog(
@@ -833,11 +833,11 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 const SizedBox(height: 5),
                 TextField(
                   controller: powerController,
+                  readOnly: ratedPower.isNotEmpty,
                   keyboardType: TextInputType.number,
                   maxLength: maxPowerLimit,
                   inputFormatters: [
-                    NoLeadingZeroFormatter(),
-                    LengthLimitingTextInputFormatter(2),
+                    LengthLimitingTextInputFormatter(5),
                   ],
                   decoration: InputDecoration(
                     label: RichText(
@@ -861,7 +861,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     // labelText: "Inverter Power",
                     labelStyle:
                         const TextStyle(color: AppColors.black, fontSize: 14),
-                    hintText: "Inverter KV",
+                    hintText: "Rated Power (W)",
                     hintStyle:
                         const TextStyle(color: AppColors.gray3, fontSize: 13),
                     border: const OutlineInputBorder(),

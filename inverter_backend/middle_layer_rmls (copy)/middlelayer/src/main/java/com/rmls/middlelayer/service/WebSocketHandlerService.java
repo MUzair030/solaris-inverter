@@ -88,6 +88,7 @@ public class WebSocketHandlerService extends TextWebSocketHandler {
                 Double gridPower = null;
                 Double gridUnits = null;
                 Integer deviceType = null;
+                Double ratedPower = null;
 
                 if (jsonNode.has("solar_voltage")) {
                     solarVoltage = jsonNode.get("solar_voltage").asDouble();
@@ -125,6 +126,9 @@ public class WebSocketHandlerService extends TextWebSocketHandler {
                 if (jsonNode.has("device_type")) {
                     deviceType = jsonNode.get("device_type").asInt();
                 }
+                if (jsonNode.has("rated_power")) {
+                    ratedPower = jsonNode.get("rated_power").asDouble();
+                }
                 if (jsonNode.has("mac")) {
                     mac = jsonNode.get("mac").asText();
                 }
@@ -150,6 +154,7 @@ public class WebSocketHandlerService extends TextWebSocketHandler {
                 inverterModel.setGrid_power(gridPower);
                 inverterModel.setGrid_units(gridUnits);
                 inverterModel.setDevice_type(deviceType);
+                inverterModel.setRated_power(ratedPower);
 
                 // Not present in the new format - leave genuinely null, no defaults fabricated.
                 inverterModel.setError(null);
