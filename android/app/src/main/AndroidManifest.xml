@@ -32,10 +32,10 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -107,46 +107,21 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-<!--        <receiver-->
-<!--            android:name="com.pravera.flutter_foreground_task.receiver.RestartReceiver"-->
-<!--            android:enabled="true" android:exported="true"-->
-<!--            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
-<!--                <action android:name="android.intent.action.REBOOT"/>-->
-<!--                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
-        <!-- Declare foreground service -->
-<!--        <service-->
-<!--            android:name="id.flutter.flutter_background_service.BackgroundService"-->
-<!--                    android:permission="android.permission.FOREGROUND_SERVICE"-->
-<!--                    android:exported="true"-->
-<!--                    android:enabled="true"-->
-<!--                    android:foregroundServiceType="dataSync|location" />-->
-        <service
-            android:name="id.flutter.flutter_background_service.BackgroundService"
-            android:permission="android.permission.FOREGROUND_SERVICE"
-            android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="false"
-            android:foregroundServiceType="dataSync"
-            tools:replace="android:exported" />
-<!--        <service-->
-<!--            android:name="id.flutter.flutter_background_service.BackgroundService"-->
-<!--            android:permission="android.permission.FOREGROUND_SERVICE"-->
-<!--            android:exported="true"-->
-<!--            android:enabled="true"-->
-<!--            android:foregroundServiceType="dataSync" />-->
+        <!-- Flutter Foreground Task -->
         <receiver
-            android:name="com.ThreepolApps.homeautomation.smartlife.BootReceiver"
-            android:enabled="true"
-            android:exported="false"
+            android:name="com.pravera.flutter_foreground_task.receiver.RestartReceiver"
+            android:enabled="true" android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.REBOOT"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notifications"/>
 <!--        <meta-data android:name="com.google.firebase.messaging.default_notification_icon"-->

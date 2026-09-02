@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';

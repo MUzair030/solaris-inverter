@@ -833,7 +833,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 const SizedBox(height: 5),
                 TextField(
                   controller: powerController,
-                  readOnly: ratedPower.isNotEmpty,
+                  readOnly: true,
                   keyboardType: TextInputType.number,
                   maxLength: maxPowerLimit,
                   inputFormatters: [
@@ -950,8 +950,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         String powerkv = powerController.text;
                         String enteredMac = macController.text;
 
-                        if (enteredName.isNotEmpty && powerkv.isNotEmpty) {
-                          int powerKvInt = int.parse(powerkv);
+                        if (enteredName.isNotEmpty) {
+                          int powerKvInt = powerkv.isNotEmpty ? int.parse(powerkv) : 0;
                           // viewModel.addMacAddress(
                           //     enteredMac, enteredName, powerKvInt, context);
 

@@ -1,6 +1,5 @@
-# Flutter Background Service
--keep class id.flutter.flutter_background_service.** { *; }
--keep interface id.flutter.flutter_background_service.** { *; }
+# Flutter Foreground Task
+-keep class com.pravera.flutter_foreground_task.** { *; }
 
 # Keep Flutter Engine and Plugins
 -keep class io.flutter.app.** { *; }
